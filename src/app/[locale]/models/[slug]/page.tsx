@@ -233,6 +233,28 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
               <small>{thermal.envelopeTransmissionRangeW[0].toFixed(0)}–{thermal.envelopeTransmissionRangeW[1].toFixed(0)} W</small>
             </div>
           </div>
+          <div className="surface-resistance-grid">
+            <div>
+              <span>Wall Rsi</span>
+              <strong>{thermal.surfaceResistances.wallRsi.toFixed(2)} m²K/W</strong>
+              <small>{locale === "sr" ? "horizontalni tok" : "horizontal heat flow"}</small>
+            </div>
+            <div>
+              <span>Roof Rsi</span>
+              <strong>{thermal.surfaceResistances.roofRsi.toFixed(2)} m²K/W</strong>
+              <small>{locale === "sr" ? "tok naviše" : "upward heat flow"}</small>
+            </div>
+            <div>
+              <span>Floor Rsi</span>
+              <strong>{thermal.surfaceResistances.floorRsi.toFixed(2)} m²K/W</strong>
+              <small>{locale === "sr" ? "tok naniže" : "downward heat flow"}</small>
+            </div>
+            <div>
+              <span>Rse</span>
+              <strong>{thermal.surfaceResistances.rse.toFixed(2)} m²K/W</strong>
+              <small>ISO 6946 · v{thermal.methodVersion}</small>
+            </div>
+          </div>
           <ThermalScenario
             locale={locale}
             baseDeltaTK={thermal.deltaTK}
