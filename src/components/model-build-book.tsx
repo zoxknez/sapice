@@ -3,10 +3,11 @@ import type {ShelterModel} from "@/lib/domain";
 import {compileShelterModel} from "@/lib/compiler";
 import {sources} from "@/data/sources";
 import {BuildGuide} from "@/components/build-guide";
+import {compiledSourceIds} from "@/lib/provenance";
 
 export function ModelBuildBook({model, locale}: {model: ShelterModel; locale: AppLocale}) {
   const compiled = compileShelterModel(model);
-  const referencedSources = model.sourceIds.map((id) => sources[id]).filter(Boolean);
+  const referencedSources = compiledSourceIds(compiled).map((id) => sources[id]).filter(Boolean);
 
   return (
     <>
