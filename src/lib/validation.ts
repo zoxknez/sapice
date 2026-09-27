@@ -902,8 +902,8 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
     if (
       frontOuter?.heightMm !== Math.round(compiled.interfaces.wallFrontHeightMm) ||
       rearOuter?.heightMm !== Math.round(compiled.interfaces.wallRearHeightMm) ||
-      sideOuter?.heightMm !== Math.round(compiled.interfaces.wallFrontHeightMm) ||
-      sideOuter?.trapezoidRearHeightMm !== Math.round(compiled.interfaces.wallRearHeightMm)
+      sideOuter?.heightMm !== Math.round(compiled.joinery.sideFrontHeightMm) ||
+      sideOuter?.trapezoidRearHeightMm !== Math.round(compiled.joinery.sideRearHeightMm)
     ) {
       issues.push({
         severity: "error",
