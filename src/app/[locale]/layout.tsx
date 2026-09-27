@@ -6,13 +6,45 @@ import {routing, type AppLocale} from "@/i18n/routing";
 import {SiteHeader} from "@/components/site-header";
 import "../globals.css";
 
-export const metadata: Metadata = {
-  title: {
-    default: "Šapice · Pet Shelter Engineering",
-    template: "%s · Šapice"
-  },
-  description: "Bilingual engineering plans for winter cat and dog shelters."
-};
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{locale: string}>;
+}): Promise<Metadata> {
+  const {locale} = await params;
+  const isSr = locale === "sr";
+
+  return {
+    metadataBase: new URL(siteUrl),
+    title: {
+      default: isSr ? "Šapice · Tehnički planovi kućica za pse i mačke" : "Šapice · Pet Shelter Engineering",
+      template: "%s · Šapice"
+    },
+    description: isSr
+      ? "SR/EN tehnički planovi zimskih kućica i skloništa za pse i mačke: 3D, mere, materijali, krojna lista i transparentni proračuni."
+      : "Bilingual engineering plans for winter cat and dog shelters with 3D, dimensions, materials, cut lists and transparent calculations.",
+    alternates: {
+      canonical: `/${locale}`,
+      languages: {
+        "sr-Latn": "/sr",
+        en: "/en",
+        "x-default": "/sr"
+      }
+    },
+    openGraph: {
+      type: "website",
+      siteName: "Šapice",
+      locale: isSr ? "sr_RS" : "en_US",
+      alternateLocale: isSr ? ["en_US"] : ["sr_RS"],
+      title: isSr ? "Šapice · Tehnički planovi kućica za pse i mačke" : "Šapice · Pet Shelter Engineering",
+      description: isSr
+        ? "Praktični, unapred projektovani modeli zimskih skloništa za pse i mačke."
+        : "Practical pre-designed winter shelter models for cats and dogs."
+    }
+  };
+}
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({locale}));
@@ -41,6 +73,12 @@ export default async function LocaleLayout({
                 <strong>Šapice</strong>
                 <p>Open pet shelter engineering.</p>
               </div>
+              <nav className="footer-nav" aria-label={locale === "sr" ? "Footer navigacija" : "Footer navigation"}>
+                <a href={`/${locale}/${locale === "sr" ? "metodologija" : "methodology"}`}>
+                  {locale === "sr" ? "Metodologija" : "Methodology"}
+                </a>
+                <a href="https://github.com/zoxknez/sapice" target="_blank" rel="noreferrer">GitHub</a>
+              </nav>
               <p>© 2026 · SR / EN · Versioned models, transparent calculations.</p>
             </div>
           </footer>
