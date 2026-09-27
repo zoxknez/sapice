@@ -55,6 +55,11 @@ export const shelterModelSchema = z.object({
     roofAccess: z.enum(["HINGED", "REMOVABLE"]),
     hingeEdge: z.enum(["REAR", "LEFT", "RIGHT"]).nullable()
   }),
+  ventilation: z.object({
+    strategy: z.literal("HIGH_REAR_PROVISION"),
+    status: z.literal("PROVISIONAL"),
+    zonesPerChamber: z.number().int().positive()
+  }),
   heated: z.boolean(),
   climateProfile: z.enum([
     "SHELTERED_MILD",
