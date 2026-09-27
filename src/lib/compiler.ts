@@ -2,6 +2,7 @@ import type {ShelterModel} from "@/lib/domain";
 import {constructionInterfaceGeometry, constructionSummary, entranceGeometry, framingMethod, getModelAssemblies, layoutGeometry, provisionalIntermediatePositions, roofPanelGeometry, roofSlope, surfaceAreas, thermalSummary, ventilationProvisionGeometry} from "@/lib/engineering";
 import {cutGeometryAreaMm2, cutGeometryCutoutPerimeterMm, cutGeometryOuterPerimeterMm} from "@/lib/cut-geometry";
 import {materials} from "@/data/materials";
+import {deterministicFingerprint} from "@/lib/fingerprint";
 
 export type CutPart = {
   id: string;
@@ -53,6 +54,10 @@ export type LinearPart = {
   notesEn?: string;
 };
 
+
+export const compilerMethod = {
+  version: "1.3.0"
+} as const;
 
 export type HardwareItem = {
   id: string;
@@ -946,7 +951,30 @@ export function compileShelterModel(model: ShelterModel) {
     }
   ];
 
+  const planFingerprint = deterministicFingerprint({
+    compilerVersion: compilerMethod.version,
+    model,
+    interfaces,
+    layout,
+    entrance,
+    ventilation,
+    construction,
+    roof,
+    roofPanel,
+    areas,
+    thermal,
+    cutParts,
+    fabricationMaterials,
+    linearParts,
+    framing,
+    hardwareItems,
+    hardware,
+    buildSteps
+  });
+
   return {
+    compilerVersion: compilerMethod.version,
+    planFingerprint,
     model,
     interfaces,
     layout,
