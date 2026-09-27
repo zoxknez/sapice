@@ -81,7 +81,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
             <div className="model-meta-line">
               <span>v{model.version}</span>
               <span>{model.climateProfile.replaceAll("_", " ")}</span>
-              <span>{locale === "sr" ? "projektovano za proračun" : "calculation design condition"} {model.designOutsideC} °C</span>
+              <span>{locale === "sr" ? "referentni spoljašnji scenario, nije rejting" : "reference outdoor scenario, not a rating"} {model.referenceOutsideC} °C</span>
             </div>
             <div className="notice">
               {model.heated
