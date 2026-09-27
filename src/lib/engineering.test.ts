@@ -95,6 +95,18 @@ describe("engineering model derivations", () => {
     }
   });
 
+  it("compiles multi-chamber dividers as roof-slope trapezoids", () => {
+    for (const model of shelterModels.filter((item) => item.layout.chambers > 1)) {
+      const compiled = compileShelterModel(model);
+      const divider = compiled.cutParts.find((part) => part.id === "divider");
+      expect(divider).toBeDefined();
+      expect(divider?.shape).toBe("trapezoid");
+      expect(divider?.heightMm).toBe(compiled.internal.frontHeightMm);
+      expect(divider?.trapezoidRearHeightMm).toBe(compiled.internal.rearHeightMm);
+      expect(divider?.thicknessMm).toBe(model.layout.dividerThicknessMm);
+    }
+  });
+
   it("centers entrances inside chambers for multi-chamber models", () => {
     for (const model of shelterModels.filter(
       (item) => item.layout.entrances === item.layout.chambers && item.layout.chambers > 1
