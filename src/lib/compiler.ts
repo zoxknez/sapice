@@ -821,6 +821,8 @@ export function compileShelterModel(model: ShelterModel) {
           ((internalFrontHeightMm + internalRearHeightMm) / 2)
         ) / 1_000_000_000,
       chamberClearWidthMm: layout.chamberWidthMm,
+      entranceSillAboveFinishedFloorMm:
+        model.layout.thresholdHeightMm - floorThicknessMm,
       floorAreaPerRecommendedAnimalM2:
         (
           Math.max(0, internalWidthMm - layout.totalDividerThicknessMm) *
