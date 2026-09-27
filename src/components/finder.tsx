@@ -3,6 +3,7 @@
 import {useMemo, useState} from "react";
 import type {ShelterModel} from "@/lib/domain";
 import type {AppLocale} from "@/i18n/routing";
+import type {ModelComparisonSummary} from "@/lib/catalog-summary";
 import {ModelCard} from "./model-card";
 import {
   matchShelterModels,
@@ -11,7 +12,15 @@ import {
   type DogSizeNeed
 } from "@/lib/finder";
 
-export function Finder({models, locale}: {models: ShelterModel[]; locale: AppLocale}) {
+export function Finder({
+  models,
+  comparisonSummaries,
+  locale
+}: {
+  models: ShelterModel[];
+  comparisonSummaries: Record<string, ModelComparisonSummary>;
+  locale: AppLocale;
+}) {
   const isSr = locale === "sr";
   const [animal, setAnimal] = useState<"cat" | "dog">("cat");
   const [count, setCount] = useState(2);
@@ -33,6 +42,14 @@ export function Finder({models, locale}: {models: ShelterModel[]; locale: AppLoc
     }),
     [models, animal, count, dogSize, heating, climate, maxWidth, maxDepth]
   );
+
+  function summaryFor(model: ShelterModel) {
+    const summary = comparisonSummaries[model.id];
+    if (!summary) {
+      throw new Error(`Missing finder card summary for ${model.id}`);
+    }
+    return summary;
+  }
 
   function reasons(model: ShelterModel) {
     const items = [
@@ -161,7 +178,7 @@ export function Finder({models, locale}: {models: ShelterModel[]; locale: AppLoc
           <div className="finder-results">
             {matches.map((model) => (
               <div className="finder-match" key={model.id}>
-                <ModelCard model={model} locale={locale} />
+                <ModelCard model={model} locale={locale} summary={summaryFor(model)} />
                 <div className="match-reasons">
                   <strong>{isSr ? "Zašto odgovara" : "Why it matches"}</strong>
                   <ul>
