@@ -2228,3 +2228,11 @@ button { cursor: pointer; }
   stroke: #70482f;
   stroke-width: 1;
 }
+
+
+.detail-actions {
+  flex-wrap: wrap;
+}
+.export-actions {
+  display: contents;
+}
