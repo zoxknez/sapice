@@ -9,7 +9,7 @@ Open, bilingual engineering plans for practical winter shelters for cats and dog
 The repository currently includes:
 
 - SR / EN routing with localized URLs
-- 10 reference shelter models
+- 16 reference shelter models with passive/heated coverage across all published cat capacity tiers and dog size classes
 - deterministic rule-based finder
 - side-by-side model comparison
 - parametric WebGL 3D viewer
@@ -175,13 +175,10 @@ Member lengths and positions are geometry-derived where possible. Intermediate-s
 
 Requirements:
 
-- Node.js 24
-- Corepack
-- pnpm 12.6.0
+- Node.js 24.21.0
+- pnpm 12.7.0
 
 ```bash
-corepack enable
-corepack prepare pnpm@12.6.0 --activate
 pnpm install
 pnpm dev
 ```
@@ -233,7 +230,7 @@ The schema is deliberately separate from canonical model definitions.
 
 The application code is under active construction.
 
-GitHub Actions currently fails before runner allocation, so the repository still lacks an independently executed full install/typecheck/test/build/E2E gate. The active environment also cannot reach GitHub directly for a fallback clone/build. The generated `pnpm-lock.yaml` remains a release gate once a real pnpm resolver is available.
+GitHub Actions currently fails before runner allocation, so the repository still lacks an independently executed full install/typecheck/test/build/E2E gate. The active environment also cannot reach GitHub directly for a fallback clone/build. A committed `pnpm-lock.yaml` is still a release gate. It cannot be generated correctly until a real pnpm resolver/build environment is available.
 
 Physical prototype and field-test status require real-world evidence, not code completion.
 
