@@ -1,6 +1,7 @@
 import type {ShelterModel} from "@/lib/domain";
 import {constructionSummary, getModelAssemblies, layoutGeometry, roofPanelGeometry, roofSlope, surfaceAreas, thermalSummary} from "@/lib/engineering";
 import {cutGeometryAreaMm2, cutGeometryCutoutPerimeterMm, cutGeometryOuterPerimeterMm} from "@/lib/cut-geometry";
+import {materials} from "@/data/materials";
 
 export type CutPart = {
   id: string;
@@ -328,6 +329,43 @@ export function compileShelterModel(model: ShelterModel) {
       notes: "Dry-fit below the sloped roof; final top edge can be scribed to the roof lining."
     }] : [])
   ];
+
+  const fabricationMaterialMap = new Map<string, {
+    id: string;
+    materialId: "plywood" | "xps";
+    thicknessMm: number;
+    nameSr: string;
+    nameEn: string;
+    netAreaM2: number;
+  }>();
+
+  for (const part of cutParts) {
+    const materialId = part.material === "xps" ? "xps" : "plywood";
+    const key = `${materialId}-${part.thicknessMm}`;
+    const areaM2 =
+      (cutGeometryAreaMm2(part) * part.quantity) / 1_000_000;
+    const existing = fabricationMaterialMap.get(key);
+    const material = materials[materialId];
+
+    if (existing) {
+      existing.netAreaM2 += areaM2;
+    } else {
+      fabricationMaterialMap.set(key, {
+        id: key,
+        materialId,
+        thicknessMm: part.thicknessMm,
+        nameSr: `${material.nameSr} · ${part.thicknessMm} mm`,
+        nameEn: `${material.nameEn} · ${part.thicknessMm} mm`,
+        netAreaM2: areaM2
+      });
+    }
+  }
+
+  const fabricationMaterials = Array.from(fabricationMaterialMap.values())
+    .sort((a, b) =>
+      a.materialId.localeCompare(b.materialId) ||
+      b.thicknessMm - a.thicknessMm
+    );
 
   const wallInsulationMm =
     assemblies.wall.layers.find((layer) => layer.role === "insulation")?.thicknessMm ?? 0;
@@ -741,6 +779,7 @@ export function compileShelterModel(model: ShelterModel) {
     areas,
     thermal,
     cutParts,
+    fabricationMaterials,
     linearParts,
     framing,
     hardwareItems,
