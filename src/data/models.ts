@@ -31,7 +31,7 @@ const models: ShelterModel[] = [
     roof: {sideOverhangMm: 70, frontOverhangMm: 90, rearOverhangMm: 90},
     heated: false,
     climateProfile: "WINTER_COLD",
-    designOutsideC: -10,
+    referenceOutsideC: -10,
     translations: {
       sr: {name: "Nordic Solo Winter", description: "Kompaktno izolovano zimsko sklonište za jednu odraslu mačku, uz rezervni kapacitet za dve mačke koje ga dobrovoljno dele."},
       en: {name: "Nordic Solo Winter", description: "Compact insulated winter shelter for one adult cat, with reserve capacity for two cats that voluntarily share it."}
@@ -52,7 +52,7 @@ const models: ShelterModel[] = [
     roof: {sideOverhangMm: 70, frontOverhangMm: 90, rearOverhangMm: 90},
     heated: false,
     climateProfile: "WINTER_COLD",
-    designOutsideC: -10,
+    referenceOutsideC: -10,
     translations: {
       sr: {name: "Nordic Duo Winter", description: "Jednokomorna zimska kućica za dve odrasle mačke sa ograničenim unutrašnjim volumenom i podignutom bazom."},
       en: {name: "Nordic Duo Winter", description: "Single-chamber winter shelter for two adult cats with restrained interior volume and an elevated base."}
@@ -73,7 +73,7 @@ const models: ShelterModel[] = [
     roof: {sideOverhangMm: 70, frontOverhangMm: 90, rearOverhangMm: 90},
     heated: false,
     climateProfile: "WINTER_COLD",
-    designOutsideC: -10,
+    referenceOutsideC: -10,
     translations: {
       sr: {name: "Nordic Quad Winter", description: "Dvokomorna kućica za četiri odrasle mačke, sa po jednom komorom za par mačaka i dva nezavisna ulaza."},
       en: {name: "Nordic Quad Winter", description: "Two-chamber shelter for four adult cats, with one chamber per pair and two independent entrances."}
@@ -94,7 +94,7 @@ const models: ShelterModel[] = [
     roof: {sideOverhangMm: 70, frontOverhangMm: 90, rearOverhangMm: 90},
     heated: true,
     climateProfile: "WINTER_SEVERE",
-    designOutsideC: -15,
+    referenceOutsideC: -15,
     translations: {
       sr: {name: "Nordic Quad Heated", description: "Grejana varijanta dvokomornog modela sa prostorom za kompatibilan namenski grejni proizvod i negrejanom zonom za izbor životinje."},
       en: {name: "Nordic Quad Heated", description: "Heated two-chamber variant with space for a compatible purpose-built heating product and an unheated choice zone."}
@@ -115,7 +115,7 @@ const models: ShelterModel[] = [
     roof: {sideOverhangMm: 70, frontOverhangMm: 90, rearOverhangMm: 90},
     heated: false,
     climateProfile: "WINTER_COLD",
-    designOutsideC: -10,
+    referenceOutsideC: -10,
     translations: {
       sr: {name: "Alpine Colony Six", description: "Trokamorno sklonište za do šest community mačaka. Više komora smanjuje zavisnost cele grupe od jednog ulaza."},
       en: {name: "Alpine Colony Six", description: "Three-chamber shelter for up to six community cats. Multiple chambers reduce the whole group's dependence on one entrance."}
@@ -136,7 +136,7 @@ const models: ShelterModel[] = [
     roof: {sideOverhangMm: 70, frontOverhangMm: 90, rearOverhangMm: 90},
     heated: false,
     climateProfile: "WINTER_COLD",
-    designOutsideC: -10,
+    referenceOutsideC: -10,
     translations: {
       sr: {name: "Alpine Small Winter", description: "Izolovana pomoćna zimska kućica za jednog manjeg psa, sa suvim podignutim podom i zaštitom od promaje."},
       en: {name: "Alpine Small Winter", description: "Insulated auxiliary winter house for one small dog with a dry raised floor and draft protection."}
@@ -157,7 +157,7 @@ const models: ShelterModel[] = [
     roof: {sideOverhangMm: 70, frontOverhangMm: 90, rearOverhangMm: 90},
     heated: false,
     climateProfile: "WINTER_COLD",
-    designOutsideC: -10,
+    referenceOutsideC: -10,
     translations: {
       sr: {name: "Alpine Medium Winter", description: "Izolovana pomoćna zimska kućica za jednog srednjeg psa, sa podignutim podom i jednovodnim krovom."},
       en: {name: "Alpine Medium Winter", description: "Insulated auxiliary winter house for one medium dog, with an elevated floor and mono-pitch roof."}
@@ -178,7 +178,7 @@ const models: ShelterModel[] = [
     roof: {sideOverhangMm: 30, frontOverhangMm: 90, rearOverhangMm: 90},
     heated: false,
     climateProfile: "WINTER_COLD",
-    designOutsideC: -10,
+    referenceOutsideC: -10,
     translations: {
       sr: {name: "Alpine Large Winter", description: "Prostranija, ali i dalje termički kontrolisana pomoćna kućica za velikog psa."},
       en: {name: "Alpine Large Winter", description: "A larger yet thermally restrained auxiliary shelter for one large dog."}
@@ -199,7 +199,7 @@ const models: ShelterModel[] = [
     roof: {sideOverhangMm: 30, frontOverhangMm: 90, rearOverhangMm: 90},
     heated: true,
     climateProfile: "WINTER_SEVERE",
-    designOutsideC: -15,
+    referenceOutsideC: -15,
     translations: {
       sr: {name: "Alpine Large Heated", description: "Velika izolovana pomoćna kućica sa predviđenom zonom za kompatibilan namenski grejni proizvod i odvojenom negrejanom površinom."},
       en: {name: "Alpine Large Heated", description: "Large insulated auxiliary shelter with a designated area for a compatible purpose-built heating product and a separate unheated surface."}
@@ -220,7 +220,7 @@ const models: ShelterModel[] = [
     roof: {sideOverhangMm: 70, frontOverhangMm: 90, rearOverhangMm: 90},
     heated: false,
     climateProfile: "WINTER_COLD",
-    designOutsideC: -10,
+    referenceOutsideC: -10,
     translations: {
       sr: {name: "Rescue Modular Eight", description: "Četvorokomorni referentni model za rescue/community upotrebu, projektovan kao ponovljiv modularni segment."},
       en: {name: "Rescue Modular Eight", description: "Four-chamber reference model for rescue/community use, designed as a repeatable modular segment."}
