@@ -964,10 +964,17 @@ export function compileShelterModel(model: ShelterModel) {
     },
     {
       id: "walls",
-      titleSr: "Sastavite zidove i ulaze",
-      titleEn: "Assemble walls and entrances",
-      detailSr: "Koristite dimenzije ulaza iz modela i zaštitite sve rezane ivice.",
-      detailEn: "Use the model entrance dimensions and protect every cut edge."
+      titleSr: "Sastavite zidove po kompajliranom joinery planu",
+      titleEn: "Assemble walls to the compiled joinery plan",
+      detailSr: "Prednji i zadnji zid ostaju pune širine, a bočni zidovi staju između njihovih unutrašnjih ravni. Koristite kompajlirane bočne dužine/visine i dimenzije ulaza; ne produžavajte bočne panele preko ugaonih zona.",
+      detailEn: "Front and rear walls remain full width while side walls fit between their inner planes. Use the compiled side lengths/heights and entrance dimensions; do not extend side panels through the corner zones."
+    },
+    {
+      id: "corner-weathering",
+      titleSr: "Zaštitite četiri spoljašnje ugaone ivice",
+      titleEn: "Weather-protect the four exterior corner edges",
+      detailSr: "Ugradite kompatibilan spoljašnji ugaoni trim/zaptivanje preko vertikalnih spojeva tako da presečene ivice ploča ne ostanu izložene vodi. Konkretan profil i preklop moraju pratiti izabrani spoljašnji završni sistem.",
+      detailEn: "Install compatible exterior corner trim/sealing over the vertical joints so cut panel edges are not exposed to water. The selected trim and overlap must follow the exterior finish system."
     },
     {
       id: "ventilation-provision",
