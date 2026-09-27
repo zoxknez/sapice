@@ -573,13 +573,22 @@ function Shelter({compiled, mode}: {compiled: CompiledShelterModel; mode: ViewMo
         />
       ))}
 
-      {model.heated && (
+      {compiled.heating.zones.map((zone) => (
         <Box
-          position={[w * 0.3, gc + floorT + 0.012, d * 0.62]}
-          size={[w * 0.34, 0.018, d * 0.36]}
+          key={zone.id}
+          position={[
+            (zone.xMm + zone.widthMm / 2) / 1000,
+            gc + floorT + 0.012,
+            (zone.zMm + zone.depthMm / 2) / 1000
+          ]}
+          size={[
+            zone.widthMm / 1000,
+            0.018,
+            zone.depthMm / 1000
+          ]}
           color="#b95c45"
         />
-      )}
+      ))}
 
       {mode !== "roof-off" && (
         <mesh
