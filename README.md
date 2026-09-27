@@ -57,7 +57,7 @@ Canonical model definitions live in Git.
 ```text
 ShelterModel
   -> construction assemblies
-  -> compiler v1.7 plan fingerprint
+  -> compiler v1.8 plan fingerprint
   -> compiled internal / interface geometry
   -> 3D viewer
   -> technical drawing
@@ -80,11 +80,17 @@ Mutable runtime data belongs in Neon:
 
 Canonical engineering geometry does **not** live in the database.
 
+## Wall joinery
+
+Compiler v1.8 uses one explicit buildable convention: the front and rear walls remain full width, while the left and right wall assemblies fit between their inner planes. This convention drives side-panel cut geometry, internal clear depth, side framing, 3D geometry, technical drawings and exports.
+
+The full exterior side envelope is still included in the thermal calculation: the central side-panel area plus the exposed front/rear corner returns. Exterior vertical corner joints receive a separate weather-trim BOM allowance.
+
 ## Thermal model
 
 The current engine is intentionally limited.
 
-Thermal method v1.1 calculates approximate steady-state envelope transmission through the wall, floor and roof assemblies. It uses orientation-specific ISO 6946 internal surface resistances (wall 0.13, upward roof flow 0.10, downward floor flow 0.17 m²K/W) and Rse 0.04 m²K/W:
+Thermal method v1.2 calculates approximate steady-state envelope transmission through the wall, floor and roof assemblies. It uses orientation-specific ISO 6946 internal surface resistances (wall 0.13, upward roof flow 0.10, downward floor flow 0.17 m²K/W) and Rse 0.04 m²K/W:
 
 ```text
 R_layer = thickness / lambda
