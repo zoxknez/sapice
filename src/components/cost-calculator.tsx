@@ -1,0 +1,134 @@
+"use client";
+
+import {useEffect, useMemo, useState} from "react";
+import type {ShelterModel} from "@/lib/domain";
+import type {AppLocale} from "@/i18n/routing";
+import {costLinesForModel} from "@/lib/costing";
+
+type Currency = "RSD" | "EUR" | "USD" | "GBP";
+type PriceMap = Record<string, number>;
+
+function unitLabel(unit: "sheet" | "m2" | "item", locale: AppLocale) {
+  if (unit === "sheet") return locale === "sr" ? "tabla" : "sheet";
+  if (unit === "m2") return "m²";
+  return locale === "sr" ? "stavka" : "item";
+}
+
+export function CostCalculator({model, locale}: {model: ShelterModel; locale: AppLocale}) {
+  const isSr = locale === "sr";
+  const lines = useMemo(() => costLinesForModel(model), [model]);
+  const [currency, setCurrency] = useState<Currency>("RSD");
+  const [prices, setPrices] = useState<PriceMap>({});
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    const raw = window.localStorage.getItem(`sapice:cost:${model.id}`);
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw) as {currency?: Currency; prices?: PriceMap};
+        if (parsed.currency) setCurrency(parsed.currency);
+        if (parsed.prices) setPrices(parsed.prices);
+      } catch {
+        // Invalid local draft is ignored.
+      }
+    }
+    setHydrated(true);
+  }, [model.id]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    window.localStorage.setItem(
+      `sapice:cost:${model.id}`,
+      JSON.stringify({currency, prices})
+    );
+  }, [currency, prices, model.id, hydrated]);
+
+  const total = lines.reduce((sum, line) => {
+    const price = prices[line.id] ?? 0;
+    return sum + line.quantity * price;
+  }, 0);
+
+  const formatter = new Intl.NumberFormat(locale === "sr" ? "sr-RS" : "en", {
+    style: "currency",
+    currency,
+    maximumFractionDigits: currency === "RSD" ? 0 : 2
+  });
+
+  return (
+    <section className="section cost-section" id="cost">
+      <div className="shell">
+        <div className="section-heading">
+          <div>
+            <span className="kicker">Local price profile</span>
+            <h2>{isSr ? "Troškovnik" : "Cost estimate"}</h2>
+          </div>
+          <p>
+            {isSr
+              ? "Količine dolaze iz modela. Cene nisu izmišljene: unesite ono što stvarno plaćate lokalno, a procena se čuva samo u vašem browseru."
+              : "Quantities come from the model. Prices are not fabricated: enter what you actually pay locally and the estimate stays in your browser."}
+          </p>
+        </div>
+
+        <div className="cost-toolbar">
+          <label>
+            <span>{isSr ? "Valuta" : "Currency"}</span>
+            <select value={currency} onChange={(event) => setCurrency(event.target.value as Currency)}>
+              <option value="RSD">RSD</option>
+              <option value="EUR">EUR</option>
+              <option value="USD">USD</option>
+              <option value="GBP">GBP</option>
+            </select>
+          </label>
+          <button type="button" onClick={() => setPrices({})}>
+            {isSr ? "Obriši moje cene" : "Clear my prices"}
+          </button>
+        </div>
+
+        <div className="cost-table">
+          {lines.map((line) => (
+            <div className="cost-row" key={line.id}>
+              <div>
+                <strong>{isSr ? line.labelSr : line.labelEn}</strong>
+                <small>{isSr ? line.noteSr : line.noteEn}</small>
+              </div>
+              <span className="cost-qty">
+                {line.quantity.toFixed(line.unit === "item" || line.unit === "sheet" ? 0 : 2)} {unitLabel(line.unit, locale)}
+              </span>
+              <label>
+                <span>{isSr ? "Cena po jedinici" : "Unit price"}</span>
+                <div className="price-input">
+                  <input
+                    inputMode="decimal"
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={prices[line.id] ?? ""}
+                    placeholder="0"
+                    onChange={(event) => {
+                      const next = event.target.value === "" ? 0 : Number(event.target.value);
+                      setPrices((current) => ({...current, [line.id]: Number.isFinite(next) ? Math.max(0, next) : 0}));
+                    }}
+                  />
+                  <span>{currency}</span>
+                </div>
+              </label>
+              <strong className="cost-line-total">
+                {formatter.format(line.quantity * (prices[line.id] ?? 0))}
+              </strong>
+            </div>
+          ))}
+        </div>
+
+        <div className="cost-total">
+          <span>{isSr ? "Procena na osnovu unetih cena" : "Estimate from entered prices"}</span>
+          <strong>{formatter.format(total)}</strong>
+        </div>
+        <p className="cost-disclaimer">
+          {isSr
+            ? "Troškovnik još ne uključuje kompletan framing/hardware BOM, dostavu, alat, rad ni nepredviđene gubitke. Stavke koje nisu detaljno kompilirane su jasno označene."
+            : "The estimate does not yet include a fully compiled framing/hardware BOM, delivery, tools, labor or unforeseen losses. Items not yet compiled in detail are explicitly labeled."}
+        </p>
+      </div>
+    </section>
+  );
+}
