@@ -2835,6 +2835,8 @@ button { cursor: pointer; }
 .hero-showcase-top { display: flex; justify-content: space-between; gap: 16px; color: #bfd0bd; font-size: 10px; text-transform: uppercase; font-weight: 800; letter-spacing: .12em; }
 .hero-showcase .model-thumbnail { width: min(100%, 570px); height: 320px; margin: auto; filter: drop-shadow(0 26px 22px #0d1b17a0); }
 .hero-showcase .model-thumbnail text { fill: #ded0b9; }
+.model-thumbnail .thumb-heating-mark text,
+.hero-showcase .model-thumbnail .thumb-heating-mark text { fill: #fff8ed; font-size: 8px; letter-spacing: .015em; }
 .hero-showcase .model-thumbnail line[stroke="#a07654"] { stroke: #cfba9b; }
 .hero-showcase-bottom { display: flex; justify-content: space-between; align-items: end; gap: 16px; border-top: 1px solid #ffffff30; padding-top: 20px; }
 .hero-showcase-bottom div { display: grid; gap: 5px; }
@@ -2885,6 +2887,7 @@ button { cursor: pointer; }
 .viewer-caption { position: absolute; top: 72px; left: 22px; display: grid; gap: 6px; pointer-events: none; color: #495c4e; text-shadow: 0 1px #f8f6ee; }
 .viewer-caption span { font-size: 10px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
 .viewer-caption strong { font: 800 12px ui-monospace, monospace; }
+.viewer-caption small { max-width: 260px; font-size: 10px; font-weight: 700; line-height: 1.35; }
 .viewer-toolbar { top: 18px; left: 18px; background: #fffcf4ed; border-color: #ffffff; box-shadow: 0 8px 24px #21382b20; }
 .viewer-toolbar button { font-size: 11px; }
 .viewer-toolbar button.active { background: #273d35; }
@@ -2894,11 +2897,23 @@ button { cursor: pointer; }
 .metric-grid strong { font-size: 21px; }
 .notice { background: #ecdfce; }
 
+#geometry .detail-content { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+#geometry .data-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 34px; }
+#geometry .data-list div:last-child { border-bottom: 1px solid var(--line); }
+
 @media (max-width: 960px) {
   .hero-grid, .detail-grid { grid-template-columns: 1fr; }
   .hero-grid { padding-block: 64px; }
   .hero-showcase { width: 100%; min-height: 410px; }
   .viewer { height: 540px; }
+}
+
+@media (max-width: 700px) {
+  #geometry .data-list { grid-template-columns: 1fr; }
+}
+
+@media print {
+  #geometry .detail-content { grid-template-columns: 1fr !important; }
 }
 @media (max-width: 640px) {
   .shell { width: min(100% - 28px, 1280px); }

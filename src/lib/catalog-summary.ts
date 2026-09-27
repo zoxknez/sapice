@@ -16,6 +16,13 @@ export type ModelComparisonSummary = {
     entranceHeightMm: number;
     entranceRadiusMm: number;
     thresholdHeightMm: number;
+    floorThicknessMm: number;
+    roofVerticalThicknessMm: number;
+    roofAngleRad: number;
+    baseProfileMm: [number, number];
+    baseRunnerPositionsXmm: number[];
+    baseSupportPositionsZmm: number[];
+    baseSupportPostHeightMm: number;
   };
 };
 
@@ -38,7 +45,14 @@ export function modelComparisonSummary(
       entranceWidthMm: compiled.entrance.widthMm,
       entranceHeightMm: compiled.entrance.heightMm,
       entranceRadiusMm: compiled.entrance.radiusMm,
-      thresholdHeightMm: compiled.entrance.thresholdHeightMm
+      thresholdHeightMm: compiled.entrance.thresholdHeightMm,
+      floorThicknessMm: compiled.construction.floorThicknessMm,
+      roofVerticalThicknessMm: compiled.interfaces.roofVerticalThicknessMm,
+      roofAngleRad: compiled.roof.angleRad,
+      baseProfileMm: compiled.framing.baseProfileMm,
+      baseRunnerPositionsXmm: compiled.framing.baseRunnerPositionsXmm,
+      baseSupportPositionsZmm: compiled.framing.baseSupportPositionsZmm,
+      baseSupportPostHeightMm: compiled.framing.baseSupportPostHeightMm
     }
   };
 }

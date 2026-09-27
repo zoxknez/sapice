@@ -1,14 +1,39 @@
 "use client";
 
-import {useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import * as THREE from "three";
-import {Canvas} from "@react-three/fiber";
+import {Canvas, useThree} from "@react-three/fiber";
 import {ContactShadows, OrbitControls} from "@react-three/drei";
 import type {ShelterModel} from "@/lib/domain";
 import type {AppLocale} from "@/i18n/routing";
 import type {CompiledShelterModel} from "@/lib/compiler";
 
 type ViewMode = "assembled" | "roof-off" | "exploded" | "frame";
+
+function ModeCamera({mode, maxSpan, inspectionSpan, targetY, defaultPosition}: {
+  mode: ViewMode;
+  maxSpan: number;
+  inspectionSpan: number;
+  targetY: number;
+  defaultPosition: [number, number, number];
+}) {
+  const {camera, controls} = useThree();
+
+  useEffect(() => {
+    const position: [number, number, number] = mode === "roof-off"
+      ? [inspectionSpan * 0.55, inspectionSpan * 2.25, -inspectionSpan * 0.45]
+      : mode === "frame"
+        ? [maxSpan * 1.35, maxSpan * 1.75, -maxSpan * 1.85]
+        : mode === "exploded"
+          ? [maxSpan * 1.45, maxSpan * 1.7, -maxSpan * 2]
+          : defaultPosition;
+    camera.position.set(...position);
+    camera.lookAt(0, targetY, 0);
+    (controls as {update?: () => void} | null)?.update?.();
+  }, [camera, controls, defaultPosition, inspectionSpan, maxSpan, mode, targetY]);
+
+  return null;
+}
 
 // A deterministic surface finish. The mesh dimensions still come exclusively
 // from the compiler; this texture only makes the timber readable in 3D.
@@ -73,7 +98,7 @@ function addRoundedRectangleHole(
   const hole = new THREE.Path();
 
   hole.moveTo(x + r, y);
-  hole.lineTo(x, y);
+  hole.quadraticCurveTo(x, y, x, y + r);
   hole.lineTo(x, y + height - r);
   hole.quadraticCurveTo(x, y + height, x + r, y + height);
   hole.lineTo(x + width - r, y + height);
@@ -502,7 +527,7 @@ function FramingSkeleton({
           rearHeight={Math.max(0.05, compiled.internal.rearHeightMm / 1000)}
           thickness={model.layout.dividerThicknessMm / 1000}
           position={[
-            positionMm / 1000,
+            (positionMm + model.layout.dividerThicknessMm / 2) / 1000,
             gc + floorT,
             compiled.construction.wallThicknessMm / 1000
           ]}
@@ -602,7 +627,7 @@ function Shelter({compiled, mode}: {compiled: CompiledShelterModel; mode: ViewMo
           frontHeight={dividerFrontHeight}
           rearHeight={dividerRearHeight}
           thickness={model.layout.dividerThicknessMm / 1000}
-          position={[positionMm / 1000, gc + floorT, sideStartZ]}
+          position={[(positionMm + model.layout.dividerThicknessMm / 2) / 1000, gc + floorT, sideStartZ]}
         />
       ))}
 
@@ -611,15 +636,16 @@ function Shelter({compiled, mode}: {compiled: CompiledShelterModel; mode: ViewMo
           key={zone.id}
           position={[
             (zone.xMm + zone.widthMm / 2) / 1000,
-            gc + floorT + 0.012,
+            gc + floorT + 0.002,
             (zone.zMm + zone.depthMm / 2) / 1000
           ]}
           size={[
             zone.widthMm / 1000,
-            0.018,
+            0.003,
             zone.depthMm / 1000
           ]}
           color="#b95c45"
+          opacity={0.38}
         />
       ))}
 
@@ -653,6 +679,7 @@ export function ShelterViewer({
   const depthM = model.dimensions.depthMm / 1000;
   const heightM = (model.dimensions.frontHeightMm + model.dimensions.groundClearanceMm) / 1000;
   const maxSpan = Math.max(widthM, depthM, heightM);
+  const inspectionSpan = Math.max(widthM, depthM + heightM * 0.65);
   const cameraPosition: [number, number, number] = [
     maxSpan * 1.7,
     Math.max(1.15, heightM * 1.65),
@@ -668,6 +695,7 @@ export function ShelterViewer({
         <directionalLight position={[-3, 7, -5]} intensity={2.8} castShadow shadow-mapSize={[1024, 1024]} />
         <directionalLight position={[4, 3, 5]} intensity={0.8} />
         <Shelter compiled={compiled} mode={mode} />
+        <ModeCamera mode={mode} maxSpan={maxSpan} inspectionSpan={inspectionSpan} targetY={orbitTarget[1]} defaultPosition={cameraPosition} />
         <ContactShadows position={[0, -0.015, 0]} opacity={0.3} scale={maxSpan * 3} blur={2.2} far={maxSpan * 2} />
         <OrbitControls
           makeDefault
@@ -701,6 +729,12 @@ export function ShelterViewer({
       <div className="viewer-caption">
         <span>{locale === "sr" ? "Interaktivni 3D model" : "Interactive 3D model"}</span>
         <strong>{model.dimensions.widthMm} × {model.dimensions.depthMm} × {model.dimensions.frontHeightMm} mm</strong>
+        {mode === "frame" && <small>
+          {locale === "sr" ? "Zeleno: okvir · oker: PROVISIONAL raspored" : "Green: frame · ochre: PROVISIONAL layout"}
+        </small>}
+        {model.heated && mode === "roof-off" && <small>
+          {locale === "sr" ? "Crveno: rezervisana zona, bez grejnog uređaja" : "Red: reserved zone, no heating device shown"}
+        </small>}
       </div>
       <div className="viewer-badge">{locale === "sr" ? "Prevuci za rotaciju · točkić za uvećanje" : "Drag to rotate · scroll to zoom"}</div>
     </div>
