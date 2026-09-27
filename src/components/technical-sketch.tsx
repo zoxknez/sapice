@@ -135,9 +135,11 @@ export function TechnicalSketch({
   const rpw = compiled.roofPanel.panelWidthMm * roofScale;
   const rpl = compiled.roofPanel.panelLengthMm * roofScale;
 
-  const entranceW = model.layout.entranceWidthMm * frontScale;
-  const entranceH = model.layout.entranceHeightMm * frontScale;
-  const threshold = model.layout.thresholdHeightMm * frontScale;
+  const entranceW = compiled.entrance.widthMm * frontScale;
+  const entranceH = compiled.entrance.heightMm * frontScale;
+  const entranceRadius = compiled.entrance.radiusMm * frontScale;
+  const threshold = compiled.entrance.thresholdHeightMm * frontScale;
+  const frameFacePx = compiled.framing.frameProfileMm[0] * frontScale;
 
   const sideStuds = compiled.linearParts.filter(
     (part) => part.wall === "left" && typeof part.positionMm === "number"
@@ -217,12 +219,61 @@ export function TechnicalSketch({
             const cx = frontX + centerMm * frontScale;
             const x = cx - entranceW / 2;
             const y = frontBottom - threshold - entranceH;
+            const header = compiled.linearParts.find(
+              (part) => part.id === `entrance-${index + 1}-header`
+            );
+            const cripple = compiled.linearParts.find(
+              (part) => part.id === `entrance-${index + 1}-cripple`
+            );
+            const headerY =
+              frontFloorTopY - (header?.elevationMm ?? 0) * frontScale;
+            const crippleBottomY =
+              frontFloorTopY - (cripple?.startHeightMm ?? 0) * frontScale;
+            const crippleTopY =
+              crippleBottomY - (cripple?.lengthMm ?? 0) * frontScale;
+
             return (
               <g key={index}>
-                <rect x={x} y={y} width={entranceW} height={entranceH} rx={Math.min(12, entranceW * 0.22)} className="drawing-opening" />
-                <line x1={x - 3} y1={frontFloorTopY - 4} x2={x - 3} y2={y - 3} className="drawing-frame drawing-frame-assumption" />
-                <line x1={x + entranceW + 3} y1={frontFloorTopY - 4} x2={x + entranceW + 3} y2={y - 3} className="drawing-frame drawing-frame-assumption" />
-                <line x1={x - 3} y1={y - 3} x2={x + entranceW + 3} y2={y - 3} className="drawing-frame drawing-frame-assumption" />
+                <rect
+                  x={x}
+                  y={y}
+                  width={entranceW}
+                  height={entranceH}
+                  rx={entranceRadius}
+                  className="drawing-opening"
+                />
+                <line
+                  x1={x - frameFacePx / 2}
+                  y1={frontFloorTopY}
+                  x2={x - frameFacePx / 2}
+                  y2={y}
+                  className="drawing-frame drawing-frame-assumption"
+                />
+                <line
+                  x1={x + entranceW + frameFacePx / 2}
+                  y1={frontFloorTopY}
+                  x2={x + entranceW + frameFacePx / 2}
+                  y2={y}
+                  className="drawing-frame drawing-frame-assumption"
+                />
+                {header && (
+                  <rect
+                    x={cx - (header.lengthMm * frontScale) / 2}
+                    y={headerY - frameFacePx / 2}
+                    width={header.lengthMm * frontScale}
+                    height={frameFacePx}
+                    className="drawing-frame-member-assumption"
+                  />
+                )}
+                {cripple && (
+                  <line
+                    x1={cx}
+                    y1={crippleBottomY}
+                    x2={cx}
+                    y2={crippleTopY}
+                    className="drawing-frame drawing-frame-assumption"
+                  />
+                )}
                 <text x={cx} y={y + entranceH / 2} textAnchor="middle" className="drawing-label">
                   E{index + 1}
                 </text>
