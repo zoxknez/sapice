@@ -560,6 +560,46 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
       });
     }
 
+    if (
+      compiled.roofWeathering.highEdge !== "FRONT" ||
+      compiled.roofWeathering.runoffEdge !== "REAR" ||
+      compiled.roofWeathering.slopeDegrees <= 0 ||
+      compiled.roofWeathering.riseMm <= 0 ||
+      !compiled.roofWeathering.runoffAwayFromEntrances
+    ) {
+      issues.push({
+        severity: "error",
+        code: "ROOF_RUNOFF_GEOMETRY_INVALID",
+        message: "Roof weathering geometry must fall from the front entrance side toward the rear runoff edge."
+      });
+    }
+
+    if (!sources[compiled.roofWeathering.referenceSourceId]) {
+      issues.push({
+        severity: "error",
+        code: "MISSING_ROOF_WEATHERING_SOURCE",
+        message: `Unknown roof weathering source: ${compiled.roofWeathering.referenceSourceId}`
+      });
+    }
+
+    const roofEdgeItem = compiled.hardwareItems.find(
+      (item) => item.id === "roof-edge-weathering-profile"
+    );
+
+    if (
+      !roofEdgeItem ||
+      Math.abs(
+        roofEdgeItem.quantity -
+          compiled.roofWeathering.fullEdgeProtectionLengthM
+      ) > 0.001
+    ) {
+      issues.push({
+        severity: "error",
+        code: "ROOF_EDGE_PROTECTION_LENGTH_MISMATCH",
+        message: "Roof edge/drip protection length does not match the compiled roof-panel perimeter."
+      });
+    }
+
     const baseIsolationItem = compiled.hardwareItems.find(
       (item) => item.id === "base-isolation-pads"
     );
