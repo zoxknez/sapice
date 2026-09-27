@@ -1807,3 +1807,49 @@ button { cursor: pointer; }
   .guide-article summary { grid-template-columns: 30px 1fr auto; padding: 18px 16px; gap: 10px; }
   .guide-article-body { padding: 0 16px 18px 56px; }
 }
+
+
+.hardware-section {
+  background: #ece4d9;
+  border-block: 1px solid var(--line);
+}
+.hardware-summary { margin-bottom: 20px; }
+.hardware-table .cut-row {
+  grid-template-columns: 150px 1.5fr .7fr .7fr;
+}
+.hardware-table small {
+  max-width: 760px;
+  white-space: normal;
+  line-height: 1.45;
+}
+.hardware-reference {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.hardware-reference > span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+.hardware-reference a {
+  color: var(--accent-dark);
+  font-size: 11px;
+  font-weight: 780;
+  text-align: right;
+}
+
+@media (max-width: 700px) {
+  .hardware-reference {
+    display: grid;
+  }
+  .hardware-reference a { text-align: left; }
+}
