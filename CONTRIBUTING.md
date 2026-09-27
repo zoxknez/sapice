@@ -13,12 +13,13 @@ A pull request should include:
 - construction assembly IDs
 - roof overhangs
 - maintenance access strategy
-- heating flag
+- ventilation strategy/provision semantics
+- heating flag and heated/passive pairing where applicable
 - climate/reference scenario
 - SR and EN copy
 - source IDs supporting welfare/method rules
 
-Derived values such as internal dimensions, roof length, U-values, material quantities, cut parts, stock layouts, framing lengths and hardware quantities should not be duplicated manually.
+Derived values such as internal dimensions, roof length/runoff, entrance geometry, ventilation/heating provision zones, U-values, material quantities, cut parts, stock layouts, framing lengths, hardware quantities and plan fingerprints should not be duplicated manually.
 
 ## Source quality
 
@@ -48,6 +49,7 @@ pnpm typecheck
 pnpm lint
 pnpm test
 pnpm build
+pnpm test:e2e
 ```
 
-should commit the generated lockfile in the same reviewed change. CI should then be changed from `--no-frozen-lockfile` to `--frozen-lockfile`.
+should commit the generated lockfile in the same reviewed change. CI should then require the lockfile through the pnpm setup step.
