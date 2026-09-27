@@ -57,7 +57,7 @@ Canonical model definitions live in Git.
 ```text
 ShelterModel
   -> construction assemblies
-  -> compiler v1.6 plan fingerprint
+  -> compiler v1.7 plan fingerprint
   -> compiled internal / interface geometry
   -> 3D viewer
   -> technical drawing
