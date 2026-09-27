@@ -100,6 +100,30 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
       }
     }
 
+    for (const part of compiled.linearParts) {
+      if (
+        part.quantity <= 0 ||
+        part.lengthMm <= 0 ||
+        part.profileMm[0] <= 0 ||
+        part.profileMm[1] <= 0 ||
+        !Number.isFinite(part.lengthMm)
+      ) {
+        issues.push({
+          severity: "error",
+          code: "INVALID_LINEAR_PART",
+          message: `Invalid framing/support geometry: ${part.id}`
+        });
+      }
+    }
+
+    if (!Number.isFinite(compiled.framing.totalLinearM) || compiled.framing.totalLinearM <= 0) {
+      issues.push({
+        severity: "error",
+        code: "INVALID_FRAMING_TOTAL",
+        message: "Compiled framing linear total is invalid."
+      });
+    }
+
     const stockChecks = [
       {
         material: "plywood-12" as const,
