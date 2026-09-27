@@ -58,7 +58,7 @@ export const shelterModelSchema = z.object({
   ventilation: z.object({
     strategy: z.literal("HIGH_REAR_PROVISION"),
     status: z.literal("PROVISIONAL"),
-    zonesPerChamber: z.number().int().positive()
+    zonesPerChamber: z.literal(1)
   }),
   heated: z.boolean(),
   climateProfile: z.enum([
