@@ -1,5 +1,5 @@
 import type {ShelterModel} from "@/lib/domain";
-import {constructionInterfaceGeometry, constructionSummary, entranceGeometry, getModelAssemblies, layoutGeometry, roofPanelGeometry, roofSlope, surfaceAreas, thermalSummary} from "@/lib/engineering";
+import {constructionInterfaceGeometry, constructionSummary, entranceGeometry, framingMethod, getModelAssemblies, layoutGeometry, roofPanelGeometry, roofSlope, surfaceAreas, thermalSummary, ventilationProvisionGeometry} from "@/lib/engineering";
 import {cutGeometryAreaMm2, cutGeometryCutoutPerimeterMm, cutGeometryOuterPerimeterMm} from "@/lib/cut-geometry";
 import {materials} from "@/data/materials";
 
@@ -135,6 +135,7 @@ export function compileShelterModel(model: ShelterModel) {
   const thermal = thermalSummary(model);
   const layout = layoutGeometry(model);
   const entrance = entranceGeometry(model);
+  const ventilation = ventilationProvisionGeometry(model);
 
   const entranceCutouts = layout.entranceCentersXmm.map((centerX) => {
     return {
@@ -383,7 +384,7 @@ export function compileShelterModel(model: ShelterModel) {
     assemblies.wall.layers.find((layer) => layer.role === "insulation")?.thicknessMm ?? 0;
   const frameProfile: [number, number] = [30, wallInsulationMm];
   const baseProfile: [number, number] = [45, 45];
-  const maxStudSpacingMm = 500;
+  const maxStudSpacingMm = framingMethod.maxStudSpacingMm;
   const maxFloorJoistSpacingMm = 500;
   const maxRoofRafterSpacingMm = 500;
   const maxBaseRunnerSpacingMm = 700;
@@ -954,6 +955,7 @@ export function compileShelterModel(model: ShelterModel) {
     interfaces,
     layout,
     entrance,
+    ventilation,
     assemblies,
     construction,
     internal: {
