@@ -1,5 +1,6 @@
 import type {ShelterModel} from "@/lib/domain";
 import type {AppLocale} from "@/i18n/routing";
+import {layoutGeometry} from "@/lib/engineering";
 
 export function ModelThumbnail({
   model,
@@ -24,6 +25,7 @@ export function ModelThumbnail({
   const originY = 132;
   const depthOffsetX = Math.min(48, model.dimensions.depthMm * scale * 0.22);
   const depthOffsetY = -22;
+  const layout = layoutGeometry(model);
 
   return (
     <svg
@@ -60,8 +62,8 @@ export function ModelThumbnail({
         fill={`url(#wood-${model.id})`}
       />
 
-      {Array.from({length: model.layout.entrances}).map((_, index) => {
-        const centerX = originX + w * ((index + 1) / (model.layout.entrances + 1));
+      {layout.entranceCentersXmm.map((centerXmm, index) => {
+        const centerX = originX + centerXmm * scale;
         return (
           <rect
             key={index}
