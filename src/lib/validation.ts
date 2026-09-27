@@ -638,6 +638,20 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
     }
 
     if (
+      model.maintenance.roofAccess === "HINGED" &&
+      (
+        compiled.hardware.hingeEdge !== compiled.roofWeathering.highEdge ||
+        compiled.hardware.latchEdge !== compiled.roofWeathering.runoffEdge
+      )
+    ) {
+      issues.push({
+        severity: "error",
+        code: "SERVICE_ROOF_WEATHERING_CONFLICT",
+        message: "Hinged service roof must hinge on the high front edge and latch at the rear runoff edge."
+      });
+    }
+
+    if (
       compiled.roofWeathering.highEdge !== "FRONT" ||
       compiled.roofWeathering.runoffEdge !== "REAR" ||
       compiled.roofWeathering.slopeDegrees <= 0 ||
