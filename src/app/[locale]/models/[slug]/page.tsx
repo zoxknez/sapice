@@ -5,6 +5,7 @@ import {shelterModels, getShelterModel} from "@/data/models";
 import {materialSummary, thermalSummary, roofSlope} from "@/lib/engineering";
 import {ShelterViewer} from "@/components/shelter-viewer";
 import {TechnicalSketch} from "@/components/technical-sketch";
+import {ModelBuildBook} from "@/components/model-build-book";
 
 export function generateStaticParams() {
   return shelterModels.map((model) => ({slug: model.slug}));
@@ -36,20 +37,36 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
               <div><span>{locale === "sr" ? "Dubina" : "Depth"}</span><strong>{model.dimensions.depthMm} mm</strong></div>
               <div><span>{locale === "sr" ? "Izolacija" : "Insulation"}</span><strong>{model.construction.wallInsulationMm} mm</strong></div>
             </div>
+            <div className="model-meta-line">
+              <span>v{model.version}</span>
+              <span>{model.climateProfile.replaceAll("_", " ")}</span>
+              <span>{locale === "sr" ? "projektovano za proračun" : "calculation design condition"} {model.designOutsideC} °C</span>
+            </div>
             <div className="notice">
               {model.heated
                 ? (locale === "sr"
-                    ? "Grejanje nije DIY električna specifikacija. Model zahteva kompatibilan namenski pet heating proizvod i poštovanje uputstva proizvođača."
-                    : "Heating is not a DIY electrical specification. The model requires a compatible purpose-built pet heating product installed to manufacturer instructions.")
+                    ? "Grejanje nije DIY električna specifikacija. Model zahteva kompatibilan namenski proizvod i poštovanje njegovog uputstva."
+                    : "Heating is not a DIY electrical specification. The model requires a compatible purpose-built product installed to its instructions.")
                 : (locale === "sr"
-                    ? "Ovo je projektantski model. Trenutni status ne znači da je fizički prototip testiran."
-                    : "This is a design model. Its current status does not imply that a physical prototype has been tested.")}
+                    ? "Status DATA_VALIDATED ne znači da je fizički prototip testiran. Takva tvrdnja će se pojaviti tek posle stvarne fizičke validacije."
+                    : "DATA_VALIDATED does not mean a physical prototype has been tested. That claim appears only after real physical validation.")}
             </div>
           </div>
         </div>
       </section>
 
-      <section className="section">
+      <nav className="model-subnav" aria-label={locale === "sr" ? "Sekcije modela" : "Model sections"}>
+        <div className="shell">
+          <a href="#geometry">{locale === "sr" ? "Mere" : "Dimensions"}</a>
+          <a href="#thermal">{locale === "sr" ? "Termika" : "Thermal"}</a>
+          <a href="#inside">{locale === "sr" ? "Unutrašnjost" : "Interior"}</a>
+          <a href="#cut-list">{locale === "sr" ? "Krojna lista" : "Cut list"}</a>
+          <a href="#build-guide">{locale === "sr" ? "Izrada" : "Build"}</a>
+          <a href="#sources">{locale === "sr" ? "Izvori" : "Sources"}</a>
+        </div>
+      </nav>
+
+      <section className="section" id="geometry">
         <div className="shell detail-content">
           <div>
             <span className="kicker">Geometry</span>
@@ -69,7 +86,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
         </div>
       </section>
 
-      <section className="section tone">
+      <section className="section tone" id="thermal">
         <div className="shell">
           <div className="section-heading">
             <div>
@@ -78,8 +95,8 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
             </div>
             <p>
               {locale === "sr"
-                ? "Steady-state procena prolaza toplote kroz omotač. Ne uključuje pouzdanu procenu infiltracije kroz ulaz i zato nije temperaturna garancija."
-                : "Steady-state envelope transmission estimate. It does not claim a reliable entrance infiltration value and is not a temperature guarantee."}
+                ? "Steady-state procena prolaza toplote kroz omotač. Ne uključuje validirani model infiltracije kroz ulaz i zato nije temperaturna garancija."
+                : "Steady-state envelope transmission estimate. It does not include a validated entrance-infiltration model and is not a temperature guarantee."}
             </p>
           </div>
           <div className="thermal-grid">
@@ -110,6 +127,8 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
           </div>
         </div>
       </section>
+
+      <ModelBuildBook model={model} locale={locale} />
     </>
   );
 }

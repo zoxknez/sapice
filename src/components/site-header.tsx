@@ -5,6 +5,12 @@ import {LocaleSwitcher} from "./locale-switcher";
 
 export async function SiteHeader({locale}: {locale: AppLocale}) {
   const t = await getTranslations({locale, namespace: "Nav"});
+  const links = [
+    ["/models", t("models")],
+    ["/finder", t("finder")],
+    ["/materials", t("materials")],
+    ["/guides", t("guides")]
+  ] as const;
 
   return (
     <header className="site-header">
@@ -18,11 +24,19 @@ export async function SiteHeader({locale}: {locale: AppLocale}) {
         </Link>
 
         <nav className="main-nav" aria-label={locale === "sr" ? "Glavna navigacija" : "Main navigation"}>
-          <Link href="/models" locale={locale}>{t("models")}</Link>
-          <Link href="/finder" locale={locale}>{t("finder")}</Link>
-          <Link href="/materials" locale={locale}>{t("materials")}</Link>
-          <Link href="/guides" locale={locale}>{t("guides")}</Link>
+          {links.map(([href, label]) => <Link key={href} href={href} locale={locale}>{label}</Link>)}
         </nav>
+
+        <details className="mobile-nav">
+          <summary aria-label={locale === "sr" ? "Otvori meni" : "Open menu"}>
+            <span />
+            <span />
+            <span />
+          </summary>
+          <nav aria-label={locale === "sr" ? "Mobilna navigacija" : "Mobile navigation"}>
+            {links.map(([href, label]) => <Link key={href} href={href} locale={locale}>{label}</Link>)}
+          </nav>
+        </details>
 
         <LocaleSwitcher />
       </div>
