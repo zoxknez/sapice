@@ -127,6 +127,67 @@ export function provisionalIntermediatePositions(
   );
 }
 
+export function heatingProvisionGeometry(model: ShelterModel) {
+  if (!model.heated) {
+    return {
+      status: "NOT_APPLICABLE" as const,
+      safetySourceId: "iec-60335-2-71-2018",
+      zones: [],
+      limitations: [
+        "No heating geometry is compiled for passive models"
+      ]
+    };
+  }
+
+  const layout = layoutGeometry(model);
+  const construction = constructionSummary(model);
+  const internalDepthMm = Math.max(
+    0,
+    model.dimensions.depthMm - 2 * construction.wallThicknessMm
+  );
+
+  const zones = layout.chamberStartsXmm.map((chamberStartMm, index) => {
+    const chamberWidthMm = layout.chamberWidthMm;
+    const widthMm = Math.round(chamberWidthMm * 0.55);
+    const depthMm = Math.round(internalDepthMm * 0.4);
+    const xMm =
+      chamberStartMm +
+      (chamberWidthMm - widthMm) / 2;
+    const zMm =
+      construction.wallThicknessMm +
+      internalDepthMm -
+      depthMm -
+      Math.max(30, Math.round(internalDepthMm * 0.08));
+
+    return {
+      id: `heating-zone-${index + 1}`,
+      chamber: index + 1,
+      xMm,
+      zMm,
+      widthMm,
+      depthMm,
+      areaM2: (widthMm * depthMm) / 1_000_000,
+      chamberFloorAreaM2:
+        (chamberWidthMm * internalDepthMm) / 1_000_000,
+      provenance: "ASSUMPTION" as const,
+      actualProductFootprint: "TBD_BY_SELECTED_HEATING_PRODUCT" as const
+    };
+  });
+
+  return {
+    status: "PRODUCT_SPECIFIC" as const,
+    safetySourceId: "iec-60335-2-71-2018",
+    zones,
+    limitations: [
+      "Zones coordinate possible product placement only",
+      "Actual heater dimensions and power are product-specific",
+      "Manufacturer instructions remain authoritative",
+      "Each chamber retains an unheated floor-choice area",
+      "No DIY mains wiring or heater construction is specified"
+    ]
+  };
+}
+
 export function ventilationProvisionGeometry(model: ShelterModel) {
   const layout = layoutGeometry(model);
   const interfaces = constructionInterfaceGeometry(model);
