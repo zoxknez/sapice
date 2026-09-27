@@ -370,16 +370,27 @@ export function surfaceAreas(model: ShelterModel) {
   const frontRearAreaMm2 =
     w * interfaces.wallFrontHeightMm +
     w * interfaces.wallRearHeightMm;
-  const sideAreaMm2 =
+  const sideEnvelopeAreaMm2 =
+    2 *
+    d *
+    ((interfaces.wallFrontHeightMm + interfaces.wallRearHeightMm) / 2);
+  const sidePanelCoreAreaMm2 =
     2 *
     joinery.sideRunMm *
     ((joinery.sideFrontHeightMm + joinery.sideRearHeightMm) / 2);
-  const wallAreaMm2 = frontRearAreaMm2 + sideAreaMm2 - openingArea;
+  const cornerReturnAreaMm2 = Math.max(
+    0,
+    sideEnvelopeAreaMm2 - sidePanelCoreAreaMm2
+  );
+  const wallAreaMm2 =
+    frontRearAreaMm2 + sideEnvelopeAreaMm2 - openingArea;
   const floorAreaMm2 = w * d;
   const roofAreaMm2 = w * roofSlope(model).trueLengthMm;
 
   return {
     wallM2: mm2ToM2(wallAreaMm2),
+    sidePanelCoreM2: mm2ToM2(sidePanelCoreAreaMm2),
+    cornerReturnM2: mm2ToM2(cornerReturnAreaMm2),
     floorM2: mm2ToM2(floorAreaMm2),
     roofM2: mm2ToM2(roofAreaMm2),
     openingM2: mm2ToM2(openingArea),
