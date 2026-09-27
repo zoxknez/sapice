@@ -1,5 +1,5 @@
 import type {ShelterModel} from "@/lib/domain";
-import {materials} from "@/data/materials";
+import {materialLambda, materials} from "@/data/materials";
 import {
   assemblyThicknessMm,
   getAssembly,
@@ -82,8 +82,8 @@ export const thermalMethod = {
 
 export function assemblyUValue(assembly: ConstructionAssembly) {
   const rLayers = assembly.layers.reduce((sum, layer) => {
-    const material = materials[layer.materialId];
-    return sum + mmToM(layer.thicknessMm) / material.lambdaTypicalWmK;
+    const lambda = materialLambda(layer.materialId, layer.thicknessMm);
+    return sum + mmToM(layer.thicknessMm) / lambda;
   }, 0);
 
   return 1 / (
