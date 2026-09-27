@@ -60,6 +60,16 @@ export const sources: Record<string, SourceRecord> = {
     topics: ["plywood", "fasteners", "spacing", "panel-edges"],
     notes: "Reference starting point for panel fastening geometry: approximately 6 in edge spacing, 12 in intermediate spacing and about 3/8 in edge offset. Šapice does not treat this roof-sheathing guide as a certified fastening design for pet shelters."
   },
+  "owens-corning-roof-installation": {
+    id: "owens-corning-roof-installation",
+    publisher: "Owens Corning Roofing",
+    title: "Oakridge and TruDefinition Duration Oakridge Shingles Installation Instructions",
+    url: "https://www.owenscorning.com/en-us/roofing/install-instructions/oakridge",
+    accessedAt: "2026-09-27",
+    tier: 1,
+    topics: ["roofing", "low-slope", "underlayment", "drip-edge", "water-management"],
+    notes: "Manufacturer example showing that low-slope roof assemblies require slope-specific underlayment/edge details. Šapice uses this as evidence that final roof covering compatibility must follow the selected product instructions, not as a universal shelter roofing specification."
+  },
   "fibran-xps-300": {
     id: "fibran-xps-300",
     publisher: "FIBRAN",
