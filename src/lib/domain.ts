@@ -38,7 +38,8 @@ export const shelterModelSchema = z.object({
     entrances: z.number().int().positive(),
     entranceWidthMm: z.number().int().positive(),
     entranceHeightMm: z.number().int().positive(),
-    thresholdHeightMm: z.number().int().nonnegative()
+    thresholdHeightMm: z.number().int().nonnegative(),
+    dividerThicknessMm: z.number().int().positive()
   }),
   construction: z.object({
     wallAssemblyId: z.string(),
