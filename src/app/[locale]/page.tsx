@@ -8,7 +8,10 @@ export default async function HomePage({params}: {params: Promise<{locale: AppLo
   const {locale} = await params;
   setRequestLocale(locale);
   const t = await getTranslations({locale, namespace: "Home"});
-  const featured = shelterModels.slice(0, 3);
+  const featuredSlugs = ["nordic-quad-winter", "alpine-medium-winter", "alpine-large-heated"];
+  const featured = featuredSlugs
+    .map((slug) => shelterModels.find((model) => model.slug === slug))
+    .filter((model): model is (typeof shelterModels)[number] => Boolean(model));
 
   return (
     <>
@@ -59,6 +62,65 @@ export default async function HomePage({params}: {params: Promise<{locale: AppLo
             <h2>{locale === "sr" ? "Napravljeno za radionicu" : "Built for the workshop"}</h2>
             <p>{locale === "sr" ? "Planovi su namenjeni stvarnoj izradi, ne samo lepim renderima." : "Plans are intended for real builds, not just attractive renders."}</p>
           </article>
+        </div>
+      </section>
+
+      <section className="section capability-section">
+        <div className="shell">
+          <div className="section-heading">
+            <div>
+              <span className="kicker">From model to workshop</span>
+              <h2>{locale === "sr" ? "Jedan model, kompletan tok izrade" : "One model, a complete build workflow"}</h2>
+            </div>
+            <p>
+              {locale === "sr"
+                ? "Nema odvojenih marketing mera i tehničkih mera. Isti kanonski model pokreće prikaz, krojnu listu, proračune i build guide."
+                : "There are no separate marketing and technical dimensions. The same canonical model drives the view, cut list, calculations and build guide."}
+            </p>
+          </div>
+
+          <div className="capability-grid">
+            <article>
+              <span>01</span>
+              <h3>{locale === "sr" ? "3D + tehničke mere" : "3D + technical dimensions"}</h3>
+              <p>{locale === "sr" ? "Parametarski 3D, roof-off/exploded prikaz i SVG tehnički crtež iz istih dimenzija." : "Parametric 3D, roof-off/exploded views and SVG technical drawings from the same dimensions."}</p>
+            </article>
+            <article>
+              <span>02</span>
+              <h3>{locale === "sr" ? "Krojna lista + nesting" : "Cut list + nesting"}</h3>
+              <p>{locale === "sr" ? "12 mm, 9 mm i XPS delovi se kompajliraju i pakuju u planning stock sa marginom i kerf-om." : "12 mm, 9 mm and XPS parts are compiled and packed into planning stock with margins and kerf."}</p>
+            </article>
+            <article>
+              <span>03</span>
+              <h3>{locale === "sr" ? "Framing + hardware" : "Framing + hardware"}</h3>
+              <p>{locale === "sr" ? "Linearne mere rama, servisni krov, šarke, zatvarači i preliminarni fastening schedule." : "Framing lengths, service roof, hinges, latches and a provisional fastening schedule."}</p>
+            </article>
+            <article>
+              <span>04</span>
+              <h3>{locale === "sr" ? "Troškovnik bez izmišljenih cena" : "Costing without fabricated prices"}</h3>
+              <p>{locale === "sr" ? "Količine dolaze iz compiler-a, a korisnik unosi sopstvene lokalne cene i valutu." : "Quantities come from the compiler while the user enters real local prices and currency."}</p>
+            </article>
+            <article>
+              <span>05</span>
+              <h3>{locale === "sr" ? "Build mode u radionici" : "Workshop build mode"}</h3>
+              <p>{locale === "sr" ? "Koraci izrade sa lokalno sačuvanim napretkom, fokus režimom i print/PDF prikazom." : "Build steps with locally saved progress, focus mode and print/PDF output."}</p>
+            </article>
+            <article>
+              <span>06</span>
+              <h3>{locale === "sr" ? "Offline za već otvorene planove" : "Offline for visited plans"}</h3>
+              <p>{locale === "sr" ? "PWA keš čuva već posećene modele za situacije kada u radionici nema stabilne mreže." : "The PWA cache keeps previously visited models available when workshop connectivity is unreliable."}</p>
+            </article>
+          </div>
+
+          <div className="validation-banner">
+            <div>
+              <span className="kicker">Validation ladder</span>
+              <strong>DATA_VALIDATED → GEOMETRY_VALIDATED → ENGINEERING_REVIEWED → PROTOTYPE_BUILT → FIELD_TESTED</strong>
+            </div>
+            <Link href="/methodology" locale={locale} className="button secondary">
+              {locale === "sr" ? "Kako radi validacija" : "How validation works"}
+            </Link>
+          </div>
         </div>
       </section>
 
