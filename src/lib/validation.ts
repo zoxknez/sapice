@@ -143,6 +143,83 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
       }
     }
 
+    const cableEntryItem = compiled.hardwareItems.find(
+      (item) => item.id === "protected-cable-entry"
+    );
+
+    if (model.heated) {
+      if (compiled.heating.zones.length !== model.layout.chambers) {
+        issues.push({
+          severity: "error",
+          code: "HEATING_ZONE_COUNT_MISMATCH",
+          message: "Heated models require one compiled heating provision zone per chamber."
+        });
+      }
+
+      if ((cableEntryItem?.quantity ?? 0) !== compiled.heating.zones.length) {
+        issues.push({
+          severity: "error",
+          code: "HEATING_CABLE_ENTRY_COUNT_MISMATCH",
+          message: "Protected cable-entry quantity must match compiled heating zones."
+        });
+      }
+
+      if (!sources[compiled.heating.safetySourceId]) {
+        issues.push({
+          severity: "error",
+          code: "MISSING_HEATING_SAFETY_SOURCE",
+          message: `Unknown heating safety source: ${compiled.heating.safetySourceId}`
+        });
+      }
+
+      const internalDepthStartMm = compiled.construction.wallThicknessMm;
+      const internalDepthEndMm =
+        model.dimensions.depthMm - compiled.construction.wallThicknessMm;
+
+      for (const zone of compiled.heating.zones) {
+        const chamberIndex = zone.chamber - 1;
+        const chamberLeftMm = compiled.layout.chamberStartsXmm[chamberIndex];
+        const chamberRightMm = chamberLeftMm + compiled.layout.chamberWidthMm;
+        const zoneRightMm = zone.xMm + zone.widthMm;
+        const zoneRearMm = zone.zMm + zone.depthMm;
+        const unheatedAreaM2 = zone.chamberFloorAreaM2 - zone.areaM2;
+
+        if (
+          zone.xMm < chamberLeftMm ||
+          zoneRightMm > chamberRightMm ||
+          zone.zMm < internalDepthStartMm ||
+          zoneRearMm > internalDepthEndMm
+        ) {
+          issues.push({
+            severity: "error",
+            code: "HEATING_ZONE_OUT_OF_BOUNDS",
+            message: `Heating provision zone ${zone.id} falls outside its chamber floor geometry.`
+          });
+        }
+
+        if (
+          zone.areaM2 <= 0 ||
+          zone.chamberFloorAreaM2 <= 0 ||
+          zone.areaM2 >= zone.chamberFloorAreaM2 ||
+          unheatedAreaM2 <= 0
+        ) {
+          issues.push({
+            severity: "error",
+            code: "HEATING_ZONE_REMOVES_CHOICE_AREA",
+            message: `Heating provision zone ${zone.id} does not leave a positive unheated floor-choice area.`
+          });
+        }
+      }
+    } else {
+      if (compiled.heating.zones.length > 0 || cableEntryItem) {
+        issues.push({
+          severity: "error",
+          code: "PASSIVE_MODEL_HAS_HEATING_PROVISION",
+          message: "Passive models must not compile heating zones or protected heating cable entries."
+        });
+      }
+    }
+
     if (
       compiled.ventilation.zones.length !==
       model.layout.chambers * model.ventilation.zonesPerChamber
