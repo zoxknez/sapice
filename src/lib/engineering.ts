@@ -1,5 +1,5 @@
 import type {ShelterModel} from "@/lib/domain";
-import {materialLambda, materials} from "@/data/materials";
+import {materialLambda, materials, type Material} from "@/data/materials";
 import {
   assemblyThicknessMm,
   getAssembly,
@@ -159,7 +159,7 @@ export function materialSummary(model: ShelterModel) {
   const area = surfaceAreas(model);
   const groups = new Map<string, {
     id: string;
-    materialId: string;
+    materialId: Material["id"];
     thicknessMm: number;
     calculatedM2: number;
   }>();
