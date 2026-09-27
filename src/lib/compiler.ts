@@ -30,6 +30,54 @@ export type BuildStep = {
   detailEn: string;
 };
 
+
+function splitInsulationPanel({
+  id,
+  nameSr,
+  nameEn,
+  widthMm,
+  heightMm,
+  thicknessMm,
+  notes
+}: {
+  id: string;
+  nameSr: string;
+  nameEn: string;
+  widthMm: number;
+  heightMm: number;
+  thicknessMm: number;
+  notes?: string;
+}): CutPart[] {
+  const stockWidthMm = 1250;
+  const stockHeightMm = 600;
+  const columns = Math.max(1, Math.ceil(widthMm / stockWidthMm));
+  const rows = Math.max(1, Math.ceil(heightMm / stockHeightMm));
+  const segmentWidth = Math.ceil(widthMm / columns);
+  const segmentHeight = Math.ceil(heightMm / rows);
+  const parts: CutPart[] = [];
+
+  for (let row = 0; row < rows; row++) {
+    for (let column = 0; column < columns; column++) {
+      const remainingWidth = widthMm - column * segmentWidth;
+      const remainingHeight = heightMm - row * segmentHeight;
+      parts.push({
+        id: `${id}-r${row + 1}c${column + 1}`,
+        nameSr,
+        nameEn,
+        material: "xps",
+        quantity: 1,
+        widthMm: Math.min(segmentWidth, remainingWidth),
+        heightMm: Math.min(segmentHeight, remainingHeight),
+        thicknessMm,
+        shape: "rectangle",
+        notes
+      });
+    }
+  }
+
+  return parts;
+}
+
 export function compileShelterModel(model: ShelterModel) {
   const construction = constructionSummary(model);
   const assemblies = getModelAssemblies(model);
@@ -179,55 +227,60 @@ export function compileShelterModel(model: ShelterModel) {
       thicknessMm: 9,
       shape: "rectangle"
     },
-    {
-      id: "wall-xps-front-rear",
-      nameSr: "XPS prednji/zadnji zid",
-      nameEn: "XPS front/rear wall",
-      material: "xps",
-      quantity: 2,
+    ...splitInsulationPanel({
+      id: "xps-front",
+      nameSr: "XPS prednjeg zida",
+      nameEn: "Front-wall XPS",
       widthMm: internalWidthMm,
-      heightMm: Math.max(internalFrontHeightMm, internalRearHeightMm),
+      heightMm: internalFrontHeightMm,
       thicknessMm: assemblies.wall.layers.find((layer) => layer.role === "insulation")?.thicknessMm ?? 0,
-      shape: "rectangle",
-      notes: "Trim each panel to the exact front or rear cavity height during dry fitting."
-    },
-    {
-      id: "wall-xps-side",
-      nameSr: "XPS bočni zidovi",
-      nameEn: "XPS side walls",
-      material: "xps",
-      quantity: 2,
+      notes: "Trim entrance openings after dry fitting against the compiled front-panel cutouts."
+    }),
+    ...splitInsulationPanel({
+      id: "xps-rear",
+      nameSr: "XPS zadnjeg zida",
+      nameEn: "Rear-wall XPS",
+      widthMm: internalWidthMm,
+      heightMm: internalRearHeightMm,
+      thicknessMm: assemblies.wall.layers.find((layer) => layer.role === "insulation")?.thicknessMm ?? 0
+    }),
+    ...splitInsulationPanel({
+      id: "xps-side-a",
+      nameSr: "XPS bočnog zida A",
+      nameEn: "Side-wall XPS A",
       widthMm: internalDepthMm,
       heightMm: internalFrontHeightMm,
       thicknessMm: assemblies.wall.layers.find((layer) => layer.role === "insulation")?.thicknessMm ?? 0,
-      shape: "trapezoid",
-      notes: `Front clear edge ${internalFrontHeightMm} mm; rear clear edge ${internalRearHeightMm} mm.`
-    },
-    {
-      id: "floor-xps",
+      notes: `Final top edge follows the roof slope down to ${internalRearHeightMm} mm.`
+    }),
+    ...splitInsulationPanel({
+      id: "xps-side-b",
+      nameSr: "XPS bočnog zida B",
+      nameEn: "Side-wall XPS B",
+      widthMm: internalDepthMm,
+      heightMm: internalFrontHeightMm,
+      thicknessMm: assemblies.wall.layers.find((layer) => layer.role === "insulation")?.thicknessMm ?? 0,
+      notes: `Final top edge follows the roof slope down to ${internalRearHeightMm} mm.`
+    }),
+    ...splitInsulationPanel({
+      id: "xps-floor",
       nameSr: "XPS poda",
       nameEn: "Floor XPS",
-      material: "xps",
-      quantity: 1,
       widthMm: internalWidthMm,
       heightMm: internalDepthMm,
-      thicknessMm: assemblies.floor.layers.find((layer) => layer.role === "insulation")?.thicknessMm ?? 0,
-      shape: "rectangle"
-    },
-    {
-      id: "roof-xps",
+      thicknessMm: assemblies.floor.layers.find((layer) => layer.role === "insulation")?.thicknessMm ?? 0
+    }),
+    ...splitInsulationPanel({
+      id: "xps-roof",
       nameSr: "XPS krova",
       nameEn: "Roof XPS",
-      material: "xps",
-      quantity: 1,
       widthMm: internalWidthMm,
       heightMm: Math.ceil(Math.hypot(
         internalDepthMm,
         Math.max(0, internalFrontHeightMm - internalRearHeightMm)
       )),
-      thicknessMm: assemblies.roof.layers.find((layer) => layer.role === "insulation")?.thicknessMm ?? 0,
-      shape: "rectangle"
-    },
+      thicknessMm: assemblies.roof.layers.find((layer) => layer.role === "insulation")?.thicknessMm ?? 0
+    }),
     ...(model.layout.chambers > 1 ? [{
       id: "divider",
       nameSr: "Unutrašnja pregrada",
