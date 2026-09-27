@@ -2760,3 +2760,11 @@ button { cursor: pointer; }
   font-size: 10px;
   font-weight: 800;
 }
+
+
+.drawing-heating-provision {
+  fill: #b85e4633;
+  stroke: #a6533d;
+  stroke-width: 1.5;
+  stroke-dasharray: 5 3;
+}
