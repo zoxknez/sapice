@@ -13,6 +13,7 @@ export function compiledSourceIds(compiled: CompiledShelterModel) {
   }
 
   ids.add(compiled.hardware.fastenerReferenceSourceId);
+  ids.add(compiled.roofWeathering.referenceSourceId);
 
   return Array.from(ids);
 }
