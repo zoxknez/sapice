@@ -111,6 +111,89 @@ export function layoutGeometry(model: ShelterModel) {
   };
 }
 
+export const framingMethod = {
+  version: "1.1.0",
+  maxStudSpacingMm: 500
+} as const;
+
+export function provisionalIntermediatePositions(
+  spanMm: number,
+  maxSpacingMm = framingMethod.maxStudSpacingMm
+) {
+  const count = Math.max(0, Math.ceil(spanMm / maxSpacingMm) - 1);
+  return Array.from(
+    {length: count},
+    (_, index) => Math.round(spanMm * ((index + 1) / (count + 1)))
+  );
+}
+
+export function ventilationProvisionGeometry(model: ShelterModel) {
+  const layout = layoutGeometry(model);
+  const interfaces = constructionInterfaceGeometry(model);
+  const rearSupportPositionsMm = provisionalIntermediatePositions(
+    model.dimensions.widthMm
+  );
+  const zones = [];
+  const topClearanceMm = Math.max(
+    45,
+    Math.min(70, Math.round(interfaces.wallRearHeightMm * 0.1))
+  );
+
+  for (let chamberIndex = 0; chamberIndex < model.layout.chambers; chamberIndex++) {
+    const chamberStartMm = layout.chamberStartsXmm[chamberIndex];
+    const chamberWidthMm = layout.chamberWidthMm;
+    const zoneWidthMm = Math.round(
+      Math.min(120, Math.max(80, chamberWidthMm * 0.2))
+    );
+    const zoneHeightMm = Math.round(
+      Math.min(60, Math.max(40, interfaces.wallRearHeightMm * 0.08))
+    );
+    const candidateFractions = [0.2, 0.8, 0.35, 0.65, 0.5];
+    const clearanceFromStudMm = zoneWidthMm / 2 + 30;
+
+    const chosenFraction =
+      candidateFractions.find((fraction) => {
+        const centerXmm = chamberStartMm + chamberWidthMm * fraction;
+        return rearSupportPositionsMm.every(
+          (studXmm) => Math.abs(studXmm - centerXmm) >= clearanceFromStudMm
+        );
+      }) ?? 0.5;
+
+    const centerXmm = chamberStartMm + chamberWidthMm * chosenFraction;
+    const bottomMm = Math.max(
+      0,
+      interfaces.wallRearHeightMm - topClearanceMm - zoneHeightMm
+    );
+
+    zones.push({
+      id: `rear-vent-zone-${chamberIndex + 1}`,
+      chamber: chamberIndex + 1,
+      wall: "rear" as const,
+      centerXmm,
+      bottomMm,
+      widthMm: zoneWidthMm,
+      heightMm: zoneHeightMm,
+      provenance: "ASSUMPTION" as const,
+      actualOpening: "TBD_BY_SELECTED_VENT_INSERT" as const
+    });
+  }
+
+  return {
+    strategy: model.ventilation.strategy,
+    status: model.ventilation.status,
+    zonesPerChamber: model.ventilation.zonesPerChamber,
+    topClearanceMm,
+    rearSupportPositionsMm,
+    zones,
+    limitations: [
+      "Provision zones are not ventilation free-area requirements",
+      "Final vent insert dimensions remain product-specific",
+      "Airflow and condensation performance require physical validation",
+      "Ventilation must not create excessive localised draughts"
+    ]
+  };
+}
+
 export function entranceGeometry(model: ShelterModel) {
   const widthMm = model.layout.entranceWidthMm;
   const heightMm = model.layout.entranceHeightMm;
