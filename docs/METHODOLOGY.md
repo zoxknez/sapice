@@ -187,11 +187,13 @@ V1 also enforces a provisional maximum support spacing.
 
 Hardware quantities and roof hinge/latch positions are generated deterministically but remain assumptions until engineering review selects real hardware products and verifies their capacities.
 
+For the current mono-pitch service roof, compiler v1.6 places the continuous hinge line on the **front high edge** and the latches on the **rear runoff edge**. This keeps the low rear edge free of a continuous hinge across the drip path. Final latch placement and weather sealing must still preserve water shedding and follow the selected roof system.
+
 ## Heating provision
 
 Heated variants do not define homemade heaters.
 
-Compiler v1.5 derives one **PRODUCT_SPECIFIC provision zone per chamber**. Each zone is bounded by the chamber floor geometry and must leave a positive unheated choice area. The BOM creates one protected cable-entry provision per zone.
+Compiler v1.6 derives one **PRODUCT_SPECIFIC provision zone per chamber**. Each zone is bounded by the chamber floor geometry and must leave a positive unheated choice area. The BOM creates one protected cable-entry provision per zone.
 
 These values do **not** specify heater power, voltage, thermostat set-points or a safe DIY electrical design.
 
