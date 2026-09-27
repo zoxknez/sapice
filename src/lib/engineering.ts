@@ -292,7 +292,12 @@ export function roofPanelGeometry(model: ShelterModel) {
   const slope = roofSlope(model);
   const cos = Math.cos(slope.angleRad);
   const extraPlanDepthMm = model.roof.frontOverhangMm + model.roof.rearOverhangMm;
-  const panelLengthMm = slope.trueLengthMm + extraPlanDepthMm / cos;
+  const frontOverhangAlongSlopeMm = model.roof.frontOverhangMm / cos;
+  const rearOverhangAlongSlopeMm = model.roof.rearOverhangMm / cos;
+  const panelLengthMm =
+    frontOverhangAlongSlopeMm +
+    slope.trueLengthMm +
+    rearOverhangAlongSlopeMm;
   const panelWidthMm = model.dimensions.widthMm + 2 * model.roof.sideOverhangMm;
   const centerPlanOffsetMm = (model.roof.rearOverhangMm - model.roof.frontOverhangMm) / 2;
   const centerHeightOffsetMm = -Math.tan(slope.angleRad) * centerPlanOffsetMm;
@@ -300,6 +305,11 @@ export function roofPanelGeometry(model: ShelterModel) {
   return {
     panelWidthMm,
     panelLengthMm,
+    frontOverhangAlongSlopeMm,
+    rearOverhangAlongSlopeMm,
+    frontWallLineFromPanelFrontMm: frontOverhangAlongSlopeMm,
+    rearWallLineFromPanelFrontMm:
+      frontOverhangAlongSlopeMm + slope.trueLengthMm,
     areaM2: mm2ToM2(panelWidthMm * panelLengthMm),
     centerPlanOffsetMm,
     centerHeightOffsetMm
