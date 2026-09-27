@@ -10,6 +10,7 @@ const catSources = [
 
 const dogSources = [
   "humane-world-pets-cold",
+  "gov-uk-dog-kennel-ventilation",
   "aspca-cold-weather",
   "iso-6946-2017",
   "iso-13789-2017"
