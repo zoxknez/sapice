@@ -91,6 +91,10 @@ export function ModelBuildBook({model, locale}: {model: ShelterModel; locale: Ap
               <strong>{compiled.framing.baseProfileMm[0]} × {compiled.framing.baseProfileMm[1]} mm</strong>
             </div>
             <div>
+              <span>{locale === "sr" ? "Max osni razmak V1" : "V1 max stud spacing"}</span>
+              <strong>≈ {compiled.framing.maxStudSpacingMm} mm</strong>
+            </div>
+            <div>
               <span>{locale === "sr" ? "Ukupna linearna dužina" : "Total linear length"}</span>
               <strong>{compiled.framing.totalLinearM.toFixed(1)} m</strong>
             </div>
