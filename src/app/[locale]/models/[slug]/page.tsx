@@ -18,6 +18,7 @@ import {StructuredData} from "@/components/structured-data";
 import {ThermalScenario} from "@/components/thermal-scenario";
 import {ModelValidationPanel} from "@/components/model-validation-panel";
 import {VentilationProvision} from "@/components/ventilation-provision";
+import {PrototypeEvidenceWorksheet} from "@/components/prototype-evidence-worksheet";
 import {compileShelterModel} from "@/lib/compiler";
 import {compiledSourceIds} from "@/lib/provenance";
 import {costLinesForCompiled} from "@/lib/costing";
@@ -163,6 +164,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
           <a href="#framing">{locale === "sr" ? "Ram" : "Framing"}</a>
           <a href="#hardware">{locale === "sr" ? "Hardware" : "Hardware"}</a>
           <a href="#build-guide">{locale === "sr" ? "Izrada" : "Build"}</a>
+          <a href="#prototype">{locale === "sr" ? "Prototip" : "Prototype"}</a>
           <a href="#sources">{locale === "sr" ? "Izvori" : "Sources"}</a>
         </div>
       </nav>
@@ -309,6 +311,14 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
       <CostCalculator modelId={model.id} lines={costLines} locale={locale} />
       <OperatingGuidance model={model} locale={locale} />
       <ModelBuildBook compiled={compiled} locale={locale} />
+      <PrototypeEvidenceWorksheet
+        locale={locale}
+        modelId={model.id}
+        modelVersion={model.version}
+        compilerVersion={compiled.compilerVersion}
+        planFingerprint={compiled.planFingerprint}
+        heated={model.heated}
+      />
     </>
   );
 }
