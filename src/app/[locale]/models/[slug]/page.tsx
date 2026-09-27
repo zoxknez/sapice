@@ -17,6 +17,7 @@ import {OperatingGuidance} from "@/components/operating-guidance";
 import {StructuredData} from "@/components/structured-data";
 import {ThermalScenario} from "@/components/thermal-scenario";
 import {ModelValidationPanel} from "@/components/model-validation-panel";
+import {VentilationProvision} from "@/components/ventilation-provision";
 import {compileShelterModel} from "@/lib/compiler";
 import {compiledSourceIds} from "@/lib/provenance";
 
@@ -147,6 +148,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
           <a href="#geometry">{locale === "sr" ? "Mere" : "Dimensions"}</a>
           <a href="#validation">{locale === "sr" ? "Validacija" : "Validation"}</a>
           <a href="#thermal">{locale === "sr" ? "Termika" : "Thermal"}</a>
+          <a href="#ventilation">{locale === "sr" ? "Ventilacija" : "Ventilation"}</a>
           <a href="#materials">{locale === "sr" ? "Materijali" : "Materials"}</a>
           <a href="#nesting">{locale === "sr" ? "Table" : "Sheets"}</a>
           <a href="#cost">{locale === "sr" ? "Trošak" : "Cost"}</a>
@@ -271,6 +273,8 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
           </div>
         </div>
       </section>
+
+      <VentilationProvision compiled={compiled} locale={locale} />
 
       <section className="section" id="materials">
         <div className="shell">
