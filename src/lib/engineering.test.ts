@@ -131,6 +131,22 @@ describe("engineering model derivations", () => {
     }
   });
 
+  it("keeps front entrance-support gaps within the compiled maximum", () => {
+    for (const model of shelterModels) {
+      const compiled = compileShelterModel(model);
+      const points = [
+        0,
+        ...compiled.framing.frontSupportPositionsXmm,
+        model.dimensions.widthMm
+      ].sort((a, b) => a - b);
+
+      for (let index = 1; index < points.length; index++) {
+        expect(points[index] - points[index - 1])
+          .toBeLessThanOrEqual(compiled.framing.maxStudSpacingMm + 1);
+      }
+    }
+  });
+
   it("keeps provisional rear and side stud gaps within the compiled maximum", () => {
     for (const model of shelterModels) {
       const compiled = compileShelterModel(model);
