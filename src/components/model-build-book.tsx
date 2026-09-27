@@ -118,6 +118,70 @@ export function ModelBuildBook({model, locale}: {model: ShelterModel; locale: Ap
         </div>
       </section>
 
+      <section className="section hardware-section" id="hardware">
+        <div className="shell">
+          <div className="section-heading">
+            <div>
+              <span className="kicker">Hardware · {compiled.hardware.status}</span>
+              <h2>{locale === "sr" ? "Pričvršćivači i servisni krov" : "Fasteners and service roof"}</h2>
+            </div>
+            <p>
+              {locale === "sr"
+                ? "Količine i geometrija su V1 radionički plan. Razmak pričvršćivača koristi APA referentni obrazac kao konzervativan početak, ali nije sertifikovan fastening design ovog proizvoda."
+                : "Quantities and geometry are a V1 workshop plan. Fastener spacing uses an APA reference pattern as a conservative starting point, but it is not a certified fastening design for this product."}
+            </p>
+          </div>
+
+          <div className="framing-summary hardware-summary">
+            <div>
+              <span>{locale === "sr" ? "Razmak na ivici" : "Edge spacing"}</span>
+              <strong>≈ {compiled.hardware.edgeSpacingMm} mm</strong>
+            </div>
+            <div>
+              <span>{locale === "sr" ? "Razmak u polju" : "Field spacing"}</span>
+              <strong>≈ {compiled.hardware.fieldSpacingMm} mm</strong>
+            </div>
+            <div>
+              <span>{locale === "sr" ? "Spoj ploča" : "Panel joint gap"}</span>
+              <strong>{compiled.hardware.panelJointGapMm} mm</strong>
+            </div>
+          </div>
+
+          <div className="cut-table hardware-table" role="table" aria-label={locale === "sr" ? "Hardware lista" : "Hardware schedule"}>
+            <div className="cut-row cut-head" role="row">
+              <span role="columnheader">ID</span>
+              <span role="columnheader">{locale === "sr" ? "Stavka" : "Item"}</span>
+              <span role="columnheader">{locale === "sr" ? "Količina" : "Quantity"}</span>
+              <span role="columnheader">{locale === "sr" ? "Status" : "Status"}</span>
+            </div>
+            {compiled.hardwareItems.map((item) => (
+              <div className="cut-row" role="row" key={item.id}>
+                <code role="cell">{item.id}</code>
+                <span role="cell">
+                  <strong>{locale === "sr" ? item.nameSr : item.nameEn}</strong>
+                  <small>{locale === "sr" ? item.notesSr : item.notesEn}</small>
+                </span>
+                <span role="cell">
+                  {item.quantity.toFixed(item.unit === "m" ? 2 : 0)} {item.unit === "m" ? "m" : (locale === "sr" ? "kom." : "pcs")}
+                </span>
+                <strong role="cell">{item.provenance}</strong>
+              </div>
+            ))}
+          </div>
+
+          <div className="hardware-reference">
+            <span>{locale === "sr" ? "Referentni obrazac pričvršćivanja" : "Fastening reference pattern"}</span>
+            <a
+              href={sources[compiled.hardware.fastenerReferenceSourceId]?.url}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {sources[compiled.hardware.fastenerReferenceSourceId]?.publisher} · {sources[compiled.hardware.fastenerReferenceSourceId]?.title} ↗
+            </a>
+          </div>
+        </div>
+      </section>
+
       <section className="section tone" id="build-guide">
         <div className="shell">
           <div className="section-heading">
