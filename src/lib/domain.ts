@@ -15,6 +15,7 @@ export const shelterModelSchema = z.object({
   validationState: validationStateSchema,
   sourceIds: z.array(z.string()).min(1),
   animal: z.enum(["cat", "dog"]),
+  animalSizeClass: z.enum(["standard", "small", "medium", "large"]),
   intendedUse: z.enum([
     "COMMUNITY_CAT_SHELTER",
     "PET_OUTDOOR_AUXILIARY",
