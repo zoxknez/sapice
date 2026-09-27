@@ -77,6 +77,28 @@ export function PlanExportButtons({
       ]);
     }
 
+    if (compiled.heating.zones.length > 0) {
+      rows.push(
+        [],
+        ["HEATING PROVISION"],
+        ["ID", "Chamber", "X mm", "Z mm", "Width mm", "Depth mm", "Area m2", "Chamber floor m2", "Actual product footprint"]
+      );
+
+      for (const zone of compiled.heating.zones) {
+        rows.push([
+          zone.id,
+          zone.chamber,
+          zone.xMm.toFixed(0),
+          zone.zMm.toFixed(0),
+          zone.widthMm,
+          zone.depthMm,
+          zone.areaM2.toFixed(3),
+          zone.chamberFloorAreaM2.toFixed(3),
+          zone.actualProductFootprint
+        ]);
+      }
+    }
+
     rows.push(
       [],
       ["ROOF WEATHERING"],
