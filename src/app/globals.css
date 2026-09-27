@@ -2191,3 +2191,28 @@ button { cursor: pointer; }
   font-size: 10px;
   line-height: 1.55;
 }
+
+
+.packed-envelope {
+  fill: none;
+  stroke: #8f8377;
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+  opacity: .7;
+}
+.packed-part-actual {
+  fill: #d9c4aa;
+  stroke: #5d4939;
+  stroke-width: 1.2;
+}
+.packed-cutout {
+  fill: #fffdf9;
+  stroke: #9b6848;
+  stroke-width: 1.2;
+}
+.packed-label {
+  fill: #4b4037;
+  stroke: none;
+  font: 700 8px ui-monospace, SFMono-Regular, Menlo, monospace;
+  pointer-events: none;
+}
