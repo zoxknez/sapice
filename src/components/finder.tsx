@@ -25,6 +25,7 @@ export function Finder({models, locale}: {models: ShelterModel[]; locale: AppLoc
   const isSr = locale === "sr";
   const [animal, setAnimal] = useState<"cat" | "dog">("cat");
   const [count, setCount] = useState(2);
+  const [dogSize, setDogSize] = useState<"small" | "medium" | "large">("medium");
   const [heating, setHeating] = useState<HeatingNeed>("any");
   const [climate, setClimate] = useState<ClimateNeed>("cold");
   const [maxWidth, setMaxWidth] = useState(1400);
@@ -39,7 +40,8 @@ export function Finder({models, locale}: {models: ShelterModel[]; locale: AppLoc
 
       return (
         model.animal === animal &&
-        model.capacity.max >= count &&
+        (animal === "cat" ? model.animalSizeClass === "standard" : model.animalSizeClass === dogSize) &&
+        model.capacity.max >= (animal === "dog" ? 1 : count) &&
         heatingOk &&
         climateRank[model.climateProfile] >= needRank[climate] &&
         model.dimensions.widthMm <= maxWidth &&
@@ -58,9 +60,13 @@ export function Finder({models, locale}: {models: ShelterModel[]; locale: AppLoc
 
   function reasons(model: ShelterModel) {
     const items = [
-      isSr
-        ? `Kapacitet: do ${model.capacity.max} životinja`
-        : `Capacity: up to ${model.capacity.max} animals`,
+      animal === "dog"
+        ? (isSr
+            ? `Veličina psa: ${model.animalSizeClass}`
+            : `Dog size class: ${model.animalSizeClass}`)
+        : (isSr
+            ? `Kapacitet: do ${model.capacity.max} mačaka`
+            : `Capacity: up to ${model.capacity.max} cats`),
       isSr
         ? `Staje u ${maxWidth} × ${maxDepth} mm prostor`
         : `Fits within ${maxWidth} × ${maxDepth} mm`,
@@ -87,16 +93,32 @@ export function Finder({models, locale}: {models: ShelterModel[]; locale: AppLoc
           </select>
         </label>
 
-        <label>
-          <span>{isSr ? "Broj životinja" : "Number of animals"}</span>
-          <input
-            type="number"
-            min={1}
-            max={12}
-            value={count}
-            onChange={(event) => setCount(Math.max(1, Number(event.target.value) || 1))}
-          />
-        </label>
+        {animal === "cat" ? (
+          <label>
+            <span>{isSr ? "Broj mačaka" : "Number of cats"}</span>
+            <input
+              type="number"
+              min={1}
+              max={12}
+              value={count}
+              onChange={(event) => setCount(Math.max(1, Number(event.target.value) || 1))}
+            />
+          </label>
+        ) : (
+          <label>
+            <span>{isSr ? "Veličina psa" : "Dog size"}</span>
+            <select value={dogSize} onChange={(event) => setDogSize(event.target.value as "small" | "medium" | "large")}>
+              <option value="small">{isSr ? "Mali" : "Small"}</option>
+              <option value="medium">{isSr ? "Srednji" : "Medium"}</option>
+              <option value="large">{isSr ? "Veliki" : "Large"}</option>
+            </select>
+            <small className="field-help">
+              {isSr
+                ? "Klasa je početni filter, ne zamena za proveru stvarnih mera psa."
+                : "The class is a starting filter, not a substitute for checking the dog's actual measurements."}
+            </small>
+          </label>
+        )}
 
         <label>
           <span>{isSr ? "Zimski profil" : "Winter profile"}</span>
