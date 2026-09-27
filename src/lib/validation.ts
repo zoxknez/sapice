@@ -638,6 +638,28 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
     }
 
     if (
+      Math.abs(
+        compiled.hardware.hingeAxisFromPanelFrontMm -
+          compiled.roofPanel.frontWallLineFromPanelFrontMm
+      ) > 0.001 ||
+      Math.abs(
+        compiled.hardware.latchAxisFromPanelFrontMm -
+          compiled.roofPanel.rearWallLineFromPanelFrontMm
+      ) > 0.001 ||
+      compiled.hardware.hingeAxisFromPanelFrontMm <= 0 ||
+      compiled.hardware.latchAxisFromPanelFrontMm >=
+        compiled.roofPanel.panelLengthMm ||
+      compiled.hardware.hingeAxisFromPanelFrontMm >=
+        compiled.hardware.latchAxisFromPanelFrontMm
+    ) {
+      issues.push({
+        severity: "error",
+        code: "ROOF_HARDWARE_ATTACHMENT_LINE_MISMATCH",
+        message: "Service-roof hardware axes must match the front/rear structural wall lines inside the roof overhangs."
+      });
+    }
+
+    if (
       model.maintenance.roofAccess === "HINGED" &&
       (
         compiled.hardware.hingeEdge !== compiled.roofWeathering.highEdge ||
