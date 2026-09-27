@@ -12,6 +12,14 @@ export type CutPart = {
   thicknessMm: number;
   shape: "rectangle" | "trapezoid";
   notes?: string;
+  cutouts?: Array<{
+    type: "roundedRectangle";
+    xMm: number;
+    yMm: number;
+    widthMm: number;
+    heightMm: number;
+    radiusMm: number;
+  }>;
 };
 
 export type BuildStep = {
@@ -35,6 +43,18 @@ export function compileShelterModel(model: ShelterModel) {
   const roof = roofSlope(model);
   const areas = surfaceAreas(model);
   const thermal = thermalSummary(model);
+
+  const entranceCutouts = Array.from({length: model.layout.entrances}, (_, index) => {
+    const centerX = model.dimensions.widthMm * ((index + 1) / (model.layout.entrances + 1));
+    return {
+      type: "roundedRectangle" as const,
+      xMm: Math.round(centerX - model.layout.entranceWidthMm / 2),
+      yMm: model.layout.thresholdHeightMm,
+      widthMm: model.layout.entranceWidthMm,
+      heightMm: model.layout.entranceHeightMm,
+      radiusMm: Math.min(40, Math.round(model.layout.entranceWidthMm * 0.22))
+    };
+  });
 
   const cutParts: CutPart[] = [
     {
@@ -69,7 +89,8 @@ export function compileShelterModel(model: ShelterModel) {
       heightMm: model.dimensions.frontHeightMm,
       thicknessMm: 12,
       shape: "rectangle",
-      notes: "Entrance cut-outs are defined by the shelter layout."
+      cutouts: entranceCutouts,
+      notes: "Entrance cut-outs are derived from the canonical shelter layout."
     },
     {
       id: "rear-outer",
