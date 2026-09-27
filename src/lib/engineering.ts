@@ -26,6 +26,41 @@ export function getModelAssemblies(model: ShelterModel) {
   };
 }
 
+export function constructionInterfaceGeometry(model: ShelterModel) {
+  const construction = constructionSummary(model);
+  const slope = roofSlope(model);
+  const roofVerticalThicknessMm =
+    construction.roofThicknessMm * Math.cos(slope.angleRad);
+
+  const wallFrontHeightMm = Math.max(
+    0,
+    model.dimensions.frontHeightMm -
+      construction.floorThicknessMm -
+      roofVerticalThicknessMm
+  );
+  const wallRearHeightMm = Math.max(
+    0,
+    model.dimensions.rearHeightMm -
+      construction.floorThicknessMm -
+      roofVerticalThicknessMm
+  );
+
+  return {
+    datum: "FLOOR_FULL_FOOTPRINT_WALLS_ON_FLOOR_ROOF_ON_WALLS" as const,
+    floorTopElevationMm: construction.floorThicknessMm,
+    roofVerticalThicknessMm,
+    wallBaseElevationMm: construction.floorThicknessMm,
+    wallFrontHeightMm,
+    wallRearHeightMm,
+    wallFrontTopElevationMm:
+      construction.floorThicknessMm + wallFrontHeightMm,
+    wallRearTopElevationMm:
+      construction.floorThicknessMm + wallRearHeightMm,
+    overallFrontHeightMm: model.dimensions.frontHeightMm,
+    overallRearHeightMm: model.dimensions.rearHeightMm
+  };
+}
+
 export function layoutGeometry(model: ShelterModel) {
   const wallThicknessMm = constructionSummary(model).wallThicknessMm;
   const clearLeftMm = wallThicknessMm;
@@ -128,10 +163,15 @@ export function roofPanelGeometry(model: ShelterModel) {
 }
 
 export function surfaceAreas(model: ShelterModel) {
-  const {widthMm: w, depthMm: d, frontHeightMm: hf, rearHeightMm: hr} = model.dimensions;
+  const {widthMm: w, depthMm: d} = model.dimensions;
+  const interfaces = constructionInterfaceGeometry(model);
   const entrance = entranceGeometry(model);
   const openingArea = entrance.totalOpeningAreaMm2;
-  const wallAreaMm2 = w * hf + w * hr + 2 * d * ((hf + hr) / 2) - openingArea;
+  const wallAreaMm2 =
+    w * interfaces.wallFrontHeightMm +
+    w * interfaces.wallRearHeightMm +
+    2 * d * ((interfaces.wallFrontHeightMm + interfaces.wallRearHeightMm) / 2) -
+    openingArea;
   const floorAreaMm2 = w * d;
   const roofAreaMm2 = w * roofSlope(model).trueLengthMm;
 
