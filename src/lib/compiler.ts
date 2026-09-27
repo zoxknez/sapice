@@ -814,6 +814,16 @@ export function compileShelterModel(model: ShelterModel) {
 
   const hardwareItems: HardwareItem[] = ([
     {
+      id: "base-isolation-pads",
+      nameSr: "Stopice / izolacioni podmetači baze",
+      nameEn: "Base isolation pads / feet",
+      quantity: baseSupportPostParts.length,
+      unit: "piece",
+      provenance: "ASSUMPTION",
+      notesSr: "Po jedna stopica ili odgovarajući izolacioni podmetač ispod svakog V1 vertikalnog oslonca, da drvo ne stoji direktno na mokroj podlozi. Konkretan proizvod, sidrenje i nosivost zavise od lokacije i podloge.",
+      notesEn: "One suitable isolation foot or pad below each V1 vertical support so timber does not bear directly on wet ground. Product selection, anchorage and capacity depend on the actual site and substrate."
+    },
+    {
       id: "panel-fasteners",
       nameSr: "Spoljašnji pričvršćivači za drvene ploče",
       nameEn: "Exterior wood-panel fasteners",
@@ -890,8 +900,8 @@ export function compileShelterModel(model: ShelterModel) {
       id: "base",
       titleSr: "Napravite podignutu bazu",
       titleEn: "Build the raised base",
-      detailSr: "Sastavite stabilnu osnovu i proverite da kućica nema direktan kontakt sa mokrim tlom.",
-      detailEn: "Assemble a stable base and keep the shelter out of direct contact with wet ground."
+      detailSr: "Sastavite kompajliranu mrežu vertikalnih oslonaca i horizontalnih runner-a. Ispod svakog oslonca koristite odgovarajuću stopicu/podmetač koji odvaja drvo od mokre podloge; konkretno sidrenje i oslonac prilagodite stvarnoj lokaciji.",
+      detailEn: "Assemble the compiled grid of vertical supports and horizontal runners. Use a suitable isolation foot/pad below each support to keep timber off wet ground; adapt anchorage and bearing details to the actual site."
     },
     {
       id: "floor",
