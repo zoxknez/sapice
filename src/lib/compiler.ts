@@ -440,6 +440,9 @@ export function compileShelterModel(model: ShelterModel) {
     })
   );
 
+  const entranceSillAboveFinishedFloorMm =
+    model.layout.thresholdHeightMm - floorThicknessMm;
+
   const entranceSupportPositionsXmm = layout.entranceCentersXmm
     .flatMap((centerMm) => [
       centerMm - model.layout.entranceWidthMm / 2,
@@ -452,7 +455,7 @@ export function compileShelterModel(model: ShelterModel) {
       const leftXmm = centerMm - model.layout.entranceWidthMm / 2;
       const rightXmm = centerMm + model.layout.entranceWidthMm / 2;
       const supportLengthMm =
-        model.layout.thresholdHeightMm + model.layout.entranceHeightMm;
+        entranceSillAboveFinishedFloorMm + model.layout.entranceHeightMm;
 
       return [
         {
@@ -819,8 +822,7 @@ export function compileShelterModel(model: ShelterModel) {
           ((internalFrontHeightMm + internalRearHeightMm) / 2)
         ) / 1_000_000_000,
       chamberClearWidthMm: layout.chamberWidthMm,
-      entranceSillAboveFinishedFloorMm:
-        model.layout.thresholdHeightMm - floorThicknessMm,
+      entranceSillAboveFinishedFloorMm,
       floorAreaPerRecommendedAnimalM2:
         (
           Math.max(0, internalWidthMm - layout.totalDividerThicknessMm) *
