@@ -23,7 +23,7 @@ The repository currently includes:
 - true part-area vs conservative packing-envelope utilization
 - provisional framing / support schedule with stud-spacing invariants
 - provisional high-rear ventilation provision zones coordinated around framing
-- service-roof hinge / latch positions
+- service-roof front-hinge / rear-latch positions coordinated with roof runoff
 - compiler-derived BOM CSV and versioned JSON export
 - local cost estimator with nesting, framing, hardware, roof, finish and ventilation quantities
 - persistent workshop build mode
@@ -57,7 +57,7 @@ Canonical model definitions live in Git.
 ```text
 ShelterModel
   -> construction assemblies
-  -> compiler v1.5 plan fingerprint
+  -> compiler v1.6 plan fingerprint
   -> compiled internal / interface geometry
   -> 3D viewer
   -> technical drawing
