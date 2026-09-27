@@ -190,7 +190,7 @@ export function ModelBuildBook({
           <div className="section-heading">
             <div>
               <span className="kicker">Hardware · {compiled.hardware.status}</span>
-              <h2>{locale === "sr" ? "Pričvršćivači i servisni krov" : "Fasteners and service roof"}</h2>
+              <h2>{locale === "sr" ? "Pričvršćivači, servisni krov i voda" : "Fasteners, service roof and water"}</h2>
             </div>
             <p>
               {locale === "sr"
@@ -211,6 +211,18 @@ export function ModelBuildBook({
             <div>
               <span>{locale === "sr" ? "Spoj ploča" : "Panel joint gap"}</span>
               <strong>{compiled.hardware.panelJointGapMm} mm</strong>
+            </div>
+            <div>
+              <span>{locale === "sr" ? "Nagib krova" : "Roof slope"}</span>
+              <strong>{compiled.roofWeathering.slopeDegrees.toFixed(1)}°</strong>
+            </div>
+            <div>
+              <span>{locale === "sr" ? "Smer oticanja" : "Runoff edge"}</span>
+              <strong>{locale === "sr" ? "pozadi" : "rear"}</strong>
+            </div>
+            <div>
+              <span>{locale === "sr" ? "Drip ivica pozadi" : "Rear drip edge"}</span>
+              <strong>{compiled.roofWeathering.rearDripEdgeLengthM.toFixed(2)} m</strong>
             </div>
           </div>
 
@@ -245,6 +257,21 @@ export function ModelBuildBook({
             >
               {sources[compiled.hardware.fastenerReferenceSourceId]?.publisher} · {sources[compiled.hardware.fastenerReferenceSourceId]?.title} ↗
             </a>
+          </div>
+          <div className="hardware-reference">
+            <span>{locale === "sr" ? "Roof weathering gate" : "Roof weathering gate"}</span>
+            <a
+              href={sources[compiled.roofWeathering.referenceSourceId]?.url}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {sources[compiled.roofWeathering.referenceSourceId]?.publisher} · {sources[compiled.roofWeathering.referenceSourceId]?.title} ↗
+            </a>
+            <small>
+              {locale === "sr"
+                ? "Kompajlirani nagib određuje geometriju, ali izabrani krovni proizvod mora eksplicitno dozvoljavati taj nagib i definisati slojeve, preklop, pričvršćivanje i ivice."
+                : "The compiled slope defines geometry, but the selected roofing product must explicitly permit that slope and define layers, overlaps, fastening and edge details."}
+            </small>
           </div>
         </div>
       </section>
