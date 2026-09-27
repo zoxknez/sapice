@@ -8,6 +8,7 @@ import {
   ventilationProvisionGeometry,
   materialSummary,
   thermalMethod,
+  wallJoineryGeometry,
   roofPanelGeometry,
   roofSlope,
   surfaceAreas,
@@ -70,9 +71,11 @@ describe("engineering model derivations", () => {
 
       expect(frontOuter?.heightMm).toBe(Math.round(compiled.interfaces.wallFrontHeightMm));
       expect(rearOuter?.heightMm).toBe(Math.round(compiled.interfaces.wallRearHeightMm));
-      expect(sideOuter?.heightMm).toBe(Math.round(compiled.interfaces.wallFrontHeightMm));
+      expect(sideOuter?.widthMm).toBeCloseTo(compiled.joinery.sideRunMm, 8);
+      expect(sideOuter?.heightMm)
+        .toBe(Math.round(compiled.joinery.sideFrontHeightMm));
       expect(sideOuter?.trapezoidRearHeightMm)
-        .toBe(Math.round(compiled.interfaces.wallRearHeightMm));
+        .toBe(Math.round(compiled.joinery.sideRearHeightMm));
 
       for (const cutout of frontOuter?.cutouts ?? []) {
         expect(cutout.yMm).toBe(compiled.internal.entranceSillAboveFinishedFloorMm);
@@ -81,6 +84,51 @@ describe("engineering model derivations", () => {
       expect(roofInner?.widthMm).toBe(model.dimensions.widthMm);
       expect(roofInner?.heightMm).toBe(Math.ceil(compiled.roof.trueLengthMm));
       expect(floorXps).toBeDefined();
+    }
+  });
+
+  it("uses one buildable wall-joinery convention across internal geometry and side panels", () => {
+    for (const model of shelterModels) {
+      const joinery = wallJoineryGeometry(model);
+      const compiled = compileShelterModel(model);
+      const wall = compiled.construction.wallThicknessMm;
+
+      expect(joinery.convention)
+        .toBe("FRONT_REAR_FULL_WIDTH_SIDES_BETWEEN");
+      expect(joinery.sideStartZmm).toBe(wall);
+      expect(joinery.sideEndZmm).toBe(model.dimensions.depthMm - wall);
+      expect(joinery.sideRunMm).toBe(model.dimensions.depthMm - 2 * wall);
+      expect(compiled.internal.depthMm).toBeCloseTo(joinery.sideRunMm, 8);
+      expect(compiled.internal.frontHeightMm)
+        .toBeCloseTo(joinery.sideFrontHeightMm, 8);
+      expect(compiled.internal.rearHeightMm)
+        .toBeCloseTo(joinery.sideRearHeightMm, 8);
+    }
+  });
+
+  it("preserves the full exterior side envelope while separating side-panel core and corner returns", () => {
+    for (const model of shelterModels) {
+      const areas = surfaceAreas(model);
+      const compiled = compileShelterModel(model);
+
+      expect(areas.sidePanelCoreM2).toBeGreaterThan(0);
+      expect(areas.cornerReturnM2).toBeGreaterThan(0);
+      expect(areas.wallJoineryConvention)
+        .toBe("FRONT_REAR_FULL_WIDTH_SIDES_BETWEEN");
+
+      const exteriorSideEnvelopeM2 =
+        2 *
+        model.dimensions.depthMm *
+        (
+          compiled.interfaces.wallFrontHeightMm +
+          compiled.interfaces.wallRearHeightMm
+        ) /
+        2 /
+        1_000_000;
+
+      expect(
+        areas.sidePanelCoreM2 + areas.cornerReturnM2
+      ).toBeCloseTo(exteriorSideEnvelopeM2, 8);
     }
   });
 
@@ -223,7 +271,7 @@ describe("engineering model derivations", () => {
   });
 
   it("uses ISO 6946 orientation-specific surface resistances", () => {
-    expect(thermalMethod.version).toBe("1.1.0");
+    expect(thermalMethod.version).toBe("1.2.0");
     expect(thermalMethod.interiorSurfaceResistanceM2KW.horizontal).toBe(0.13);
     expect(thermalMethod.interiorSurfaceResistanceM2KW.upward).toBe(0.10);
     expect(thermalMethod.interiorSurfaceResistanceM2KW.downward).toBe(0.17);
@@ -431,17 +479,21 @@ describe("engineering model derivations", () => {
     for (const model of shelterModels) {
       const compiled = compileShelterModel(model);
 
-      for (const [wall, spanMm] of [
-        ["rear", model.dimensions.widthMm],
-        ["left", model.dimensions.depthMm],
-        ["right", model.dimensions.depthMm]
+      for (const [wall, startMm, endMm] of [
+        ["rear", 0, model.dimensions.widthMm],
+        ["left", compiled.joinery.sideStartZmm, compiled.joinery.sideEndZmm],
+        ["right", compiled.joinery.sideStartZmm, compiled.joinery.sideEndZmm]
       ] as const) {
         const positions = compiled.linearParts
           .filter((part) => part.wall === wall && typeof part.positionMm === "number")
           .map((part) => part.positionMm as number)
           .sort((a, b) => a - b);
 
-        const points = [0, ...positions, spanMm];
+        expect(positions.every(
+          (positionMm) => positionMm > startMm && positionMm < endMm
+        )).toBe(true);
+
+        const points = [startMm, ...positions, endMm];
         for (let index = 1; index < points.length; index++) {
           expect(points[index] - points[index - 1])
             .toBeLessThanOrEqual(compiled.framing.maxStudSpacingMm + 1);
