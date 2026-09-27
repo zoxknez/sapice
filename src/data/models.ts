@@ -259,7 +259,112 @@ const models: ShelterModel[] = [
   }
 ];
 
-export const shelterModels = models.map((model) => {
+function heatedVariant(
+  base: ShelterModel,
+  {
+    id,
+    slug,
+    name,
+    descriptionSr,
+    descriptionEn
+  }: {
+    id: string;
+    slug: string;
+    name: string;
+    descriptionSr: string;
+    descriptionEn: string;
+  }
+): ShelterModel {
+  return {
+    ...base,
+    id,
+    slug,
+    version: "1.0.0",
+    sourceIds: Array.from(
+      new Set([...base.sourceIds, "iec-60335-2-71-2018"])
+    ),
+    heated: true,
+    climateProfile: "WINTER_SEVERE",
+    referenceOutsideC: -15,
+    translations: {
+      sr: {
+        name,
+        description: descriptionSr
+      },
+      en: {
+        name,
+        description: descriptionEn
+      }
+    }
+  };
+}
+
+function requiredModel(id: string) {
+  const model = models.find((item) => item.id === id);
+  if (!model) throw new Error(`Missing base model: ${id}`);
+  return model;
+}
+
+const additionalHeatedModels: ShelterModel[] = [
+  heatedVariant(requiredModel("cat-solo-winter-01"), {
+    id: "cat-solo-heated-01",
+    slug: "nordic-solo-heated",
+    name: "Nordic Solo Heated",
+    descriptionSr:
+      "Grejana varijanta kompaktnog skloništa za jednu odraslu mačku, sa koordinacionom zonom za namenski grejni proizvod i obaveznom negrejanom površinom izbora.",
+    descriptionEn:
+      "Heated variant of the compact single-cat shelter, with a coordination zone for a purpose-built heating product and a required unheated choice area."
+  }),
+  heatedVariant(requiredModel("cat-duo-winter-01"), {
+    id: "cat-duo-heated-01",
+    slug: "nordic-duo-heated",
+    name: "Nordic Duo Heated",
+    descriptionSr:
+      "Grejana jednokomorna varijanta za dve odrasle mačke, sa namenskom heating provision zonom i preostalom negrejanom površinom poda.",
+    descriptionEn:
+      "Heated single-chamber variant for two adult cats, with a purpose-built heating provision zone and remaining unheated floor area."
+  }),
+  heatedVariant(requiredModel("cat-six-winter-01"), {
+    id: "cat-six-heated-01",
+    slug: "alpine-colony-six-heated",
+    name: "Alpine Colony Six Heated",
+    descriptionSr:
+      "Grejana trokomorna varijanta za do šest community mačaka, sa po jednom odvojenom heating provision zonom u svakoj komori.",
+    descriptionEn:
+      "Heated three-chamber variant for up to six community cats, with one separate heating provision zone in each chamber."
+  }),
+  heatedVariant(requiredModel("rescue-cat-eight-01"), {
+    id: "rescue-cat-eight-heated-01",
+    slug: "rescue-modular-eight-heated",
+    name: "Rescue Modular Eight Heated",
+    descriptionSr:
+      "Grejana četvorokomorna rescue/community varijanta za do osam mačaka, sa odvojenom product-specific heating zonom po komori.",
+    descriptionEn:
+      "Heated four-chamber rescue/community variant for up to eight cats, with a separate product-specific heating zone in each chamber."
+  }),
+  heatedVariant(requiredModel("dog-small-winter-01"), {
+    id: "dog-small-heated-01",
+    slug: "alpine-small-heated",
+    name: "Alpine Small Heated",
+    descriptionSr:
+      "Grejana pomoćna zimska kućica za jednog manjeg psa, sa koordinacionom zonom za namenski proizvod i negrejanom površinom za izbor.",
+    descriptionEn:
+      "Heated auxiliary winter shelter for one small dog, with a coordination zone for a purpose-built product and an unheated choice area."
+  }),
+  heatedVariant(requiredModel("dog-medium-winter-01"), {
+    id: "dog-medium-heated-01",
+    slug: "alpine-medium-heated",
+    name: "Alpine Medium Heated",
+    descriptionSr:
+      "Grejana pomoćna zimska kućica za jednog srednjeg psa, sa namenskom heating provision zonom i zaštićenim kablovskim prolazom.",
+    descriptionEn:
+      "Heated auxiliary winter shelter for one medium dog, with a dedicated heating provision zone and protected cable-routing provision."
+  })
+];
+
+const allModels = [...models, ...additionalHeatedModels];
+
+export const shelterModels = allModels.map((model) => {
   const parsed = shelterModelSchema.parse(model);
   assertShelterModelValid(parsed);
   return parsed;
