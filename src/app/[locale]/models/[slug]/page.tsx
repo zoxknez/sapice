@@ -146,14 +146,39 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
             </p>
           </div>
           <div className="thermal-grid">
-            <div><span>Wall U</span><strong>{thermal.wallU.toFixed(2)} W/m²K</strong></div>
-            <div><span>Floor U</span><strong>{thermal.floorU.toFixed(2)} W/m²K</strong></div>
-            <div><span>Roof U</span><strong>{thermal.roofU.toFixed(2)} W/m²K</strong></div>
-            <div><span>ΔT comparison</span><strong>{thermal.deltaTK} K</strong></div>
-            <div className="wide">
-              <span>{locale === "sr" ? "Procena transmisije omotača" : "Envelope transmission estimate"}</span>
-              <strong>{thermal.envelopeTransmissionW.toFixed(0)} W</strong>
+            <div>
+              <span>Wall U · nominal</span>
+              <strong>{thermal.wallU.toFixed(2)} W/m²K</strong>
+              <small>{thermal.wallURange[0].toFixed(2)}–{thermal.wallURange[1].toFixed(2)} W/m²K</small>
             </div>
+            <div>
+              <span>Floor U · nominal</span>
+              <strong>{thermal.floorU.toFixed(2)} W/m²K</strong>
+              <small>{thermal.floorURange[0].toFixed(2)}–{thermal.floorURange[1].toFixed(2)} W/m²K</small>
+            </div>
+            <div>
+              <span>Roof U · nominal</span>
+              <strong>{thermal.roofU.toFixed(2)} W/m²K</strong>
+              <small>{thermal.roofURange[0].toFixed(2)}–{thermal.roofURange[1].toFixed(2)} W/m²K</small>
+            </div>
+            <div>
+              <span>ΔT comparison</span>
+              <strong>{thermal.deltaTK} K</strong>
+              <small>method v{thermal.methodVersion}</small>
+            </div>
+            <div className="wide">
+              <span>{locale === "sr" ? "Nominalna transmisija omotača" : "Nominal envelope transmission"}</span>
+              <strong>{thermal.envelopeTransmissionW.toFixed(0)} W</strong>
+              <small>{thermal.envelopeTransmissionRangeW[0].toFixed(0)}–{thermal.envelopeTransmissionRangeW[1].toFixed(0)} W</small>
+            </div>
+          </div>
+          <div className="thermal-limitations">
+            <strong>{locale === "sr" ? "Trenutne limitacije modela" : "Current model limitations"}</strong>
+            <ul>
+              {thermal.limitations.map((limitation) => (
+                <li key={limitation}>{limitation}</li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
