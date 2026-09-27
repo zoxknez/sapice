@@ -43,7 +43,7 @@ export type LinearPart = {
   quantity: number;
   lengthMm: number;
   provenance: "ASSUMPTION" | "GEOMETRY";
-  wall?: "front" | "rear" | "left" | "right" | "floor" | "base" | "divider";
+  wall?: "front" | "rear" | "left" | "right" | "floor" | "roof" | "base" | "divider";
   positionMm?: number;
   startHeightMm?: number;
   elevationMm?: number;
@@ -382,6 +382,87 @@ export function compileShelterModel(model: ShelterModel) {
   const frameProfile: [number, number] = [30, wallInsulationMm];
   const baseProfile: [number, number] = [45, 45];
   const maxStudSpacingMm = 500;
+  const maxFloorJoistSpacingMm = 500;
+  const maxRoofRafterSpacingMm = 500;
+  const maxBaseRunnerSpacingMm = 700;
+
+  const baseRunnerCount = Math.max(
+    2,
+    Math.ceil(model.dimensions.widthMm / maxBaseRunnerSpacingMm)
+  );
+  const baseRunnerPositionsXmm = Array.from(
+    {length: baseRunnerCount},
+    (_, index) =>
+      model.dimensions.widthMm * ((index + 1) / (baseRunnerCount + 1))
+  );
+  const baseRunnerParts: LinearPart[] = baseRunnerPositionsXmm.map(
+    (positionMm, index) => ({
+      id: `base-runner-${index + 1}`,
+      nameSr: `Uzdužni nosač baze ${index + 1}`,
+      nameEn: `Base runner ${index + 1}`,
+      profileMm: baseProfile,
+      quantity: 1,
+      lengthMm: model.dimensions.depthMm,
+      provenance: "ASSUMPTION" as const,
+      wall: "base" as const,
+      positionMm,
+      notesSr: `Pozicija je izvedena iz V1 maksimalnog razmaka oslonaca ≈ ${maxBaseRunnerSpacingMm} mm.`,
+      notesEn: `Position is derived from the V1 maximum base-support spacing of ≈ ${maxBaseRunnerSpacingMm} mm.`
+    })
+  );
+
+  const floorJoistCount = Math.max(
+    0,
+    Math.ceil(model.dimensions.depthMm / maxFloorJoistSpacingMm) - 1
+  );
+  const floorJoistPositionsZmm = Array.from(
+    {length: floorJoistCount},
+    (_, index) =>
+      model.dimensions.depthMm * ((index + 1) / (floorJoistCount + 1))
+  );
+  const floorJoistParts: LinearPart[] = floorJoistPositionsZmm.map(
+    (positionMm, index) => ({
+      id: `floor-joist-${index + 1}`,
+      nameSr: `Međuprečka poda ${index + 1}`,
+      nameEn: `Floor intermediate joist ${index + 1}`,
+      profileMm: frameProfile,
+      quantity: 1,
+      lengthMm: Math.max(
+        1,
+        model.dimensions.widthMm - 2 * frameProfile[0]
+      ),
+      provenance: "ASSUMPTION" as const,
+      wall: "floor" as const,
+      positionMm,
+      notesSr: `Pozicija prati V1 maksimalni osni razmak ≈ ${maxFloorJoistSpacingMm} mm.`,
+      notesEn: `Position follows the V1 maximum center spacing of ≈ ${maxFloorJoistSpacingMm} mm.`
+    })
+  );
+
+  const roofRafterCount = Math.max(
+    0,
+    Math.ceil(model.dimensions.widthMm / maxRoofRafterSpacingMm) - 1
+  );
+  const roofRafterPositionsXmm = Array.from(
+    {length: roofRafterCount},
+    (_, index) =>
+      model.dimensions.widthMm * ((index + 1) / (roofRafterCount + 1))
+  );
+  const roofRafterParts: LinearPart[] = roofRafterPositionsXmm.map(
+    (positionMm, index) => ({
+      id: `roof-rafter-${index + 1}`,
+      nameSr: `Kosi nosač krova ${index + 1}`,
+      nameEn: `Roof rafter ${index + 1}`,
+      profileMm: frameProfile,
+      quantity: 1,
+      lengthMm: Math.round(roof.trueLengthMm),
+      provenance: "ASSUMPTION" as const,
+      wall: "roof" as const,
+      positionMm,
+      notesSr: `Pozicija prati V1 maksimalni osni razmak ≈ ${maxRoofRafterSpacingMm} mm.`,
+      notesEn: `Position follows the V1 maximum center spacing of ≈ ${maxRoofRafterSpacingMm} mm.`
+    })
+  );
 
   const clearStudHeightAtDepth = (positionMm: number) => {
     const ratio =
@@ -530,18 +611,7 @@ export function compileShelterModel(model: ShelterModel) {
   );
 
   const linearParts: LinearPart[] = [
-    {
-      id: "base-runner",
-      nameSr: "Uzdužni nosači baze",
-      nameEn: "Base runners",
-      profileMm: baseProfile,
-      quantity: 2,
-      lengthMm: model.dimensions.depthMm,
-      provenance: "ASSUMPTION",
-      wall: "base",
-      notesSr: "Početni V1 profil. Potvrditi izbor drveta i zaštitu od vlage pre ENGINEERING_REVIEWED statusa.",
-      notesEn: "Initial V1 profile. Confirm timber selection and moisture protection before ENGINEERING_REVIEWED status."
-    },
+    ...baseRunnerParts,
     {
       id: "floor-frame-long",
       nameSr: "Uzdužne letve rama poda",
@@ -646,7 +716,9 @@ export function compileShelterModel(model: ShelterModel) {
       }
     ] : []),
     ...rearIntermediateStuds,
-    ...sideIntermediateStuds
+    ...sideIntermediateStuds,
+    ...floorJoistParts,
+    ...roofRafterParts
   ];
 
   const framing = {
@@ -654,6 +726,12 @@ export function compileShelterModel(model: ShelterModel) {
     frameProfileMm: frameProfile,
     baseProfileMm: baseProfile,
     maxStudSpacingMm,
+    maxFloorJoistSpacingMm,
+    maxRoofRafterSpacingMm,
+    maxBaseRunnerSpacingMm,
+    baseRunnerPositionsXmm,
+    floorJoistPositionsZmm,
+    roofRafterPositionsXmm,
     frontSupportPositionsXmm: entranceSupportPositionsXmm,
     totalLinearM: linearParts.reduce(
       (sum, part) => sum + (part.quantity * part.lengthMm) / 1000,
