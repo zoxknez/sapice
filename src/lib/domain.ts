@@ -44,6 +44,11 @@ export const shelterModelSchema = z.object({
     floorAssemblyId: z.string(),
     roofAssemblyId: z.string()
   }),
+  roof: z.object({
+    sideOverhangMm: z.number().int().nonnegative(),
+    frontOverhangMm: z.number().int().nonnegative(),
+    rearOverhangMm: z.number().int().nonnegative()
+  }),
   heated: z.boolean(),
   climateProfile: z.enum([
     "SHELTERED_MILD",
