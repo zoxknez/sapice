@@ -357,6 +357,28 @@ export function TechnicalSketch({
           <line x1={bodyX} y1={sideFrontRoofUndersideY} x2={bodyX + sd} y2={sideRearRoofUndersideY} className="drawing-interface" />
           <line x1={bodyX} y1={sideFloorTopY} x2={bodyX + sd} y2={sideFloorTopY} className="drawing-interface" />
           <line x1={roofFrontX} y1={roofFrontY} x2={roofRearX} y2={roofRearY} className="drawing-roof" />
+          {(() => {
+            const x1 = roofFrontX + (roofRearX - roofFrontX) * 0.42;
+            const x2 = roofFrontX + (roofRearX - roofFrontX) * 0.78;
+            const y1 = roofFrontY + (roofRearY - roofFrontY) * 0.42 - 10;
+            const y2 = roofFrontY + (roofRearY - roofFrontY) * 0.78 - 10;
+            return (
+              <g className="drawing-runoff">
+                <line x1={x1} y1={y1} x2={x2} y2={y2} />
+                <polygon
+                  points={`${x2},${y2} ${x2 - 11},${y2 - 5} ${x2 - 9},${y2 + 7}`}
+                />
+                <text
+                  x={(x1 + x2) / 2}
+                  y={(y1 + y2) / 2 - 8}
+                  textAnchor="middle"
+                  className="drawing-axis-label"
+                >
+                  {isSr ? "OTICANJE → POZADI" : "RUNOFF → REAR"}
+                </text>
+              </g>
+            );
+          })()}
           <line x1={bodyX} y1={sideGround} x2={bodyX + sd} y2={sideGround} className="drawing-ground" />
 
           <rect
