@@ -6,7 +6,7 @@ import {Canvas} from "@react-three/fiber";
 import {ContactShadows, OrbitControls} from "@react-three/drei";
 import type {ShelterModel} from "@/lib/domain";
 import type {AppLocale} from "@/i18n/routing";
-import {compileShelterModel, type CompiledShelterModel} from "@/lib/compiler";
+import type {CompiledShelterModel} from "@/lib/compiler";
 
 type ViewMode = "assembled" | "roof-off" | "exploded" | "frame";
 
@@ -342,14 +342,14 @@ function FramingSkeleton({
   );
 }
 
-function Shelter({model, mode}: {model: ShelterModel; mode: ViewMode}) {
+function Shelter({compiled, mode}: {compiled: CompiledShelterModel; mode: ViewMode}) {
+  const model = compiled.model;
   const w = model.dimensions.widthMm / 1000;
   const d = model.dimensions.depthMm / 1000;
   const hf = model.dimensions.frontHeightMm / 1000;
   const hr = model.dimensions.rearHeightMm / 1000;
   const gc = model.dimensions.groundClearanceMm / 1000;
 
-  const compiled = compileShelterModel(model);
   const construction = compiled.construction;
   const wallT = construction.wallThicknessMm / 1000;
   const floorT = construction.floorThicknessMm / 1000;
@@ -467,7 +467,14 @@ function Shelter({model, mode}: {model: ShelterModel; mode: ViewMode}) {
   );
 }
 
-export function ShelterViewer({model, locale}: {model: ShelterModel; locale: AppLocale}) {
+export function ShelterViewer({
+  compiled,
+  locale
+}: {
+  compiled: CompiledShelterModel;
+  locale: AppLocale;
+}) {
+  const model = compiled.model;
   const [mode, setMode] = useState<ViewMode>("assembled");
   const widthM = model.dimensions.widthMm / 1000;
   const depthM = model.dimensions.depthMm / 1000;
@@ -486,7 +493,7 @@ export function ShelterViewer({model, locale}: {model: ShelterModel; locale: App
         <color attach="background" args={["#eee9e0"]} />
         <ambientLight intensity={1.45} />
         <directionalLight position={[3, 5, 2]} intensity={2.2} castShadow />
-        <Shelter model={model} mode={mode} />
+        <Shelter compiled={compiled} mode={mode} />
         <ContactShadows position={[0, -0.02, 0]} opacity={0.28} scale={5} blur={2.5} far={4} />
         <OrbitControls
           makeDefault
