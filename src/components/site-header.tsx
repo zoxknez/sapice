@@ -9,7 +9,8 @@ export async function SiteHeader({locale}: {locale: AppLocale}) {
     ["/models", t("models")],
     ["/finder", t("finder")],
     ["/materials", t("materials")],
-    ["/guides", t("guides")]
+    ["/guides", t("guides")],
+    ["/methodology", t("methodology")]
   ] as const;
 
   return (
