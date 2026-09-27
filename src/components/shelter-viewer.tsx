@@ -6,7 +6,7 @@ import {Canvas} from "@react-three/fiber";
 import {ContactShadows, OrbitControls} from "@react-three/drei";
 import type {ShelterModel} from "@/lib/domain";
 import type {AppLocale} from "@/i18n/routing";
-import {constructionSummary, roofPanelGeometry, roofSlope} from "@/lib/engineering";
+import {constructionSummary, layoutGeometry, roofPanelGeometry, roofSlope} from "@/lib/engineering";
 
 type ViewMode = "assembled" | "roof-off" | "exploded";
 
@@ -83,8 +83,9 @@ function FrontPanel({
     shape.lineTo(0, height);
     shape.closePath();
 
-    for (let index = 0; index < model.layout.entrances; index++) {
-      const centerX = width * ((index + 1) / (model.layout.entrances + 1));
+    const layout = layoutGeometry(model);
+    for (const centerXmm of layout.entranceCentersXmm) {
+      const centerX = centerXmm / 1000;
       addRoundedRectangleHole(
         shape,
         centerX - entranceWidth / 2,
@@ -166,6 +167,10 @@ function Shelter({model, mode}: {model: ShelterModel; mode: ViewMode}) {
   const roofWidth = roofPanel.panelWidthMm / 1000;
   const roofCenterZ = d / 2 + roofPanel.centerPlanOffsetMm / 1000;
   const roofCenterY = gc + avgH + roofT / 2 + roofPanel.centerHeightOffsetMm / 1000;
+  const layout = layoutGeometry(model);
+  const dividerDepth = Math.max(0.05, d - 2 * wallT);
+  const dividerFrontHeight = Math.max(0.05, hf - floorT - roofT);
+  const dividerRearHeight = Math.max(0.05, hr - floorT - roofT);
 
   const exploded = mode === "exploded";
   const wallOffset = exploded ? 0.28 : 0;
@@ -218,14 +223,16 @@ function Shelter({model, mode}: {model: ShelterModel; mode: ViewMode}) {
         position={[w + wallOffset, gc, 0]}
       />
 
-      {model.layout.chambers > 1 && (
-        <Box
-          position={[w / 2, gc + floorT + Math.max(0.1, avgH - floorT) * 0.43, d / 2]}
-          size={[wallT * 0.75, Math.max(0.1, avgH - floorT) * 0.76, d * 0.78]}
-          color="#d4ad82"
-          opacity={0.76}
+      {layout.dividerPositionsXmm.map((positionMm, index) => (
+        <SidePanel
+          key={`divider-${index + 1}`}
+          depth={dividerDepth}
+          frontHeight={dividerFrontHeight}
+          rearHeight={dividerRearHeight}
+          thickness={0.012}
+          position={[positionMm / 1000, gc + floorT, wallT]}
         />
-      )}
+      ))}
 
       {model.heated && (
         <Box
