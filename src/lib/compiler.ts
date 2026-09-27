@@ -39,6 +39,8 @@ export type LinearPart = {
   quantity: number;
   lengthMm: number;
   provenance: "ASSUMPTION" | "GEOMETRY";
+  wall?: "front" | "rear" | "left" | "right" | "floor" | "base" | "divider";
+  positionMm?: number;
   notesSr?: string;
   notesEn?: string;
 };
@@ -327,6 +329,66 @@ export function compileShelterModel(model: ShelterModel) {
     assemblies.wall.layers.find((layer) => layer.role === "insulation")?.thicknessMm ?? 0;
   const frameProfile: [number, number] = [30, wallInsulationMm];
   const baseProfile: [number, number] = [45, 45];
+  const maxStudSpacingMm = 500;
+
+  const clearStudHeightAtDepth = (positionMm: number) => {
+    const ratio = model.dimensions.depthMm === 0 ? 0 : positionMm / model.dimensions.depthMm;
+    const externalHeight =
+      model.dimensions.frontHeightMm +
+      (model.dimensions.rearHeightMm - model.dimensions.frontHeightMm) * ratio;
+    return Math.max(1, Math.round(externalHeight - floorThicknessMm - roofThicknessMm));
+  };
+
+  const rearIntermediateCount = Math.max(
+    0,
+    Math.ceil(model.dimensions.widthMm / maxStudSpacingMm) - 1
+  );
+  const rearIntermediateStuds: LinearPart[] = Array.from(
+    {length: rearIntermediateCount},
+    (_, index) => {
+      const positionMm = Math.round(
+        model.dimensions.widthMm * ((index + 1) / (rearIntermediateCount + 1))
+      );
+      return {
+        id: `rear-stud-${index + 1}`,
+        nameSr: "Međustub zadnjeg zida",
+        nameEn: "Rear-wall intermediate stud",
+        profileMm: frameProfile,
+        quantity: 1,
+        lengthMm: internalRearHeightMm,
+        provenance: "ASSUMPTION" as const,
+        wall: "rear" as const,
+        positionMm,
+        notesSr: `Pozicija je izvedena iz V1 maksimalnog osnog razmaka ≈ ${maxStudSpacingMm} mm.`,
+        notesEn: `Position is derived from the V1 maximum stud spacing of ≈ ${maxStudSpacingMm} mm.`
+      };
+    }
+  );
+
+  const sideIntermediateCount = Math.max(
+    0,
+    Math.ceil(model.dimensions.depthMm / maxStudSpacingMm) - 1
+  );
+  const sideIntermediateStuds: LinearPart[] = ["left", "right"].flatMap((wallSide) =>
+    Array.from({length: sideIntermediateCount}, (_, index) => {
+      const positionMm = Math.round(
+        model.dimensions.depthMm * ((index + 1) / (sideIntermediateCount + 1))
+      );
+      return {
+        id: `${wallSide}-stud-${index + 1}`,
+        nameSr: "Međustub bočnog zida",
+        nameEn: "Side-wall intermediate stud",
+        profileMm: frameProfile,
+        quantity: 1,
+        lengthMm: clearStudHeightAtDepth(positionMm),
+        provenance: "ASSUMPTION" as const,
+        wall: wallSide as "left" | "right",
+        positionMm,
+        notesSr: `Pozicija prati V1 maksimalni osni razmak ≈ ${maxStudSpacingMm} mm; dužina prati kosinu krova.`,
+        notesEn: `Position follows the V1 maximum stud spacing of ≈ ${maxStudSpacingMm} mm; length follows the roof slope.`
+      };
+    })
+  );
 
   const linearParts: LinearPart[] = [
     {
@@ -337,6 +399,7 @@ export function compileShelterModel(model: ShelterModel) {
       quantity: 2,
       lengthMm: model.dimensions.depthMm,
       provenance: "ASSUMPTION",
+      wall: "base",
       notesSr: "Početni V1 profil. Potvrditi izbor drveta i zaštitu od vlage pre ENGINEERING_REVIEWED statusa.",
       notesEn: "Initial V1 profile. Confirm timber selection and moisture protection before ENGINEERING_REVIEWED status."
     },
@@ -347,7 +410,8 @@ export function compileShelterModel(model: ShelterModel) {
       profileMm: frameProfile,
       quantity: 2,
       lengthMm: model.dimensions.depthMm,
-      provenance: "GEOMETRY"
+      provenance: "GEOMETRY",
+      wall: "floor"
     },
     {
       id: "floor-frame-short",
@@ -356,7 +420,8 @@ export function compileShelterModel(model: ShelterModel) {
       profileMm: frameProfile,
       quantity: 2,
       lengthMm: Math.max(1, model.dimensions.widthMm - 2 * frameProfile[0]),
-      provenance: "GEOMETRY"
+      provenance: "GEOMETRY",
+      wall: "floor"
     },
     {
       id: "front-rear-bottom-rail",
@@ -420,15 +485,19 @@ export function compileShelterModel(model: ShelterModel) {
       quantity: (model.layout.chambers - 1) * 2,
       lengthMm: internalRearHeightMm,
       provenance: "GEOMETRY" as const,
+      wall: "divider" as const,
       notesSr: "Po dve vertikalne letve po pregradi; finalno uklapanje prati kosinu krova.",
       notesEn: "Two vertical cleats per divider; final fitting follows the roof slope."
-    }] : [])
+    }] : []),
+    ...rearIntermediateStuds,
+    ...sideIntermediateStuds
   ];
 
   const framing = {
     status: "PROVISIONAL" as const,
     frameProfileMm: frameProfile,
     baseProfileMm: baseProfile,
+    maxStudSpacingMm,
     totalLinearM: linearParts.reduce(
       (sum, part) => sum + (part.quantity * part.lengthMm) / 1000,
       0
