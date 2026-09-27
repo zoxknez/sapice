@@ -49,6 +49,13 @@ describe("catalog integrity", () => {
     }
   });
 
+  it("keeps every hinged reference roof on the high-edge hinge layout", () => {
+    for (const model of shelterModels) {
+      expect(model.maintenance.roofAccess).toBe("HINGED");
+      expect(model.maintenance.hingeEdge).toBe("FRONT");
+    }
+  });
+
   it("keeps every heated reference bound to the animal-heating safety source", () => {
     for (const model of shelterModels.filter((item) => item.heated)) {
       expect(model.sourceIds).toContain("iec-60335-2-71-2018");
