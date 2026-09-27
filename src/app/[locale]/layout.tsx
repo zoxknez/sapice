@@ -34,6 +34,13 @@ export async function generateMetadata({
         "x-default": "/sr"
       }
     },
+    twitter: {
+      card: "summary_large_image",
+      title: isSr ? "Šapice · Tehnički planovi kućica za pse i mačke" : "Šapice · Pet Shelter Engineering",
+      description: isSr
+        ? "Praktični, unapred projektovani modeli zimskih skloništa za pse i mačke."
+        : "Practical pre-designed winter shelter models for cats and dogs."
+    },
     openGraph: {
       type: "website",
       siteName: "Šapice",
