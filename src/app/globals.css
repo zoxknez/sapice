@@ -1976,3 +1976,30 @@ button { cursor: pointer; }
     transition-duration: .001ms !important;
   }
 }
+
+
+.state-page {
+  min-height: calc(100vh - 150px);
+  display: grid;
+  align-items: center;
+}
+.state-card {
+  max-width: 880px;
+}
+.state-code {
+  display: inline-grid;
+  place-items: center;
+  min-width: 72px;
+  height: 72px;
+  margin-bottom: 22px;
+  border-radius: 22px;
+  background: var(--ink);
+  color: #fff;
+  font: 850 24px ui-monospace, monospace;
+}
+.error-digest {
+  display: block;
+  margin-top: 20px;
+  color: var(--muted);
+  font: 700 10px ui-monospace, monospace;
+}
