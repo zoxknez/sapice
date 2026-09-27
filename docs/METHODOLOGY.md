@@ -57,6 +57,30 @@ floor thickness
 
 Front/rear wall cut parts, 3D geometry and technical drawings use the same datum.
 
+## Wall joinery
+
+Compiler v1.8 uses the convention:
+
+```text
+full-width front wall
++ full-width rear wall
++ left/right wall assemblies fitted between their inner planes
+```
+
+Derived joinery values include side-wall start/end Z coordinates, clear side run, front/rear side-panel heights and true sloped top length.
+
+This convention drives:
+
+- exterior side-panel cut sizes
+- interior side lining and insulation sizes
+- clear internal depth
+- side-wall framing positions
+- 3D assembly
+- workshop drawing boundaries
+- corner-weathering BOM allowance
+
+The thermal envelope still uses the **full exterior side projection**, not merely the shortened side-panel face. The difference is tracked as corner-return envelope area. V1.2 does not claim a 2D corner thermal-bridge calculation.
+
 ## Entrance geometry
 
 Entrances use one shared rounded-rectangle definition.
@@ -81,7 +105,7 @@ Entrance centers are placed inside the resulting chamber clear widths.
 
 Dividers have explicit thickness and are compiled as roof-slope trapezoids rather than rectangular placeholders.
 
-## Thermal model v1.1
+## Thermal model v1.2
 
 The current engine provides an approximate steady-state envelope-transmission calculation:
 
@@ -187,13 +211,13 @@ V1 also enforces a provisional maximum support spacing.
 
 Hardware quantities and roof hinge/latch positions are generated deterministically but remain assumptions until engineering review selects real hardware products and verifies their capacities.
 
-For the current mono-pitch service roof, compiler v1.7 places the hinge axis on the **front-wall structural line** and the latch axis on the **rear-wall structural line**, both inside the outer roof overhangs. The front and rear panel edges therefore remain weathering overhangs rather than hardware attachment lines, and the low rear drip edge stays clear. Final hardware selection and weather sealing must still preserve water shedding and follow the selected roof system.
+For the current mono-pitch service roof, compiler v1.8 places the hinge axis on the **front-wall structural line** and the latch axis on the **rear-wall structural line**, both inside the outer roof overhangs. The front and rear panel edges therefore remain weathering overhangs rather than hardware attachment lines, and the low rear drip edge stays clear. Final hardware selection and weather sealing must still preserve water shedding and follow the selected roof system.
 
 ## Heating provision
 
 Heated variants do not define homemade heaters.
 
-Compiler v1.7 derives one **PRODUCT_SPECIFIC provision zone per chamber**. Each zone is bounded by the chamber floor geometry and must leave a positive unheated choice area. The BOM creates one protected cable-entry provision per zone.
+Compiler v1.8 derives one **PRODUCT_SPECIFIC provision zone per chamber**. Each zone is bounded by the chamber floor geometry and must leave a positive unheated choice area. The BOM creates one protected cable-entry provision per zone.
 
 These values do **not** specify heater power, voltage, thermostat set-points or a safe DIY electrical design.
 
