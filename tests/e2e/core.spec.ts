@@ -20,7 +20,7 @@ test("model page exposes compiled workshop sections", async ({page}) => {
   await expect(page.getByRole("heading", {name: "Raspored na tablama"})).toBeVisible();
   await expect(page.getByRole("heading", {name: "Troškovnik"})).toBeVisible();
   await expect(page.getByRole("heading", {name: "Raspored letvi i nosača"})).toBeVisible();
-  await expect(page.getByRole("heading", {name: "Pričvršćivači i servisni krov"})).toBeVisible();
+  await expect(page.getByRole("heading", {name: "Pričvršćivači, servisni krov i voda"})).toBeVisible();
 });
 
 test("dynamic locale switch preserves the model slug", async ({page}) => {
@@ -74,4 +74,22 @@ test("prototype evidence persists against the exact compiled plan", async ({page
   await expect(
     page.getByLabel("Konstrukcija je stabilna na stvarnoj podlozi")
   ).toBeChecked();
+});
+
+
+test("heated finder coverage exists for every dog size", async ({page}) => {
+  await page.goto("/sr/pronadji-model");
+
+  await page.getByLabel("Životinja").selectOption("dog");
+  await page.getByLabel("Grejanje").selectOption("heated");
+  await page.getByLabel("Zimski profil").selectOption("severe");
+
+  for (const [size, modelName] of [
+    ["small", "Alpine Small Heated"],
+    ["medium", "Alpine Medium Heated"],
+    ["large", "Alpine Large Heated"]
+  ] as const) {
+    await page.getByLabel("Veličina psa").selectOption(size);
+    await expect(page.getByText(modelName, {exact: true})).toBeVisible();
+  }
 });
