@@ -25,7 +25,7 @@ export function costLinesForModel(model: ShelterModel): CostLine[] {
 
   const plywood9 = materials.find((item) => item.id === "plywood-9");
   const xps = materials.find((item) => item.id.startsWith("xps-"));
-  const roofMembraneM2 = compiled.areas.roofM2 * 1.15;
+  const roofMembraneM2 = compiled.roofPanel.areaM2 * 1.15;
 
   const lines: CostLine[] = [
     {
