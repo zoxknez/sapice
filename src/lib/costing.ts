@@ -33,6 +33,8 @@ export function costLinesForModel(model: ShelterModel): CostLine[] {
 
   const insulationMm = assemblyInsulationMm(compiled.assemblies.wall);
   const roofMembraneM2 = compiled.roofPanel.areaM2 * 1.15;
+  const exteriorFinishAreaM2 =
+    (compiled.areas.wallM2 + compiled.areas.floorM2) * 1.1;
 
   const lines: CostLine[] = [
     {
@@ -70,6 +72,24 @@ export function costLinesForModel(model: ShelterModel): CostLine[] {
       unit: "m2",
       noteSr: "Površina kompletnog kosog krovnog panela + 15% rezerve za preklop i otpad.",
       noteEn: "Full sloped roof panel area + 15% allowance for overlap and waste."
+    },
+    {
+      id: "exterior-finish-area",
+      labelSr: "Spoljašnja zaštita drvenih površina",
+      labelEn: "Exterior wood protection",
+      quantity: exteriorFinishAreaM2,
+      unit: "m2",
+      noteSr: "Površina spoljašnjih zidova i donje strane poda + 10% rezerve. Broj premaza i potrošnja zavise od konkretnog netoksičnog proizvoda.",
+      noteEn: "Exterior wall and floor-underside area + 10% allowance. Coat count and coverage depend on the selected non-toxic exterior product."
+    },
+    {
+      id: "ventilation-inserts",
+      labelSr: "Podesivi ventilacioni umeci",
+      labelEn: "Adjustable ventilation inserts",
+      quantity: compiled.ventilation.zones.length,
+      unit: "item",
+      noteSr: "Po jedan konkretan umetak za svaku PROVISION zonu. Finalni cutout i net free area moraju pratiti tehnički list izabranog proizvoda.",
+      noteEn: "One selected insert for each PROVISION zone. Final cutout and net free area must follow the selected product data sheet."
     },
     {
       id: "timber-frame",
