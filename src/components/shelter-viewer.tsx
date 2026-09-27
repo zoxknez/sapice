@@ -6,7 +6,7 @@ import {Canvas} from "@react-three/fiber";
 import {ContactShadows, OrbitControls} from "@react-three/drei";
 import type {ShelterModel} from "@/lib/domain";
 import type {AppLocale} from "@/i18n/routing";
-import {layoutGeometry} from "@/lib/engineering";
+import {entranceGeometry, layoutGeometry} from "@/lib/engineering";
 import {compileShelterModel, type CompiledShelterModel} from "@/lib/compiler";
 
 type ViewMode = "assembled" | "roof-off" | "exploded" | "frame";
@@ -72,10 +72,11 @@ function FrontPanel({
   const geometry = useMemo(() => {
     const width = model.dimensions.widthMm / 1000;
     const height = model.dimensions.frontHeightMm / 1000;
-    const entranceWidth = model.layout.entranceWidthMm / 1000;
-    const entranceHeight = model.layout.entranceHeightMm / 1000;
-    const threshold = model.layout.thresholdHeightMm / 1000;
-    const radius = Math.min(0.04, entranceWidth * 0.22);
+    const entrance = entranceGeometry(model);
+    const entranceWidth = entrance.widthMm / 1000;
+    const entranceHeight = entrance.heightMm / 1000;
+    const threshold = entrance.thresholdHeightMm / 1000;
+    const radius = entrance.radiusMm / 1000;
 
     const shape = new THREE.Shape();
     shape.moveTo(0, 0);
