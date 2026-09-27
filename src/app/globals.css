@@ -1304,3 +1304,27 @@ button { cursor: pointer; }
   .build-focus-card > p { font-size: 17px; }
   .build-focus-card footer { margin-top: auto; }
 }
+
+
+.stock-layouts { display: grid; gap: 46px; }
+.stock-layout { min-width: 0; }
+.stock-layout-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+.stock-layout-head h3 {
+  margin: 8px 0 0;
+  font-size: 25px;
+  letter-spacing: -.035em;
+}
+.stock-layout-head .sheet-summary { margin: 0; }
+
+@media (max-width: 640px) {
+  .stock-layout-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
