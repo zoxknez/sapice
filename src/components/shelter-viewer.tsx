@@ -7,8 +7,9 @@ import {ContactShadows, OrbitControls} from "@react-three/drei";
 import type {ShelterModel} from "@/lib/domain";
 import type {AppLocale} from "@/i18n/routing";
 import {constructionSummary, layoutGeometry, roofPanelGeometry, roofSlope} from "@/lib/engineering";
+import {compileShelterModel, type CompiledShelterModel} from "@/lib/compiler";
 
-type ViewMode = "assembled" | "roof-off" | "exploded";
+type ViewMode = "assembled" | "roof-off" | "exploded" | "frame";
 
 function Box({
   position,
@@ -83,7 +84,7 @@ function FrontPanel({
     shape.lineTo(0, height);
     shape.closePath();
 
-    const layout = layoutGeometry(model);
+    const layout = compiled.layout;
     for (const centerXmm of layout.entranceCentersXmm) {
       const centerX = centerXmm / 1000;
       addRoundedRectangleHole(
@@ -149,6 +150,186 @@ function SidePanel({
   );
 }
 
+function FramingSkeleton({
+  model,
+  compiled
+}: {
+  model: ShelterModel;
+  compiled: CompiledShelterModel;
+}) {
+  const w = model.dimensions.widthMm / 1000;
+  const d = model.dimensions.depthMm / 1000;
+  const hf = model.dimensions.frontHeightMm / 1000;
+  const hr = model.dimensions.rearHeightMm / 1000;
+  const gc = model.dimensions.groundClearanceMm / 1000;
+  const floorT = compiled.construction.floorThicknessMm / 1000;
+  const roofT = compiled.construction.roofThicknessMm / 1000;
+  const profileFace = compiled.framing.frameProfileMm[0] / 1000;
+  const profileDepth = compiled.framing.frameProfileMm[1] / 1000;
+  const base = compiled.framing.baseProfileMm[0] / 1000;
+  const wallInset = compiled.construction.wallThicknessMm / 2000;
+
+  const frontStudHeight = Math.max(0.05, hf - floorT - roofT);
+  const rearStudHeight = Math.max(0.05, hr - floorT - roofT);
+  const frontY = gc + floorT + frontStudHeight / 2;
+  const rearY = gc + floorT + rearStudHeight / 2;
+  const frameColor = "#4d705f";
+  const assumedColor = "#aa754e";
+
+  const entranceSupports = compiled.layout.entranceCentersXmm.flatMap((centerMm, index) => {
+    const half = model.layout.entranceWidthMm / 2000;
+    const supportLength = (model.layout.thresholdHeightMm + model.layout.entranceHeightMm) / 1000;
+    const y = gc + floorT + supportLength / 2;
+    const centerM = centerMm / 1000;
+    return [
+      <Box
+        key={`entry-${index}-l`}
+        position={[centerM - half, y, wallInset]}
+        size={[profileFace, supportLength, profileDepth]}
+        color={assumedColor}
+      />,
+      <Box
+        key={`entry-${index}-r`}
+        position={[centerM + half, y, wallInset]}
+        size={[profileFace, supportLength, profileDepth]}
+        color={assumedColor}
+      />,
+      <Box
+        key={`entry-${index}-h`}
+        position={[
+          centerM,
+          gc + floorT + supportLength,
+          wallInset
+        ]}
+        size={[
+          model.layout.entranceWidthMm / 1000 + 2 * profileFace,
+          profileFace,
+          profileDepth
+        ]}
+        color={assumedColor}
+      />
+    ];
+  });
+
+  const rearStuds = compiled.linearParts
+    .filter((part) => part.wall === "rear" && typeof part.positionMm === "number")
+    .map((part) => (
+      <Box
+        key={part.id}
+        position={[
+          (part.positionMm ?? 0) / 1000,
+          gc + floorT + part.lengthMm / 2000,
+          d - wallInset
+        ]}
+        size={[profileFace, part.lengthMm / 1000, profileDepth]}
+        color={assumedColor}
+      />
+    ));
+
+  const sideStuds = compiled.linearParts
+    .filter(
+      (part) =>
+        (part.wall === "left" || part.wall === "right") &&
+        typeof part.positionMm === "number"
+    )
+    .map((part) => (
+      <Box
+        key={part.id}
+        position={[
+          part.wall === "left" ? wallInset : w - wallInset,
+          gc + floorT + part.lengthMm / 2000,
+          (part.positionMm ?? 0) / 1000
+        ]}
+        size={[profileDepth, part.lengthMm / 1000, profileFace]}
+        color={assumedColor}
+      />
+    ));
+
+  const sideTopLength = compiled.roof.trueLengthMm / 1000;
+  const sideTopY = gc + (hf + hr) / 2 - roofT / 2;
+  const sideTopZ = d / 2;
+
+  return (
+    <group>
+      <Box position={[w * 0.22, gc / 2, d / 2]} size={[base, gc, d * 0.88]} color="#51463a" />
+      <Box position={[w * 0.78, gc / 2, d / 2]} size={[base, gc, d * 0.88]} color="#51463a" />
+
+      <Box position={[wallInset, gc + floorT / 2, d / 2]} size={[profileDepth, profileFace, d]} color={frameColor} />
+      <Box position={[w - wallInset, gc + floorT / 2, d / 2]} size={[profileDepth, profileFace, d]} color={frameColor} />
+      <Box position={[w / 2, gc + floorT / 2, wallInset]} size={[w, profileFace, profileDepth]} color={frameColor} />
+      <Box position={[w / 2, gc + floorT / 2, d - wallInset]} size={[w, profileFace, profileDepth]} color={frameColor} />
+
+      <Box position={[wallInset, frontY, wallInset]} size={[profileFace, frontStudHeight, profileDepth]} color={frameColor} />
+      <Box position={[w - wallInset, frontY, wallInset]} size={[profileFace, frontStudHeight, profileDepth]} color={frameColor} />
+      <Box position={[wallInset, rearY, d - wallInset]} size={[profileFace, rearStudHeight, profileDepth]} color={frameColor} />
+      <Box position={[w - wallInset, rearY, d - wallInset]} size={[profileFace, rearStudHeight, profileDepth]} color={frameColor} />
+
+      <Box
+        position={[w / 2, gc + floorT + profileFace / 2, wallInset]}
+        size={[w, profileFace, profileDepth]}
+        color={frameColor}
+      />
+      <Box
+        position={[w / 2, gc + hf - roofT - profileFace / 2, wallInset]}
+        size={[w, profileFace, profileDepth]}
+        color={frameColor}
+      />
+      <Box
+        position={[w / 2, gc + floorT + profileFace / 2, d - wallInset]}
+        size={[w, profileFace, profileDepth]}
+        color={frameColor}
+      />
+      <Box
+        position={[w / 2, gc + hr - roofT - profileFace / 2, d - wallInset]}
+        size={[w, profileFace, profileDepth]}
+        color={frameColor}
+      />
+
+      {[wallInset, w - wallInset].map((x) => (
+        <mesh
+          key={x}
+          position={[x, sideTopY, sideTopZ]}
+          rotation={[compiled.roof.angleRad, 0, 0]}
+          castShadow
+        >
+          <boxGeometry args={[profileDepth, profileFace, sideTopLength]} />
+          <meshStandardMaterial color={frameColor} roughness={0.78} />
+        </mesh>
+      ))}
+
+      <Box
+        position={[wallInset, gc + floorT + profileFace / 2, d / 2]}
+        size={[profileDepth, profileFace, d]}
+        color={frameColor}
+      />
+      <Box
+        position={[w - wallInset, gc + floorT + profileFace / 2, d / 2]}
+        size={[profileDepth, profileFace, d]}
+        color={frameColor}
+      />
+
+      {entranceSupports}
+      {rearStuds}
+      {sideStuds}
+
+      {compiled.layout.dividerPositionsXmm.map((positionMm, index) => (
+        <SidePanel
+          key={`frame-divider-${index + 1}`}
+          depth={Math.max(0.05, d - 2 * compiled.construction.wallThicknessMm / 1000)}
+          frontHeight={Math.max(0.05, compiled.internal.frontHeightMm / 1000)}
+          rearHeight={Math.max(0.05, compiled.internal.rearHeightMm / 1000)}
+          thickness={model.layout.dividerThicknessMm / 1000}
+          position={[
+            positionMm / 1000,
+            gc + floorT,
+            compiled.construction.wallThicknessMm / 1000
+          ]}
+        />
+      ))}
+    </group>
+  );
+}
+
 function Shelter({model, mode}: {model: ShelterModel; mode: ViewMode}) {
   const w = model.dimensions.widthMm / 1000;
   const d = model.dimensions.depthMm / 1000;
@@ -156,13 +337,14 @@ function Shelter({model, mode}: {model: ShelterModel; mode: ViewMode}) {
   const hr = model.dimensions.rearHeightMm / 1000;
   const gc = model.dimensions.groundClearanceMm / 1000;
 
-  const construction = constructionSummary(model);
+  const compiled = compileShelterModel(model);
+  const construction = compiled.construction;
   const wallT = construction.wallThicknessMm / 1000;
   const floorT = construction.floorThicknessMm / 1000;
   const roofT = Math.min(construction.roofThicknessMm / 1000, 0.085);
   const avgH = (hf + hr) / 2;
-  const roof = roofSlope(model);
-  const roofPanel = roofPanelGeometry(model);
+  const roof = compiled.roof;
+  const roofPanel = compiled.roofPanel;
   const roofLength = roofPanel.panelLengthMm / 1000;
   const roofWidth = roofPanel.panelWidthMm / 1000;
   const roofCenterZ = d / 2 + roofPanel.centerPlanOffsetMm / 1000;
@@ -179,6 +361,10 @@ function Shelter({model, mode}: {model: ShelterModel; mode: ViewMode}) {
 
   return (
     <group position={[-w / 2, 0, -d / 2]}>
+      {mode === "frame" ? (
+        <FramingSkeleton model={model} compiled={compiled} />
+      ) : (
+        <>
       <Box
         position={[w * 0.22, gc / 2, d / 2]}
         size={[0.085, gc, d * 0.88]}
@@ -253,6 +439,8 @@ function Shelter({model, mode}: {model: ShelterModel; mode: ViewMode}) {
           <meshStandardMaterial color="#5d554c" roughness={0.92} />
         </mesh>
       )}
+        </>
+      )}
     </group>
   );
 }
@@ -291,7 +479,8 @@ export function ShelterViewer({model, locale}: {model: ShelterModel; locale: App
         {([
           ["assembled", "3D"],
           ["roof-off", locale === "sr" ? "Bez krova" : "Roof off"],
-          ["exploded", locale === "sr" ? "Rastavljeno" : "Exploded"]
+          ["exploded", locale === "sr" ? "Rastavljeno" : "Exploded"],
+          ["frame", locale === "sr" ? "Ram" : "Frame"]
         ] as const).map(([value, label]) => (
           <button
             key={value}
