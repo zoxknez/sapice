@@ -150,6 +150,67 @@ function SidePanel({
   );
 }
 
+function BaseSupportSystem({
+  compiled,
+  color = "#51463a"
+}: {
+  compiled: CompiledShelterModel;
+  color?: string;
+}) {
+  const model = compiled.model;
+  const d = model.dimensions.depthMm / 1000;
+  const gc = model.dimensions.groundClearanceMm / 1000;
+  const baseWidth = compiled.framing.baseProfileMm[0] / 1000;
+  const baseHeight = compiled.framing.baseProfileMm[1] / 1000;
+
+  const runners = compiled.linearParts
+    .filter(
+      (part) =>
+        part.wall === "base" &&
+        part.id.startsWith("base-runner-") &&
+        typeof part.positionMm === "number"
+    )
+    .map((part) => (
+      <Box
+        key={part.id}
+        position={[
+          (part.positionMm ?? 0) / 1000,
+          gc - baseHeight / 2,
+          d / 2
+        ]}
+        size={[baseWidth, baseHeight, part.lengthMm / 1000]}
+        color={color}
+      />
+    ));
+
+  const posts = compiled.linearParts
+    .filter(
+      (part) =>
+        part.wall === "base" &&
+        part.id.startsWith("base-post-") &&
+        typeof part.positionXmm === "number" &&
+        typeof part.positionZmm === "number"
+    )
+    .map((part) => (
+      <Box
+        key={part.id}
+        position={[
+          (part.positionXmm ?? 0) / 1000,
+          part.lengthMm / 2000,
+          (part.positionZmm ?? 0) / 1000
+        ]}
+        size={[
+          part.profileMm[0] / 1000,
+          part.lengthMm / 1000,
+          part.profileMm[1] / 1000
+        ]}
+        color={color}
+      />
+    ));
+
+  return <group>{posts}{runners}</group>;
+}
+
 function FramingSkeleton({
   model,
   compiled
@@ -164,7 +225,6 @@ function FramingSkeleton({
   const roofT = compiled.construction.roofThicknessMm / 1000;
   const profileFace = compiled.framing.frameProfileMm[0] / 1000;
   const profileDepth = compiled.framing.frameProfileMm[1] / 1000;
-  const base = compiled.framing.baseProfileMm[0] / 1000;
   const wallInset = compiled.construction.wallThicknessMm / 2000;
 
   const frontStudHeight = Math.max(0.05, compiled.interfaces.wallFrontHeightMm / 1000);
@@ -252,6 +312,85 @@ function FramingSkeleton({
       />
     ));
 
+  const floorFrameCenterY = (() => {
+    const exteriorPanelMm =
+      compiled.assemblies.floor.layers.find(
+        (layer) => layer.role === "exterior-panel"
+      )?.thicknessMm ?? 0;
+    return gc + (exteriorPanelMm + compiled.framing.frameProfileMm[1] / 2) / 1000;
+  })();
+
+  const floorJoists = compiled.linearParts
+    .filter(
+      (part) =>
+        part.wall === "floor" &&
+        part.id.startsWith("floor-joist-") &&
+        typeof part.positionMm === "number"
+    )
+    .map((part) => (
+      <Box
+        key={part.id}
+        position={[
+          w / 2,
+          floorFrameCenterY,
+          (part.positionMm ?? 0) / 1000
+        ]}
+        size={[
+          part.lengthMm / 1000,
+          profileDepth,
+          profileFace
+        ]}
+        color={assumedColor}
+      />
+    ));
+
+  const roofExteriorPanelMm =
+    compiled.assemblies.roof.layers.find(
+      (layer) => layer.role === "exterior-panel"
+    )?.thicknessMm ?? 0;
+  const roofInsulationMm =
+    compiled.assemblies.roof.layers.find(
+      (layer) => layer.role === "insulation"
+    )?.thicknessMm ?? 0;
+  const roofFrameNormalDepthM =
+    (roofExteriorPanelMm + roofInsulationMm / 2) / 1000;
+  const roofFrameCenterY =
+    gc +
+    (model.dimensions.frontHeightMm + model.dimensions.rearHeightMm) / 2000 -
+    roofFrameNormalDepthM * Math.cos(compiled.roof.angleRad);
+  const roofFrameCenterZ =
+    d / 2 -
+    roofFrameNormalDepthM * Math.sin(compiled.roof.angleRad);
+
+  const roofRafters = compiled.linearParts
+    .filter(
+      (part) =>
+        part.wall === "roof" &&
+        part.id.startsWith("roof-rafter-") &&
+        typeof part.positionMm === "number"
+    )
+    .map((part) => (
+      <mesh
+        key={part.id}
+        position={[
+          (part.positionMm ?? 0) / 1000,
+          roofFrameCenterY,
+          roofFrameCenterZ
+        ]}
+        rotation={[compiled.roof.angleRad, 0, 0]}
+        castShadow
+      >
+        <boxGeometry
+          args={[
+            profileFace,
+            profileDepth,
+            part.lengthMm / 1000
+          ]}
+        />
+        <meshStandardMaterial color={assumedColor} roughness={0.78} />
+      </mesh>
+    ));
+
   const sideTopLength = compiled.roof.trueLengthMm / 1000;
   const sideTopY =
     gc +
@@ -262,13 +401,13 @@ function FramingSkeleton({
 
   return (
     <group>
-      <Box position={[w * 0.22, gc / 2, d / 2]} size={[base, gc, d * 0.88]} color="#51463a" />
-      <Box position={[w * 0.78, gc / 2, d / 2]} size={[base, gc, d * 0.88]} color="#51463a" />
+      <BaseSupportSystem compiled={compiled} />
 
-      <Box position={[wallInset, gc + floorT / 2, d / 2]} size={[profileDepth, profileFace, d]} color={frameColor} />
-      <Box position={[w - wallInset, gc + floorT / 2, d / 2]} size={[profileDepth, profileFace, d]} color={frameColor} />
-      <Box position={[w / 2, gc + floorT / 2, wallInset]} size={[w, profileFace, profileDepth]} color={frameColor} />
-      <Box position={[w / 2, gc + floorT / 2, d - wallInset]} size={[w, profileFace, profileDepth]} color={frameColor} />
+      <Box position={[profileFace / 2, floorFrameCenterY, d / 2]} size={[profileFace, profileDepth, d]} color={frameColor} />
+      <Box position={[w - profileFace / 2, floorFrameCenterY, d / 2]} size={[profileFace, profileDepth, d]} color={frameColor} />
+      <Box position={[w / 2, floorFrameCenterY, profileFace / 2]} size={[Math.max(0.05, w - 2 * profileFace), profileDepth, profileFace]} color={frameColor} />
+      <Box position={[w / 2, floorFrameCenterY, d - profileFace / 2]} size={[Math.max(0.05, w - 2 * profileFace), profileDepth, profileFace]} color={frameColor} />
+      {floorJoists}
 
       <Box position={[wallInset, frontY, wallInset]} size={[profileFace, frontStudHeight, profileDepth]} color={frameColor} />
       <Box position={[w - wallInset, frontY, wallInset]} size={[profileFace, frontStudHeight, profileDepth]} color={frameColor} />
@@ -323,6 +462,7 @@ function FramingSkeleton({
       {entranceHeaders}
       {rearStuds}
       {sideStuds}
+      {roofRafters}
 
       {compiled.layout.dividerPositionsXmm.map((positionMm, index) => (
         <SidePanel
@@ -383,16 +523,7 @@ function Shelter({compiled, mode}: {compiled: CompiledShelterModel; mode: ViewMo
         <FramingSkeleton model={model} compiled={compiled} />
       ) : (
         <>
-      <Box
-        position={[w * 0.22, gc / 2, d / 2]}
-        size={[0.085, gc, d * 0.88]}
-        color="#51463a"
-      />
-      <Box
-        position={[w * 0.78, gc / 2, d / 2]}
-        size={[0.085, gc, d * 0.88]}
-        color="#51463a"
-      />
+      <BaseSupportSystem compiled={compiled} />
 
       <Box
         position={[w / 2, gc + floorT / 2 + floorOffset, d / 2]}
