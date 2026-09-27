@@ -695,10 +695,31 @@ export function compileShelterModel(model: ShelterModel) {
       depthMm: internalDepthMm,
       frontHeightMm: internalFrontHeightMm,
       rearHeightMm: internalRearHeightMm,
+      averageHeightMm: (internalFrontHeightMm + internalRearHeightMm) / 2,
       usableFloorAreaM2:
         (Math.max(0, internalWidthMm - layout.totalDividerThicknessMm) * internalDepthMm) /
         1_000_000,
-      chamberClearWidthMm: layout.chamberWidthMm
+      usableVolumeM3:
+        (
+          Math.max(0, internalWidthMm - layout.totalDividerThicknessMm) *
+          internalDepthMm *
+          ((internalFrontHeightMm + internalRearHeightMm) / 2)
+        ) / 1_000_000_000,
+      chamberClearWidthMm: layout.chamberWidthMm,
+      floorAreaPerRecommendedAnimalM2:
+        (
+          Math.max(0, internalWidthMm - layout.totalDividerThicknessMm) *
+          internalDepthMm
+        ) /
+        1_000_000 /
+        model.capacity.recommended,
+      floorAreaPerMaxAnimalM2:
+        (
+          Math.max(0, internalWidthMm - layout.totalDividerThicknessMm) *
+          internalDepthMm
+        ) /
+        1_000_000 /
+        model.capacity.max
     },
     roof,
     roofPanel,
