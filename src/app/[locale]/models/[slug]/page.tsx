@@ -19,6 +19,7 @@ import {ThermalScenario} from "@/components/thermal-scenario";
 import {ModelValidationPanel} from "@/components/model-validation-panel";
 import {VentilationProvision} from "@/components/ventilation-provision";
 import {PrototypeEvidenceWorksheet} from "@/components/prototype-evidence-worksheet";
+import {HeatingProvision} from "@/components/heating-provision";
 import {compileShelterModel} from "@/lib/compiler";
 import {compiledSourceIds} from "@/lib/provenance";
 import {costLinesForCompiled} from "@/lib/costing";
@@ -155,6 +156,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
           <a href="#validation">{locale === "sr" ? "Validacija" : "Validation"}</a>
           <a href="#thermal">{locale === "sr" ? "Termika" : "Thermal"}</a>
           <a href="#ventilation">{locale === "sr" ? "Ventilacija" : "Ventilation"}</a>
+          {model.heated && <a href="#heating">{locale === "sr" ? "Grejanje" : "Heating"}</a>}
           <a href="#materials">{locale === "sr" ? "Materijali" : "Materials"}</a>
           <a href="#nesting">{locale === "sr" ? "Table" : "Sheets"}</a>
           <a href="#cost">{locale === "sr" ? "Trošak" : "Cost"}</a>
@@ -286,6 +288,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
       </section>
 
       <VentilationProvision compiled={compiled} locale={locale} />
+      <HeatingProvision compiled={compiled} locale={locale} />
 
       <section className="section" id="materials">
         <div className="shell">
