@@ -13,7 +13,7 @@ export function ModelCard({
   locale: AppLocale;
   summary: ModelComparisonSummary;
 }) {
-  const copy = model.translations[locale];
+  const copy = model.translations[locale] ?? model.translations.sr;
   return (
     <article className="model-card">
       <div className="model-visual">

@@ -3,11 +3,13 @@ import type {AppLocale} from "@/i18n/routing";
 import {Link} from "@/i18n/navigation";
 import {shelterModels} from "@/data/models";
 import {ModelCard} from "@/components/model-card";
+import {ModelThumbnail} from "@/components/model-thumbnail";
 import {StructuredData} from "@/components/structured-data";
 import {modelComparisonSummaryMap} from "@/lib/catalog-summary";
 
 export default async function HomePage({params}: {params: Promise<{locale: AppLocale}>}) {
-  const {locale} = await params;
+  const {locale: routeLocale} = await params;
+  const locale: AppLocale = routeLocale === "en" ? "en" : "sr";
   setRequestLocale(locale);
   const t = await getTranslations({locale, namespace: "Home"});
   const featuredSlugs = ["nordic-quad-winter", "alpine-medium-winter", "alpine-large-heated"];
@@ -54,22 +56,28 @@ export default async function HomePage({params}: {params: Promise<{locale: AppLo
             </div>
             <div className="trust-row">
               <span><strong>{shelterModels.length}</strong>{locale === "sr" ? "gotovih modela" : "ready models"}</span>
-              <span><strong>SR + EN</strong>bilingual</span>
-              <span><strong>3D</strong>parametric</span>
-              <span><strong>0 AI</strong>runtime</span>
+              <span><strong>SR + EN</strong>{locale === "sr" ? "dva jezika" : "two languages"}</span>
+              <span><strong>3D</strong>{locale === "sr" ? "iz stvarnih mera" : "from real dimensions"}</span>
+              <span><strong>0 AI</strong>{locale === "sr" ? "pri izradi plana" : "at plan runtime"}</span>
             </div>
           </div>
-          <div className="hero-object" aria-hidden="true">
-            <div className="house-illustration">
-              <div className="house-roof" />
-              <div className="house-body">
-                <div className="house-door" />
-                <div className="house-section-lines" />
+          {featured[0] && (
+            <Link href={{pathname: "/models/[slug]", params: {slug: featured[0].slug}}} locale={locale} className="hero-showcase">
+              <div className="hero-showcase-top">
+                <span>{locale === "sr" ? "Iz biblioteke modela" : "From the model library"}</span>
+                <span>01 / {String(shelterModels.length).padStart(2, "0")}</span>
               </div>
-              <div className="dimension dimension-w">1200 mm</div>
-              <div className="dimension dimension-h">650 mm</div>
-            </div>
-          </div>
+              <ModelThumbnail model={featured[0]} locale={locale} summary={featuredSummaries[featured[0].id]} />
+              <div className="hero-showcase-bottom">
+                <div>
+                  <small>{locale === "sr" ? "ISTAKNUTI MODEL" : "FEATURED MODEL"}</small>
+                  <strong>{featured[0].translations[locale].name}</strong>
+                  <span>{featured[0].dimensions.widthMm} × {featured[0].dimensions.depthMm} × {featured[0].dimensions.frontHeightMm} mm</span>
+                </div>
+                <span className="hero-showcase-arrow" aria-hidden="true">↗</span>
+              </div>
+            </Link>
+          )}
         </div>
       </section>
 
@@ -97,7 +105,7 @@ export default async function HomePage({params}: {params: Promise<{locale: AppLo
         <div className="shell">
           <div className="section-heading">
             <div>
-              <span className="kicker">From model to workshop</span>
+              <span className="kicker">{locale === "sr" ? "Od modela do radionice" : "From model to workshop"}</span>
               <h2>{locale === "sr" ? "Jedan model, kompletan tok izrade" : "One model, a complete build workflow"}</h2>
             </div>
             <p>
@@ -156,7 +164,7 @@ export default async function HomePage({params}: {params: Promise<{locale: AppLo
         <div className="shell">
           <div className="section-heading">
             <div>
-              <span className="kicker">Reference set</span>
+              <span className="kicker">{locale === "sr" ? "Izdvojeni modeli" : "Reference set"}</span>
               <h2>{t("catalogTitle")}</h2>
             </div>
             <p>{t("catalogLead")}</p>

@@ -25,7 +25,8 @@ export async function generateMetadata({
 }
 
 export default async function ModelsPage({params}: {params: Promise<{locale: AppLocale}>}) {
-  const {locale} = await params;
+  const {locale: routeLocale} = await params;
+  const locale: AppLocale = routeLocale === "en" ? "en" : "sr";
   setRequestLocale(locale);
   const t = await getTranslations({locale, namespace: "Models"});
   const comparisonSummaries = modelComparisonSummaryMap(shelterModels);
@@ -33,7 +34,7 @@ export default async function ModelsPage({params}: {params: Promise<{locale: App
   return (
     <section className="page-hero">
       <div className="shell">
-        <span className="kicker">Engineering catalog</span>
+        <span className="kicker">{locale === "sr" ? "Katalog konstrukcija" : "Engineering catalog"}</span>
         <h1>{t("title")}</h1>
         <p className="page-lead">{t("lead")}</p>
         <ModelCatalog models={shelterModels} comparisonSummaries={comparisonSummaries} locale={locale} />

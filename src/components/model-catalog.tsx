@@ -18,15 +18,18 @@ export function ModelCatalog({
   const isSr = locale === "sr";
   const [animal, setAnimal] = useState<"all" | "cat" | "dog">("all");
   const [heating, setHeating] = useState<"all" | "heated" | "passive">("all");
+  const [query, setQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const visible = useMemo(
     () => models.filter((model) => {
       const animalOk = animal === "all" || model.animal === animal;
       const heatOk = heating === "all" || (heating === "heated" ? model.heated : !model.heated);
-      return animalOk && heatOk;
+      const search = query.trim().toLocaleLowerCase();
+      const searchOk = !search || `${model.translations[locale].name} ${model.translations[locale].description} ${model.slug}`.toLocaleLowerCase().includes(search);
+      return animalOk && heatOk && searchOk;
     }),
-    [models, animal, heating]
+    [models, animal, heating, query, locale]
   );
 
   const selected = useMemo(
@@ -53,16 +56,22 @@ export function ModelCatalog({
   return (
     <>
       <div className="filter-bar" aria-label={isSr ? "Filteri modela" : "Model filters"}>
+        <label className="catalog-search">
+          <span aria-hidden="true">⌕</span>
+          <input type="search" value={query} onChange={(event) => setQuery(event.target.value)}
+            placeholder={isSr ? "Pretražite modele" : "Search models"}
+            aria-label={isSr ? "Pretražite modele" : "Search models"} />
+        </label>
         <div className="segmented">
           {(["all", "cat", "dog"] as const).map((value) => (
-            <button key={value} className={animal === value ? "active" : ""} onClick={() => setAnimal(value)}>
+            <button type="button" key={value} className={animal === value ? "active" : ""} aria-pressed={animal === value} onClick={() => setAnimal(value)}>
               {value === "all" ? (isSr ? "Sve" : "All") : value === "cat" ? (isSr ? "Mačke" : "Cats") : (isSr ? "Psi" : "Dogs")}
             </button>
           ))}
         </div>
         <div className="segmented">
           {(["all", "passive", "heated"] as const).map((value) => (
-            <button key={value} className={heating === value ? "active" : ""} onClick={() => setHeating(value)}>
+            <button type="button" key={value} className={heating === value ? "active" : ""} aria-pressed={heating === value} onClick={() => setHeating(value)}>
               {value === "all" ? (isSr ? "Sva grejanja" : "All heating") : value === "heated" ? (isSr ? "Grejane" : "Heated") : (isSr ? "Bez grejanja" : "Passive")}
             </button>
           ))}
@@ -184,6 +193,15 @@ export function ModelCatalog({
           );
         })}
       </div>
+
+      {visible.length === 0 && (
+        <div className="catalog-empty">
+          <strong>{isSr ? "Nema modela za ove filtere." : "No models match these filters."}</strong>
+          <button type="button" onClick={() => { setQuery(""); setAnimal("all"); setHeating("all"); }}>
+            {isSr ? "Prikaži sve modele" : "Show all models"}
+          </button>
+        </div>
+      )}
 
       {selected.length === 1 && (
         <div className="compare-hint">

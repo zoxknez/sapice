@@ -4,6 +4,9 @@ import {sources} from "@/data/sources";
 import {BuildGuide} from "@/components/build-guide";
 import {compiledSourceIds} from "@/lib/provenance";
 
+const workshopMm = (value: number) => String(Math.round(value * 10) / 10);
+const workshopNote = (value: string) => value.replace(/\b\d+\.\d{2,}\b/g, (number) => workshopMm(Number(number)));
+
 export function ModelBuildBook({
   compiled,
   locale
@@ -77,14 +80,14 @@ export function ModelBuildBook({
                       ? (locale === "sr" ? "trapezni profil" : "trapezoid profile")
                       : part.material}
                     {(locale === "sr" ? part.notesSr : part.notesEn)
-                      ? ` · ${locale === "sr" ? part.notesSr : part.notesEn}`
+                      ? ` · ${workshopNote((locale === "sr" ? part.notesSr : part.notesEn) ?? "")}`
                       : ""}
                   </small>
                 </span>
                 <span role="cell">
                   {part.shape === "trapezoid" && part.trapezoidRearHeightMm !== undefined
-                    ? `${part.widthMm} × Hf ${part.heightMm} / Hr ${part.trapezoidRearHeightMm} × ${part.thicknessMm} mm`
-                    : `${part.widthMm} × ${part.heightMm} × ${part.thicknessMm} mm`}
+                    ? `${workshopMm(part.widthMm)} × Hf ${workshopMm(part.heightMm)} / Hr ${workshopMm(part.trapezoidRearHeightMm)} × ${workshopMm(part.thicknessMm)} mm`
+                    : `${workshopMm(part.widthMm)} × ${workshopMm(part.heightMm)} × ${workshopMm(part.thicknessMm)} mm`}
                 </span>
                 <strong role="cell">{part.quantity}</strong>
               </div>
@@ -177,7 +180,7 @@ export function ModelBuildBook({
                       : ""}
                   </small>
                 </span>
-                <span role="cell">{part.profileMm[0]} × {part.profileMm[1]} mm · {part.lengthMm} mm</span>
+                <span role="cell">{part.profileMm[0]} × {part.profileMm[1]} mm · {workshopMm(part.lengthMm)} mm</span>
                 <strong role="cell">{part.quantity}</strong>
               </div>
             ))}

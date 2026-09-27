@@ -10,6 +10,31 @@ import type {CompiledShelterModel} from "@/lib/compiler";
 
 type ViewMode = "assembled" | "roof-off" | "exploded" | "frame";
 
+// A deterministic surface finish. The mesh dimensions still come exclusively
+// from the compiler; this texture only makes the timber readable in 3D.
+const woodGrain = (() => {
+  const size = 128;
+  const pixels = new Uint8Array(size * size * 4);
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const wave = Math.sin(x * 0.31 + Math.sin(y * 0.045) * 2.2) * 8;
+      const fine = Math.sin(x * 1.7 + y * 0.08) * 3;
+      const value = Math.max(190, Math.min(255, Math.round(226 + wave + fine)));
+      const index = (y * size + x) * 4;
+      pixels[index] = value;
+      pixels[index + 1] = value - 3;
+      pixels[index + 2] = value - 8;
+      pixels[index + 3] = 255;
+    }
+  }
+  const texture = new THREE.DataTexture(pixels, size, size);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+  return texture;
+})();
+
 function Box({
   position,
   size,
@@ -26,6 +51,7 @@ function Box({
       <boxGeometry args={size} />
       <meshStandardMaterial
         color={color}
+        map={color === "#a66f42" || color === "#a97046" ? woodGrain : undefined}
         transparent={opacity < 1}
         opacity={opacity}
         roughness={0.78}
@@ -105,7 +131,7 @@ function FrontPanel({
 
   return (
     <mesh position={position} geometry={geometry} castShadow receiveShadow>
-      <meshStandardMaterial color="#c18a57" roughness={0.82} />
+      <meshStandardMaterial color="#c18a57" map={woodGrain} roughness={0.82} />
     </mesh>
   );
 }
@@ -145,7 +171,7 @@ function SidePanel({
       castShadow
       receiveShadow
     >
-      <meshStandardMaterial color="#b98050" roughness={0.84} />
+      <meshStandardMaterial color="#b98050" map={woodGrain} roughness={0.84} />
     </mesh>
   );
 }
@@ -605,7 +631,7 @@ function Shelter({compiled, mode}: {compiled: CompiledShelterModel; mode: ViewMo
           receiveShadow
         >
           <boxGeometry args={[roofWidth, roofT, roofLength]} />
-          <meshStandardMaterial color="#5d554c" roughness={0.92} />
+          <meshStandardMaterial color="#333b3b" roughness={0.82} metalness={0.08} />
         </mesh>
       )}
         </>
@@ -628,26 +654,28 @@ export function ShelterViewer({
   const heightM = (model.dimensions.frontHeightMm + model.dimensions.groundClearanceMm) / 1000;
   const maxSpan = Math.max(widthM, depthM, heightM);
   const cameraPosition: [number, number, number] = [
-    maxSpan * 1.35,
-    Math.max(1.2, heightM * 1.18),
-    maxSpan * 1.55
+    maxSpan * 1.7,
+    Math.max(1.15, heightM * 1.65),
+    -maxSpan * 2.2
   ];
   const orbitTarget: [number, number, number] = [0, heightM * 0.43, 0];
 
   return (
-    <div className="viewer" aria-label={`3D preview: ${model.translations.en.name}`}>
-      <Canvas camera={{position: cameraPosition, fov: 38}} dpr={[1, 1.5]} shadows>
-        <color attach="background" args={["#eee9e0"]} />
-        <ambientLight intensity={1.45} />
-        <directionalLight position={[3, 5, 2]} intensity={2.2} castShadow />
+    <div className="viewer" aria-label={`${locale === "sr" ? "3D prikaz" : "3D preview"}: ${model.translations[locale].name}`}>
+      <Canvas camera={{position: cameraPosition, fov: 35}} dpr={[1, 1.75]} shadows>
+        <color attach="background" args={["#e9e4d9"]} />
+        <hemisphereLight args={["#fff8eb", "#a49b8e", 2]} />
+        <directionalLight position={[-3, 7, -5]} intensity={2.8} castShadow shadow-mapSize={[1024, 1024]} />
+        <directionalLight position={[4, 3, 5]} intensity={0.8} />
         <Shelter compiled={compiled} mode={mode} />
-        <ContactShadows position={[0, -0.02, 0]} opacity={0.28} scale={5} blur={2.5} far={4} />
+        <ContactShadows position={[0, -0.015, 0]} opacity={0.3} scale={maxSpan * 3} blur={2.2} far={maxSpan * 2} />
         <OrbitControls
           makeDefault
           enablePan={false}
-          minDistance={1.25}
-          maxDistance={5}
+          minDistance={maxSpan * 0.85}
+          maxDistance={maxSpan * 4}
           target={orbitTarget}
+          maxPolarAngle={Math.PI * 0.48}
         />
       </Canvas>
 
@@ -670,7 +698,11 @@ export function ShelterViewer({
         ))}
       </div>
 
-      <div className="viewer-badge">WebGL · canonical dimensions</div>
+      <div className="viewer-caption">
+        <span>{locale === "sr" ? "Interaktivni 3D model" : "Interactive 3D model"}</span>
+        <strong>{model.dimensions.widthMm} × {model.dimensions.depthMm} × {model.dimensions.frontHeightMm} mm</strong>
+      </div>
+      <div className="viewer-badge">{locale === "sr" ? "Prevuci za rotaciju · točkić za uvećanje" : "Drag to rotate · scroll to zoom"}</div>
     </div>
   );
 }

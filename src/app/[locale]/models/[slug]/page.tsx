@@ -67,7 +67,8 @@ export async function generateMetadata({
 }
 
 export default async function ModelPage({params}: {params: Promise<{locale: AppLocale; slug: string}>}) {
-  const {locale, slug} = await params;
+  const {locale: routeLocale, slug} = await params;
+  const locale: AppLocale = routeLocale === "en" ? "en" : "sr";
   setRequestLocale(locale);
   const model = getShelterModel(slug);
   if (!model) notFound();
@@ -158,13 +159,13 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
           <a href="#ventilation">{locale === "sr" ? "Ventilacija" : "Ventilation"}</a>
           {model.heated && <a href="#heating">{locale === "sr" ? "Grejanje" : "Heating"}</a>}
           <a href="#materials">{locale === "sr" ? "Materijali" : "Materials"}</a>
-          <a href="#nesting">{locale === "sr" ? "Table" : "Sheets"}</a>
+          <a href="#nesting">{locale === "sr" ? "Raspored tabla" : "Sheets"}</a>
           <a href="#cost">{locale === "sr" ? "Trošak" : "Cost"}</a>
           <a href="#operation">{locale === "sr" ? "Korišćenje" : "Use"}</a>
           <a href="#inside">{locale === "sr" ? "Unutrašnjost" : "Interior"}</a>
           <a href="#cut-list">{locale === "sr" ? "Krojna lista" : "Cut list"}</a>
           <a href="#framing">{locale === "sr" ? "Ram" : "Framing"}</a>
-          <a href="#hardware">{locale === "sr" ? "Hardware" : "Hardware"}</a>
+          <a href="#hardware">{locale === "sr" ? "Okov" : "Hardware"}</a>
           <a href="#build-guide">{locale === "sr" ? "Izrada" : "Build"}</a>
           <a href="#prototype">{locale === "sr" ? "Prototip" : "Prototype"}</a>
           <a href="#sources">{locale === "sr" ? "Izvori" : "Sources"}</a>
@@ -174,7 +175,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
       <section className="section" id="geometry">
         <div className="shell detail-content">
           <div>
-            <span className="kicker">Geometry</span>
+            <span className="kicker">{locale === "sr" ? "Geometrija" : "Geometry"}</span>
             <h2>{locale === "sr" ? "Mere i konstrukcija" : "Dimensions and construction"}</h2>
             <TechnicalSketch compiled={compiled} locale={locale} />
           </div>
