@@ -61,22 +61,22 @@ function addRoundedRectangleHole(
 }
 
 function FrontPanel({
-  model,
+  compiled,
   thickness,
   position
 }: {
-  model: ShelterModel;
+  compiled: CompiledShelterModel;
   thickness: number;
   position: [number, number, number];
 }) {
   const geometry = useMemo(() => {
+    const model = compiled.model;
     const width = model.dimensions.widthMm / 1000;
-    const height = model.dimensions.frontHeightMm / 1000;
-    const entrance = entranceGeometry(model);
-    const entranceWidth = entrance.widthMm / 1000;
-    const entranceHeight = entrance.heightMm / 1000;
-    const threshold = entrance.thresholdHeightMm / 1000;
-    const radius = entrance.radiusMm / 1000;
+    const height = compiled.interfaces.wallFrontHeightMm / 1000;
+    const entranceWidth = compiled.entrance.widthMm / 1000;
+    const entranceHeight = compiled.entrance.heightMm / 1000;
+    const threshold = compiled.internal.entranceSillAboveFinishedFloorMm / 1000;
+    const radius = compiled.entrance.radiusMm / 1000;
 
     const shape = new THREE.Shape();
     shape.moveTo(0, 0);
@@ -102,7 +102,7 @@ function FrontPanel({
       depth: thickness,
       bevelEnabled: false
     });
-  }, [model, thickness]);
+  }, [compiled, thickness]);
 
   return (
     <mesh position={position} geometry={geometry} castShadow receiveShadow>
@@ -160,8 +160,6 @@ function FramingSkeleton({
 }) {
   const w = model.dimensions.widthMm / 1000;
   const d = model.dimensions.depthMm / 1000;
-  const hf = model.dimensions.frontHeightMm / 1000;
-  const hr = model.dimensions.rearHeightMm / 1000;
   const gc = model.dimensions.groundClearanceMm / 1000;
   const floorT = compiled.construction.floorThicknessMm / 1000;
   const roofT = compiled.construction.roofThicknessMm / 1000;
@@ -170,8 +168,8 @@ function FramingSkeleton({
   const base = compiled.framing.baseProfileMm[0] / 1000;
   const wallInset = compiled.construction.wallThicknessMm / 2000;
 
-  const frontStudHeight = Math.max(0.05, hf - floorT - roofT);
-  const rearStudHeight = Math.max(0.05, hr - floorT - roofT);
+  const frontStudHeight = Math.max(0.05, compiled.interfaces.wallFrontHeightMm / 1000);
+  const rearStudHeight = Math.max(0.05, compiled.interfaces.wallRearHeightMm / 1000);
   const frontY = gc + floorT + frontStudHeight / 2;
   const rearY = gc + floorT + rearStudHeight / 2;
   const frameColor = "#4d705f";
@@ -211,7 +209,10 @@ function FramingSkeleton({
           (part.positionMm ?? 0) / 1000,
           gc +
             floorT +
-            (model.layout.thresholdHeightMm + model.layout.entranceHeightMm) / 1000,
+            (
+              compiled.internal.entranceSillAboveFinishedFloorMm +
+              model.layout.entranceHeightMm
+            ) / 1000,
           wallInset
         ]}
         size={[part.lengthMm / 1000, profileFace, profileDepth]}
@@ -254,7 +255,11 @@ function FramingSkeleton({
     ));
 
   const sideTopLength = compiled.roof.trueLengthMm / 1000;
-  const sideTopY = gc + (hf + hr) / 2 - roofT / 2;
+  const sideTopY =
+    gc +
+    floorT +
+    (frontStudHeight + rearStudHeight) / 2 -
+    profileFace / 2;
   const sideTopZ = d / 2;
 
   return (
@@ -278,7 +283,7 @@ function FramingSkeleton({
         color={frameColor}
       />
       <Box
-        position={[w / 2, gc + hf - roofT - profileFace / 2, wallInset]}
+        position={[w / 2, gc + floorT + frontStudHeight - profileFace / 2, wallInset]}
         size={[w, profileFace, profileDepth]}
         color={frameColor}
       />
@@ -288,7 +293,7 @@ function FramingSkeleton({
         color={frameColor}
       />
       <Box
-        position={[w / 2, gc + hr - roofT - profileFace / 2, d - wallInset]}
+        position={[w / 2, gc + floorT + rearStudHeight - profileFace / 2, d - wallInset]}
         size={[w, profileFace, profileDepth]}
         color={frameColor}
       />
@@ -350,18 +355,24 @@ function Shelter({model, mode}: {model: ShelterModel; mode: ViewMode}) {
   const construction = compiled.construction;
   const wallT = construction.wallThicknessMm / 1000;
   const floorT = construction.floorThicknessMm / 1000;
-  const roofT = Math.min(construction.roofThicknessMm / 1000, 0.085);
+  const roofT = construction.roofThicknessMm / 1000;
   const avgH = (hf + hr) / 2;
   const roof = compiled.roof;
   const roofPanel = compiled.roofPanel;
   const roofLength = roofPanel.panelLengthMm / 1000;
   const roofWidth = roofPanel.panelWidthMm / 1000;
   const roofCenterZ = d / 2 + roofPanel.centerPlanOffsetMm / 1000;
-  const roofCenterY = gc + avgH + roofT / 2 + roofPanel.centerHeightOffsetMm / 1000;
+  const roofCenterY =
+    gc +
+    avgH -
+    (roofT * Math.cos(roof.angleRad)) / 2 +
+    roofPanel.centerHeightOffsetMm / 1000;
   const layout = compiled.layout;
+  const wallFrontHeight = compiled.interfaces.wallFrontHeightMm / 1000;
+  const wallRearHeight = compiled.interfaces.wallRearHeightMm / 1000;
   const dividerDepth = Math.max(0.05, d - 2 * wallT);
-  const dividerFrontHeight = Math.max(0.05, hf - floorT - roofT);
-  const dividerRearHeight = Math.max(0.05, hr - floorT - roofT);
+  const dividerFrontHeight = Math.max(0.05, compiled.internal.frontHeightMm / 1000);
+  const dividerRearHeight = Math.max(0.05, compiled.internal.rearHeightMm / 1000);
 
   const exploded = mode === "exploded";
   const wallOffset = exploded ? 0.28 : 0;
@@ -392,30 +403,34 @@ function Shelter({model, mode}: {model: ShelterModel; mode: ViewMode}) {
       />
 
       <FrontPanel
-        model={model}
+        compiled={compiled}
         thickness={wallT}
-        position={[0, gc, -wallOffset]}
+        position={[0, gc + floorT, -wallOffset]}
       />
 
       <Box
-        position={[w / 2, gc + hr / 2, d - wallT / 2 + wallOffset]}
-        size={[w, hr, wallT]}
+        position={[
+          w / 2,
+          gc + floorT + wallRearHeight / 2,
+          d - wallT / 2 + wallOffset
+        ]}
+        size={[w, wallRearHeight, wallT]}
         color="#a97046"
       />
 
       <SidePanel
         depth={d}
-        frontHeight={hf}
-        rearHeight={hr}
+        frontHeight={wallFrontHeight}
+        rearHeight={wallRearHeight}
         thickness={wallT}
-        position={[wallT - wallOffset, gc, 0]}
+        position={[wallT - wallOffset, gc + floorT, 0]}
       />
       <SidePanel
         depth={d}
-        frontHeight={hf}
-        rearHeight={hr}
+        frontHeight={wallFrontHeight}
+        rearHeight={wallRearHeight}
         thickness={wallT}
-        position={[w + wallOffset, gc, 0]}
+        position={[w + wallOffset, gc + floorT, 0]}
       />
 
       {layout.dividerPositionsXmm.map((positionMm, index) => (
