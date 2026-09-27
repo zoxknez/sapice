@@ -3,6 +3,7 @@ import type {AppLocale} from "@/i18n/routing";
 import {Link} from "@/i18n/navigation";
 import {shelterModels} from "@/data/models";
 import {ModelCard} from "@/components/model-card";
+import {StructuredData} from "@/components/structured-data";
 
 export default async function HomePage({params}: {params: Promise<{locale: AppLocale}>}) {
   const {locale} = await params;
@@ -13,8 +14,32 @@ export default async function HomePage({params}: {params: Promise<{locale: AppLo
     .map((slug) => shelterModels.find((model) => model.slug === slug))
     .filter((model): model is (typeof shelterModels)[number] => Boolean(model));
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "Šapice",
+    url: `${siteUrl}/${locale}`,
+    applicationCategory: "UtilitiesApplication",
+    operatingSystem: "Web",
+    inLanguage: locale === "sr" ? "sr-Latn" : "en",
+    description: locale === "sr"
+      ? "Deterministička web aplikacija za izbor i izradu unapred definisanih zimskih kućica za pse i mačke."
+      : "Deterministic web application for selecting and building predefined winter shelters for cats and dogs.",
+    featureList: [
+      "Parametric 3D",
+      "Technical dimensions",
+      "Cut lists",
+      "Sheet nesting",
+      "Thermal estimates",
+      "Cost profiles",
+      "Workshop build mode"
+    ]
+  };
+
   return (
     <>
+      <StructuredData data={structuredData} />
       <section className="hero">
         <div className="shell hero-grid">
           <div className="hero-copy">
