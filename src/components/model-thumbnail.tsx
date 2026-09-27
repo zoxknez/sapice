@@ -90,17 +90,6 @@ export function ModelThumbnail({
         fill="#514d48"
       />
 
-      {model.heated && (
-        <rect
-          x={originX + w * 0.58}
-          y={originY - 8}
-          width={w * 0.24}
-          height="5"
-          rx="2.5"
-          fill="#a94f3f"
-        />
-      )}
-
       <line x1={originX} y1="154" x2={originX + w} y2="154" stroke="#8d5838" strokeWidth="1" />
       <line x1={originX} y1="149" x2={originX} y2="159" stroke="#8d5838" />
       <line x1={originX + w} y1="149" x2={originX + w} y2="159" stroke="#8d5838" />
