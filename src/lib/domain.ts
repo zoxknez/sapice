@@ -53,7 +53,7 @@ export const shelterModelSchema = z.object({
   }),
   maintenance: z.object({
     roofAccess: z.enum(["HINGED", "REMOVABLE"]),
-    hingeEdge: z.enum(["REAR", "LEFT", "RIGHT"]).nullable()
+    hingeEdge: z.enum(["FRONT", "REAR"]).nullable()
   }),
   ventilation: z.object({
     strategy: z.literal("HIGH_REAR_PROVISION"),
