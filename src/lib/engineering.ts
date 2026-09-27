@@ -29,13 +29,25 @@ export function layoutGeometry(model: ShelterModel) {
   const wallThicknessMm = constructionSummary(model).wallThicknessMm;
   const clearLeftMm = wallThicknessMm;
   const clearWidthMm = Math.max(0, model.dimensions.widthMm - 2 * wallThicknessMm);
-  const chamberWidthMm = clearWidthMm / model.layout.chambers;
+  const dividerThicknessMm = model.layout.dividerThicknessMm;
+  const dividerCount = Math.max(0, model.layout.chambers - 1);
+  const totalDividerThicknessMm = dividerCount * dividerThicknessMm;
+  const usableChamberWidthMm = Math.max(0, clearWidthMm - totalDividerThicknessMm);
+  const chamberWidthMm = usableChamberWidthMm / model.layout.chambers;
+
+  const chamberStartsXmm = Array.from(
+    {length: model.layout.chambers},
+    (_, index) =>
+      clearLeftMm +
+      index * chamberWidthMm +
+      index * dividerThicknessMm
+  );
 
   const entranceCentersXmm = Array.from(
     {length: model.layout.entrances},
     (_, index) => {
       if (model.layout.entrances === model.layout.chambers) {
-        return clearLeftMm + chamberWidthMm * (index + 0.5);
+        return chamberStartsXmm[index] + chamberWidthMm / 2;
       }
 
       return clearLeftMm + clearWidthMm * ((index + 1) / (model.layout.entrances + 1));
@@ -43,13 +55,20 @@ export function layoutGeometry(model: ShelterModel) {
   );
 
   const dividerPositionsXmm = Array.from(
-    {length: Math.max(0, model.layout.chambers - 1)},
-    (_, index) => clearLeftMm + chamberWidthMm * (index + 1)
+    {length: dividerCount},
+    (_, index) =>
+      chamberStartsXmm[index] +
+      chamberWidthMm +
+      dividerThicknessMm / 2
   );
 
   return {
     clearLeftMm,
     clearWidthMm,
+    usableChamberWidthMm,
+    dividerThicknessMm,
+    totalDividerThicknessMm,
+    chamberStartsXmm,
     entranceCentersXmm,
     dividerPositionsXmm,
     chamberWidthMm
