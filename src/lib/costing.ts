@@ -120,10 +120,10 @@ export function costLinesForCompiled(compiled: CompiledShelterModel): CostLine[]
       id: "heating-product",
       labelSr: "Namenski pet-heating proizvod",
       labelEn: "Purpose-built pet heating product",
-      quantity: 1,
+      quantity: compiled.heating.zones.length,
       unit: "item",
-      noteSr: "Cena konkretnog kompatibilnog proizvoda. Aplikacija ne projektuje improvizovan grejač.",
-      noteEn: "Price of the selected compatible product. The app does not design an improvised heater."
+      noteSr: "Planerski po jedan kompatibilan namenski proizvod po kompajliranoj heating zoni. Ako konkretan sertifikovan sistem eksplicitno pokriva više zona, stvarna nabavka prati njegov tehnički list. Aplikacija ne projektuje improvizovan grejač.",
+      noteEn: "Planning quantity assumes one compatible purpose-built product per compiled heating zone. If a selected certified system explicitly serves multiple zones, actual procurement follows its product data. The app does not design an improvised heater."
     });
   }
 
