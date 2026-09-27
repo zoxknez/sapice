@@ -16,6 +16,7 @@ import {PlanExportButtons} from "@/components/plan-export-buttons";
 import {OperatingGuidance} from "@/components/operating-guidance";
 import {StructuredData} from "@/components/structured-data";
 import {ThermalScenario} from "@/components/thermal-scenario";
+import {ModelValidationPanel} from "@/components/model-validation-panel";
 import {compileShelterModel} from "@/lib/compiler";
 import {compiledSourceIds} from "@/lib/provenance";
 
@@ -144,6 +145,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
       <nav className="model-subnav" aria-label={locale === "sr" ? "Sekcije modela" : "Model sections"}>
         <div className="shell">
           <a href="#geometry">{locale === "sr" ? "Mere" : "Dimensions"}</a>
+          <a href="#validation">{locale === "sr" ? "Validacija" : "Validation"}</a>
           <a href="#thermal">{locale === "sr" ? "Termika" : "Thermal"}</a>
           <a href="#materials">{locale === "sr" ? "Materijali" : "Materials"}</a>
           <a href="#nesting">{locale === "sr" ? "Table" : "Sheets"}</a>
@@ -184,6 +186,8 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
           </div>
         </div>
       </section>
+
+      <ModelValidationPanel compiled={compiled} locale={locale} />
 
       <section className="section tone" id="thermal">
         <div className="shell">
