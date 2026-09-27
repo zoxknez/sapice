@@ -10,6 +10,7 @@ import {TechnicalSketch} from "@/components/technical-sketch";
 import {ModelBuildBook} from "@/components/model-build-book";
 import {SheetLayout} from "@/components/sheet-layout";
 import {CostCalculator} from "@/components/cost-calculator";
+import {PrintPlanButton} from "@/components/print-plan-button";
 import {compileShelterModel} from "@/lib/compiler";
 
 export function generateStaticParams() {
@@ -82,6 +83,9 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
               <span>v{model.version}</span>
               <span>{model.climateProfile.replaceAll("_", " ")}</span>
               <span>{locale === "sr" ? "referentni spoljašnji scenario, nije rejting" : "reference outdoor scenario, not a rating"} {model.referenceOutsideC} °C</span>
+            </div>
+            <div className="detail-actions">
+              <PrintPlanButton locale={locale} />
             </div>
             <div className="notice">
               {model.heated
