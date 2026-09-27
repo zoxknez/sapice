@@ -1,5 +1,5 @@
 import type {ShelterModel} from "@/lib/domain";
-import {roofSlope, surfaceAreas, thermalSummary} from "@/lib/engineering";
+import {constructionSummary, getModelAssemblies, roofSlope, surfaceAreas, thermalSummary} from "@/lib/engineering";
 
 export type CutPart = {
   id: string;
@@ -23,9 +23,11 @@ export type BuildStep = {
 };
 
 export function compileShelterModel(model: ShelterModel) {
-  const wall = model.construction.wallThicknessMm;
-  const floorThicknessMm = model.construction.floorInsulationMm + 24;
-  const roofThicknessMm = model.construction.roofInsulationMm + 21;
+  const construction = constructionSummary(model);
+  const assemblies = getModelAssemblies(model);
+  const wall = construction.wallThicknessMm;
+  const floorThicknessMm = construction.floorThicknessMm;
+  const roofThicknessMm = construction.roofThicknessMm;
   const internalWidthMm = Math.max(0, model.dimensions.widthMm - 2 * wall);
   const internalDepthMm = Math.max(0, model.dimensions.depthMm - 2 * wall);
   const internalFrontHeightMm = Math.max(0, model.dimensions.frontHeightMm - floorThicknessMm - roofThicknessMm);
@@ -159,6 +161,8 @@ export function compileShelterModel(model: ShelterModel) {
 
   return {
     model,
+    assemblies,
+    construction,
     internal: {
       widthMm: internalWidthMm,
       depthMm: internalDepthMm,
