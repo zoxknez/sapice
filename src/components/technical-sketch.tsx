@@ -318,6 +318,44 @@ export function TechnicalSketch({
           <text x={roofX + rpw / 2} y={roofY + rpl - 9} textAnchor="middle" className="drawing-label">
             {isSr ? "ŠARKE · ZADNJA IVICA" : "HINGES · REAR EDGE"}
           </text>
+
+          {compiled.hardware.hingePositionsAcrossRoofMm.map((positionMm, index) => {
+            const x = roofX + positionMm * roofScale;
+            return (
+              <g key={`hinge-${index + 1}`}>
+                <rect
+                  x={x - 8}
+                  y={roofY + rpl - 4}
+                  width="16"
+                  height="8"
+                  rx="2"
+                  className="drawing-hardware-hinge"
+                />
+                <text x={x} y={roofY + rpl + 15} textAnchor="middle" className="drawing-axis-label">
+                  H{index + 1}
+                </text>
+              </g>
+            );
+          })}
+
+          {compiled.hardware.latchPositionsAcrossRoofMm.map((positionMm, index) => {
+            const x = roofX + positionMm * roofScale;
+            return (
+              <g key={`latch-${index + 1}`}>
+                <rect
+                  x={x - 6}
+                  y={roofY - 4}
+                  width="12"
+                  height="8"
+                  rx="2"
+                  className="drawing-hardware-latch"
+                />
+                <text x={x} y={roofY - 10} textAnchor="middle" className="drawing-axis-label">
+                  L{index + 1}
+                </text>
+              </g>
+            );
+          })}
         </g>
         <HDimension x1={roofX} x2={roofX + rpw} y={roofY + rpl + 28} label={`${Math.ceil(compiled.roofPanel.panelWidthMm)} mm`} />
         <VDimension x={roofX - 24} y1={roofY} y2={roofY + rpl} label={`${Math.ceil(compiled.roofPanel.panelLengthMm)} mm`} />
