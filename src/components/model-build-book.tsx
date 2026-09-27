@@ -2,6 +2,7 @@ import type {AppLocale} from "@/i18n/routing";
 import type {ShelterModel} from "@/lib/domain";
 import {compileShelterModel} from "@/lib/compiler";
 import {sources} from "@/data/sources";
+import {BuildGuide} from "@/components/build-guide";
 
 export function ModelBuildBook({model, locale}: {model: ShelterModel; locale: AppLocale}) {
   const compiled = compileShelterModel(model);
@@ -79,17 +80,12 @@ export function ModelBuildBook({model, locale}: {model: ShelterModel; locale: Ap
                 : "Steps follow the model configuration. Heated variants automatically include a dedicated step constrained to purpose-built equipment."}
             </p>
           </div>
-          <ol className="build-steps">
-            {compiled.buildSteps.map((step, index) => (
-              <li key={step.id}>
-                <span className="step-number">{String(index + 1).padStart(2, "0")}</span>
-                <div>
-                  <h3>{locale === "sr" ? step.titleSr : step.titleEn}</h3>
-                  <p>{locale === "sr" ? step.detailSr : step.detailEn}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
+          <BuildGuide
+            modelId={model.id}
+            version={model.version}
+            steps={compiled.buildSteps}
+            locale={locale}
+          />
         </div>
       </section>
 
