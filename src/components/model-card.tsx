@@ -15,7 +15,7 @@ export function ModelCard({model, locale}: {model: ShelterModel; locale: AppLoca
       <div className="model-card-body">
         <div className="eyebrow-row">
           <span>{model.animal === "cat" ? (locale === "sr" ? "Mačke" : "Cats") : (locale === "sr" ? "Psi" : "Dogs")}</span>
-          <span>{model.capacity.recommended}×</span>
+          <span>{model.animal === "dog" ? model.animalSizeClass : `${model.capacity.recommended}×`}</span>
           <span>{model.heated ? (locale === "sr" ? "Grejana" : "Heated") : (locale === "sr" ? "Pasivna" : "Passive")}</span>
         </div>
         <h3>{copy.name}</h3>
