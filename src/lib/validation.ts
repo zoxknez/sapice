@@ -92,11 +92,15 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
     });
   }
 
-  if (model.layout.entranceHeightMm >= model.dimensions.frontHeightMm) {
+  if (
+    model.layout.thresholdHeightMm +
+    model.layout.entranceHeightMm >=
+    model.dimensions.frontHeightMm
+  ) {
     issues.push({
       severity: "error",
       code: "ENTRANCE_TOO_TALL",
-      message: "Entrance height must be smaller than the front wall."
+      message: "Entrance plus threshold must fit inside the front wall."
     });
   }
 
