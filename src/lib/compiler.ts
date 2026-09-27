@@ -1,5 +1,5 @@
 import type {ShelterModel} from "@/lib/domain";
-import {constructionSummary, getModelAssemblies, roofSlope, surfaceAreas, thermalSummary} from "@/lib/engineering";
+import {constructionSummary, getModelAssemblies, roofPanelGeometry, roofSlope, surfaceAreas, thermalSummary} from "@/lib/engineering";
 
 export type CutPart = {
   id: string;
@@ -41,6 +41,7 @@ export function compileShelterModel(model: ShelterModel) {
   const internalFrontHeightMm = Math.max(0, model.dimensions.frontHeightMm - floorThicknessMm - roofThicknessMm);
   const internalRearHeightMm = Math.max(0, model.dimensions.rearHeightMm - floorThicknessMm - roofThicknessMm);
   const roof = roofSlope(model);
+  const roofPanel = roofPanelGeometry(model);
   const areas = surfaceAreas(model);
   const thermal = thermalSummary(model);
 
@@ -121,8 +122,8 @@ export function compileShelterModel(model: ShelterModel) {
       nameEn: "Exterior roof panel",
       material: "plywood-12",
       quantity: 1,
-      widthMm: model.dimensions.widthMm + 140,
-      heightMm: Math.ceil(roof.trueLengthMm + 180),
+      widthMm: Math.ceil(roofPanel.panelWidthMm),
+      heightMm: Math.ceil(roofPanel.panelLengthMm),
       thicknessMm: 12,
       shape: "rectangle"
     }
@@ -192,6 +193,7 @@ export function compileShelterModel(model: ShelterModel) {
       usableFloorAreaM2: (internalWidthMm * internalDepthMm) / 1_000_000
     },
     roof,
+    roofPanel,
     areas,
     thermal,
     cutParts,
