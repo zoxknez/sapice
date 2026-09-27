@@ -45,6 +45,8 @@ export type LinearPart = {
   provenance: "ASSUMPTION" | "GEOMETRY";
   wall?: "front" | "rear" | "left" | "right" | "floor" | "base" | "divider";
   positionMm?: number;
+  startHeightMm?: number;
+  elevationMm?: number;
   notesSr?: string;
   notesEn?: string;
 };
@@ -382,11 +384,14 @@ export function compileShelterModel(model: ShelterModel) {
   const maxStudSpacingMm = 500;
 
   const clearStudHeightAtDepth = (positionMm: number) => {
-    const ratio = model.dimensions.depthMm === 0 ? 0 : positionMm / model.dimensions.depthMm;
-    const externalHeight =
-      model.dimensions.frontHeightMm +
-      (model.dimensions.rearHeightMm - model.dimensions.frontHeightMm) * ratio;
-    return Math.max(1, Math.round(externalHeight - floorThicknessMm - roofThicknessMm));
+    const ratio =
+      model.dimensions.depthMm === 0
+        ? 0
+        : positionMm / model.dimensions.depthMm;
+    const wallHeightMm =
+      interfaces.wallFrontHeightMm +
+      (interfaces.wallRearHeightMm - interfaces.wallFrontHeightMm) * ratio;
+    return Math.max(1, Math.round(wallHeightMm));
   };
 
   const rearIntermediateCount = Math.max(
@@ -443,12 +448,15 @@ export function compileShelterModel(model: ShelterModel) {
   const entranceSillAboveFinishedFloorMm =
     model.layout.thresholdHeightMm - floorThicknessMm;
 
-  const entranceSupportPositionsXmm = layout.entranceCentersXmm
-    .flatMap((centerMm) => [
-      centerMm - model.layout.entranceWidthMm / 2,
-      centerMm + model.layout.entranceWidthMm / 2
-    ])
-    .sort((a, b) => a - b);
+  const entranceSupportPositionsXmm = Array.from(
+    new Set(
+      layout.entranceCentersXmm.flatMap((centerMm) => [
+        centerMm - model.layout.entranceWidthMm / 2,
+        centerMm,
+        centerMm + model.layout.entranceWidthMm / 2
+      ])
+    )
+  ).sort((a, b) => a - b);
 
   const entranceFrameParts: LinearPart[] = layout.entranceCentersXmm.flatMap(
     (centerMm, index) => {
@@ -456,6 +464,17 @@ export function compileShelterModel(model: ShelterModel) {
       const rightXmm = centerMm + model.layout.entranceWidthMm / 2;
       const supportLengthMm =
         entranceSillAboveFinishedFloorMm + model.layout.entranceHeightMm;
+
+      const headerElevationMm = supportLengthMm + frameProfile[0] / 2;
+      const crippleStartHeightMm = supportLengthMm + frameProfile[0];
+      const crippleLengthMm = Math.max(
+        1,
+        Math.round(
+          interfaces.wallFrontHeightMm -
+            crippleStartHeightMm -
+            frameProfile[0]
+        )
+      );
 
       return [
         {
@@ -467,7 +486,8 @@ export function compileShelterModel(model: ShelterModel) {
           lengthMm: supportLengthMm,
           provenance: "GEOMETRY" as const,
           wall: "front" as const,
-          positionMm: leftXmm
+          positionMm: leftXmm,
+          startHeightMm: 0
         },
         {
           id: `entrance-${index + 1}-right-support`,
@@ -478,7 +498,8 @@ export function compileShelterModel(model: ShelterModel) {
           lengthMm: supportLengthMm,
           provenance: "GEOMETRY" as const,
           wall: "front" as const,
-          positionMm: rightXmm
+          positionMm: rightXmm,
+          startHeightMm: 0
         },
         {
           id: `entrance-${index + 1}-header`,
@@ -489,7 +510,20 @@ export function compileShelterModel(model: ShelterModel) {
           lengthMm: model.layout.entranceWidthMm + 2 * frameProfile[0],
           provenance: "GEOMETRY" as const,
           wall: "front" as const,
-          positionMm: centerMm
+          positionMm: centerMm,
+          elevationMm: headerElevationMm
+        },
+        {
+          id: `entrance-${index + 1}-cripple`,
+          nameSr: `Kratki stub iznad ulaza ${index + 1}`,
+          nameEn: `Entrance ${index + 1} cripple stud`,
+          profileMm: frameProfile,
+          quantity: 1,
+          lengthMm: crippleLengthMm,
+          provenance: "GEOMETRY" as const,
+          wall: "front" as const,
+          positionMm: centerMm,
+          startHeightMm: crippleStartHeightMm
         }
       ];
     }
@@ -572,7 +606,7 @@ export function compileShelterModel(model: ShelterModel) {
       nameEn: "Front corner studs",
       profileMm: frameProfile,
       quantity: 2,
-      lengthMm: Math.max(1, model.dimensions.frontHeightMm - floorThicknessMm - roofThicknessMm),
+      lengthMm: Math.max(1, Math.round(interfaces.wallFrontHeightMm)),
       provenance: "GEOMETRY"
     },
     {
@@ -581,7 +615,7 @@ export function compileShelterModel(model: ShelterModel) {
       nameEn: "Rear corner studs",
       profileMm: frameProfile,
       quantity: 2,
-      lengthMm: Math.max(1, model.dimensions.rearHeightMm - floorThicknessMm - roofThicknessMm),
+      lengthMm: Math.max(1, Math.round(interfaces.wallRearHeightMm)),
       provenance: "GEOMETRY"
     },
     ...entranceFrameParts,
