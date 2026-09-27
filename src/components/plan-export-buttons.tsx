@@ -105,6 +105,8 @@ export function PlanExportButtons({
       ["Status", compiled.roofWeathering.status],
       ["High edge", compiled.roofWeathering.highEdge],
       ["Runoff edge", compiled.roofWeathering.runoffEdge],
+      ["Service roof hinge edge", compiled.hardware.hingeEdge ?? ""],
+      ["Service roof latch edge", compiled.hardware.latchEdge ?? ""],
       ["Slope degrees", compiled.roofWeathering.slopeDegrees.toFixed(2)],
       ["Rise mm", compiled.roofWeathering.riseMm],
       ["Run mm", compiled.roofWeathering.runMm],
