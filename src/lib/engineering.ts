@@ -25,6 +25,32 @@ export function getModelAssemblies(model: ShelterModel) {
   };
 }
 
+export function layoutGeometry(model: ShelterModel) {
+  const entranceCentersXmm = Array.from(
+    {length: model.layout.entrances},
+    (_, index) => {
+      if (model.layout.entrances === model.layout.chambers) {
+        return model.dimensions.widthMm * ((index + 0.5) / model.layout.chambers);
+      }
+
+      return model.dimensions.widthMm * ((index + 1) / (model.layout.entrances + 1));
+    }
+  );
+
+  const dividerPositionsXmm = Array.from(
+    {length: Math.max(0, model.layout.chambers - 1)},
+    (_, index) => model.dimensions.widthMm * ((index + 1) / model.layout.chambers)
+  );
+
+  const chamberWidthMm = model.dimensions.widthMm / model.layout.chambers;
+
+  return {
+    entranceCentersXmm,
+    dividerPositionsXmm,
+    chamberWidthMm
+  };
+}
+
 export function roofSlope(model: ShelterModel) {
   const rise = model.dimensions.frontHeightMm - model.dimensions.rearHeightMm;
   const run = model.dimensions.depthMm;
