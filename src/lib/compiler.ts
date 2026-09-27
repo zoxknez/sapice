@@ -319,7 +319,7 @@ export function compileShelterModel(model: ShelterModel) {
       quantity: model.layout.chambers - 1,
       widthMm: internalDepthMm,
       heightMm: internalRearHeightMm,
-      thicknessMm: 12,
+      thicknessMm: model.layout.dividerThicknessMm,
       shape: "rectangle" as const,
       notes: "Dry-fit below the sloped roof; final top edge can be scribed to the roof lining."
     }] : [])
@@ -695,7 +695,10 @@ export function compileShelterModel(model: ShelterModel) {
       depthMm: internalDepthMm,
       frontHeightMm: internalFrontHeightMm,
       rearHeightMm: internalRearHeightMm,
-      usableFloorAreaM2: (internalWidthMm * internalDepthMm) / 1_000_000
+      usableFloorAreaM2:
+        (Math.max(0, internalWidthMm - layout.totalDividerThicknessMm) * internalDepthMm) /
+        1_000_000,
+      chamberClearWidthMm: layout.chamberWidthMm
     },
     roof,
     roofPanel,
