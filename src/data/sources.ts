@@ -40,6 +40,36 @@ export const sources: Record<string, SourceRecord> = {
     topics: ["pets", "winter", "safety"],
     notes: "Supports the limitation that outdoor auxiliary shelters are not a substitute for keeping companion animals indoors during severe cold."
   },
+  "fibran-xps-300": {
+    id: "fibran-xps-300",
+    publisher: "FIBRAN",
+    title: "FIBRANxps 300 Technical Data Sheet",
+    url: "https://fibran.com/wp-content/uploads/sites/9/2020/06/TDS_FIBRANxps_300_eng.pdf",
+    accessedAt: "2026-09-27",
+    tier: 1,
+    topics: ["xps", "thermal-conductivity", "stock-dimensions"],
+    notes: "Declares 1250 × 600 mm board dimensions and λD 0.033 W/mK for thicknesses up to 60 mm."
+  },
+  "usfs-wood-handbook-2021": {
+    id: "usfs-wood-handbook-2021",
+    publisher: "USDA Forest Products Laboratory",
+    title: "Wood Handbook: Wood as an Engineering Material, Chapter 4",
+    url: "https://research.fs.usda.gov/fpl/wood-handbook",
+    accessedAt: "2026-09-27",
+    tier: 1,
+    topics: ["wood", "thermal-conductivity", "moisture"],
+    notes: "Documents that wood thermal conductivity varies materially with species, density, moisture content and grain direction."
+  },
+  "nord-marine-birch-plywood": {
+    id: "nord-marine-birch-plywood",
+    publisher: "Nord Compensati",
+    title: "Technical Specifications of Birch Marine Plywood",
+    url: "https://nordcompensati.com/wp-content/uploads/2017/02/Birch_ENG.pdf",
+    accessedAt: "2026-09-27",
+    tier: 2,
+    topics: ["plywood", "thermal-conductivity", "marine-plywood"],
+    notes: "Manufacturer technical specification lists thermal conductivity of 0.17 W/mK for birch marine plywood."
+  },
   "iso-6946-2017": {
     id: "iso-6946-2017",
     publisher: "ISO",
