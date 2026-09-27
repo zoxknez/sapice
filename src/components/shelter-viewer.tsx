@@ -229,7 +229,7 @@ function Shelter({model, mode}: {model: ShelterModel; mode: ViewMode}) {
           depth={dividerDepth}
           frontHeight={dividerFrontHeight}
           rearHeight={dividerRearHeight}
-          thickness={0.012}
+          thickness={model.layout.dividerThicknessMm / 1000}
           position={[positionMm / 1000, gc + floorT, wallT]}
         />
       ))}
