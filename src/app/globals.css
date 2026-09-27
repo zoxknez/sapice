@@ -2550,3 +2550,11 @@ button { cursor: pointer; }
     grid-template-columns: 1fr 1fr;
   }
 }
+
+
+.drawing-vent-provision {
+  stroke: #4d7581;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 5 3;
+}
