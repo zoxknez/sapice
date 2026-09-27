@@ -187,7 +187,8 @@ export function compileShelterModel(model: ShelterModel) {
       shape: "rectangle",
       cutouts: entranceCutouts.map((cutout) => ({
         ...cutout,
-        xMm: Math.max(0, cutout.xMm - wall)
+        xMm: Math.max(0, cutout.xMm - wall),
+        yMm: Math.max(0, cutout.yMm - floorThicknessMm)
       }))
     },
     {
