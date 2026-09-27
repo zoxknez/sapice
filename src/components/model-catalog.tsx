@@ -168,7 +168,7 @@ export function ModelCatalog({
           const selectedForCompare = selectedIds.includes(model.id);
           return (
             <div className="catalog-model" key={model.id}>
-              <ModelCard model={model} locale={locale} />
+              <ModelCard model={model} locale={locale} summary={summaryFor(model)} />
               <button
                 type="button"
                 className={selectedForCompare ? "compare-toggle active" : "compare-toggle"}
