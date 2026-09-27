@@ -97,8 +97,8 @@ export const sources: Record<string, SourceRecord> = {
     url: "https://www.iso.org/standard/65708.html",
     accessedAt: "2026-09-27",
     tier: 1,
-    topics: ["thermal", "u-value", "r-value"],
-    notes: "Methodological reference for steady-state layer resistance and transmittance. The app does not claim ISO certification."
+    topics: ["thermal", "u-value", "r-value", "surface-resistance"],
+    notes: "Methodological reference for steady-state layer resistance and transmittance. Thermal method v1.1 applies orientation-specific internal surface resistances: Rsi 0.10 m²K/W for upward heat flow, 0.13 for horizontal and 0.17 for downward, with Rse 0.04 m²K/W. The app does not claim ISO certification."
   },
   "iso-13789-2017": {
     id: "iso-13789-2017",
