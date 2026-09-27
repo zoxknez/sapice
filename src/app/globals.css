@@ -2236,3 +2236,69 @@ button { cursor: pointer; }
 .export-actions {
   display: contents;
 }
+
+
+.thermal-scenario {
+  margin-top: 18px;
+  padding: 20px;
+  border: 1px solid #ffffff1b;
+  border-radius: 18px;
+  background: #ffffff0b;
+}
+.thermal-scenario-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 20px;
+}
+.thermal-scenario-head strong {
+  display: block;
+  margin-top: 6px;
+  color: #fff;
+  font-size: 16px;
+}
+.thermal-scenario output {
+  min-width: 76px;
+  text-align: right;
+  color: #fff;
+  font: 800 24px ui-monospace, monospace;
+}
+.thermal-scenario > input[type="range"] {
+  width: 100%;
+  margin: 20px 0 16px;
+  accent-color: #c39772;
+}
+.thermal-scenario-result {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.thermal-scenario-result > div {
+  padding: 14px;
+  border-radius: 13px;
+  background: #ffffff0d;
+}
+.thermal-scenario-result span {
+  display: block;
+  color: #bfb7ae;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+.thermal-scenario-result strong {
+  display: block;
+  margin-top: 6px;
+  color: #fff;
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+}
+.thermal-scenario > p {
+  margin: 14px 0 0;
+  color: #b6ada5;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+@media (max-width: 560px) {
+  .thermal-scenario-result { grid-template-columns: 1fr; }
+}
