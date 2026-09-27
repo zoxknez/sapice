@@ -2405,3 +2405,41 @@ button { cursor: pointer; }
   .validation-ladder li { grid-template-columns: 38px 1fr; }
   .validation-state { grid-column: 2; justify-self: start; }
 }
+
+
+.surface-resistance-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 18px;
+}
+.surface-resistance-grid > div {
+  padding: 14px;
+  border: 1px solid #ffffff18;
+  border-radius: 14px;
+  background: #ffffff09;
+}
+.surface-resistance-grid span,
+.surface-resistance-grid small {
+  display: block;
+  color: #bcb3aa;
+  font-size: 9px;
+  line-height: 1.4;
+}
+.surface-resistance-grid span {
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+.surface-resistance-grid strong {
+  display: block;
+  margin: 6px 0 4px;
+  color: #fff;
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 720px) {
+  .surface-resistance-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
