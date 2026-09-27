@@ -1,4 +1,5 @@
 import type {CutPart} from "@/lib/compiler";
+import {cutGeometryAreaMm2} from "@/lib/cut-geometry";
 
 export type PackedPart = {
   partId: string;
@@ -71,33 +72,11 @@ function splitFreeRect(free: FreeRect, usedWidth: number, usedHeight: number) {
   return [right, bottom].filter((rect) => rect.width > 0 && rect.height > 0);
 }
 
-function roundedRectangleAreaMm2(cutout: NonNullable<CutPart["cutouts"]>[number]) {
-  const radius = Math.min(
-    cutout.radiusMm,
-    cutout.widthMm / 2,
-    cutout.heightMm / 2
-  );
-  return (
-    cutout.widthMm * cutout.heightMm -
-    (4 - Math.PI) * radius * radius
-  );
-}
-
 export function cutPartAreaMm2(part: Pick<
   CutPart,
   "widthMm" | "heightMm" | "shape" | "trapezoidRearHeightMm" | "cutouts"
 >) {
-  const grossArea =
-    part.shape === "trapezoid" && part.trapezoidRearHeightMm !== undefined
-      ? part.widthMm * ((part.heightMm + part.trapezoidRearHeightMm) / 2)
-      : part.widthMm * part.heightMm;
-
-  const cutoutArea = (part.cutouts ?? []).reduce(
-    (sum, cutout) => sum + roundedRectangleAreaMm2(cutout),
-    0
-  );
-
-  return Math.max(0, grossArea - cutoutArea);
+  return cutGeometryAreaMm2(part);
 }
 
 function packPayload(
