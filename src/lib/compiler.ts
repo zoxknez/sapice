@@ -1,5 +1,5 @@
 import type {ShelterModel} from "@/lib/domain";
-import {constructionSummary, getModelAssemblies, roofPanelGeometry, roofSlope, surfaceAreas, thermalSummary} from "@/lib/engineering";
+import {constructionSummary, getModelAssemblies, layoutGeometry, roofPanelGeometry, roofSlope, surfaceAreas, thermalSummary} from "@/lib/engineering";
 
 export type CutPart = {
   id: string;
@@ -121,9 +121,9 @@ export function compileShelterModel(model: ShelterModel) {
   const roofPanel = roofPanelGeometry(model);
   const areas = surfaceAreas(model);
   const thermal = thermalSummary(model);
+  const layout = layoutGeometry(model);
 
-  const entranceCutouts = Array.from({length: model.layout.entrances}, (_, index) => {
-    const centerX = model.dimensions.widthMm * ((index + 1) / (model.layout.entrances + 1));
+  const entranceCutouts = layout.entranceCentersXmm.map((centerX) => {
     return {
       type: "roundedRectangle" as const,
       xMm: Math.round(centerX - model.layout.entranceWidthMm / 2),
@@ -667,6 +667,7 @@ export function compileShelterModel(model: ShelterModel) {
 
   return {
     model,
+    layout,
     assemblies,
     construction,
     internal: {
