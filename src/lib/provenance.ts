@@ -14,6 +14,9 @@ export function compiledSourceIds(compiled: CompiledShelterModel) {
 
   ids.add(compiled.hardware.fastenerReferenceSourceId);
   ids.add(compiled.roofWeathering.referenceSourceId);
+  if (compiled.heating.zones.length > 0) {
+    ids.add(compiled.heating.safetySourceId);
+  }
 
   return Array.from(ids);
 }
