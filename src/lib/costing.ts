@@ -1,6 +1,5 @@
 import type {ShelterModel} from "@/lib/domain";
 import {compileShelterModel} from "@/lib/compiler";
-import {materialSummary} from "@/lib/engineering";
 import {packCutParts} from "@/lib/nesting";
 import {assemblyInsulationMm} from "@/data/assemblies";
 
@@ -14,17 +13,25 @@ export type CostLine = {
   noteEn: string;
 };
 
-const STANDARD_SHEET_AREA_M2 = 2.5 * 1.25;
-
 export function costLinesForModel(model: ShelterModel): CostLine[] {
   const compiled = compileShelterModel(model);
-  const materials = materialSummary(model);
+
   const sheets12 = packCutParts(
-    compiled.cutParts.filter((part) => part.material === "plywood-12")
+    compiled.cutParts.filter((part) => part.material === "plywood-12"),
+    {sheetWidthMm: 2500, sheetHeightMm: 1250, kerfMm: 3, marginMm: 10}
   ).length;
 
-  const plywood9 = materials.find((item) => item.id === "plywood-9");
-  const xps = materials.find((item) => item.id.startsWith("xps-"));
+  const sheets9 = packCutParts(
+    compiled.cutParts.filter((part) => part.material === "plywood-9"),
+    {sheetWidthMm: 2500, sheetHeightMm: 1250, kerfMm: 3, marginMm: 10}
+  ).length;
+
+  const xpsBoards = packCutParts(
+    compiled.cutParts.filter((part) => part.material === "xps"),
+    {sheetWidthMm: 1250, sheetHeightMm: 600, kerfMm: 2, marginMm: 5}
+  ).length;
+
+  const insulationMm = assemblyInsulationMm(compiled.assemblies.wall);
   const roofMembraneM2 = compiled.roofPanel.areaM2 * 1.15;
 
   const lines: CostLine[] = [
@@ -34,45 +41,35 @@ export function costLinesForModel(model: ShelterModel): CostLine[] {
       labelEn: "Plywood 12 mm",
       quantity: sheets12,
       unit: "sheet",
-      noteSr: "Broj tabla iz V1 nesting rasporeda 2500 × 1250 mm.",
-      noteEn: "Sheet count from the V1 2500 × 1250 mm nesting layout."
-    }
-  ];
-
-  if (plywood9) {
-    lines.push({
+      noteSr: "Broj tabla iz nesting rasporeda 2500 × 1250 mm.",
+      noteEn: "Sheet count from the 2500 × 1250 mm nesting layout."
+    },
+    {
       id: "plywood-9-sheet",
       labelSr: "Šperploča 9 mm",
       labelEn: "Plywood 9 mm",
-      quantity: Math.ceil(plywood9.purchaseM2 / STANDARD_SHEET_AREA_M2),
+      quantity: sheets9,
       unit: "sheet",
-      noteSr: "Procena tabla iz surface-based unutrašnje obloge; detaljni nesting 9 mm sloja sledi.",
-      noteEn: "Sheet estimate from surface-based interior lining; detailed 9 mm nesting is pending."
-    });
-  }
-
-  if (xps) {
-    const thickness = assemblyInsulationMm(compiled.assemblies.wall);
-    lines.push({
-      id: "xps-m2",
-      labelSr: `XPS ${thickness} mm`,
-      labelEn: `XPS ${thickness} mm`,
-      quantity: xps.purchaseM2,
-      unit: "m2",
-      noteSr: "Površina uključuje 10% projektantske rezerve.",
-      noteEn: "Area includes a 10% design allowance."
-    });
-  }
-
-  lines.push(
+      noteSr: "Broj tabla iz nesting rasporeda 2500 × 1250 mm.",
+      noteEn: "Sheet count from the 2500 × 1250 mm nesting layout."
+    },
+    {
+      id: "xps-board",
+      labelSr: `XPS ${insulationMm} mm`,
+      labelEn: `XPS ${insulationMm} mm`,
+      quantity: xpsBoards,
+      unit: "sheet",
+      noteSr: "Broj ploča iz planerskog stock formata 1250 × 600 mm. Proveriti dimenzije kod lokalnog dobavljača.",
+      noteEn: "Board count from the planning stock size 1250 × 600 mm. Verify dimensions with the local supplier."
+    },
     {
       id: "roof-membrane",
       labelSr: "Hidroizolacija krova",
       labelEn: "Roof waterproofing",
       quantity: roofMembraneM2,
       unit: "m2",
-      noteSr: "Površina kosog krova + 15% rezerve za preklop i otpad.",
-      noteEn: "True sloped roof area + 15% allowance for overlap and waste."
+      noteSr: "Površina kompletnog kosog krovnog panela + 15% rezerve za preklop i otpad.",
+      noteEn: "Full sloped roof panel area + 15% allowance for overlap and waste."
     },
     {
       id: "hardware",
@@ -83,7 +80,7 @@ export function costLinesForModel(model: ShelterModel): CostLine[] {
       noteSr: "Privremena zbirna stavka dok framing/hardware BOM ne bude detaljno kompiliran.",
       noteEn: "Temporary lump-sum line until the framing/hardware BOM is fully compiled."
     }
-  );
+  ];
 
   if (model.heated) {
     lines.push({
