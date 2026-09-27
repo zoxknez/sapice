@@ -222,7 +222,6 @@ function FramingSkeleton({
   const d = model.dimensions.depthMm / 1000;
   const gc = model.dimensions.groundClearanceMm / 1000;
   const floorT = compiled.construction.floorThicknessMm / 1000;
-  const roofT = compiled.construction.roofThicknessMm / 1000;
   const profileFace = compiled.framing.frameProfileMm[0] / 1000;
   const profileDepth = compiled.framing.frameProfileMm[1] / 1000;
   const wallInset = compiled.construction.wallThicknessMm / 2000;
@@ -511,7 +510,6 @@ function Shelter({compiled, mode}: {compiled: CompiledShelterModel; mode: ViewMo
     (roofT * Math.cos(roof.angleRad)) / 2 +
     roofPanel.centerHeightOffsetMm / 1000;
   const layout = compiled.layout;
-  const wallFrontHeight = compiled.interfaces.wallFrontHeightMm / 1000;
   const wallRearHeight = compiled.interfaces.wallRearHeightMm / 1000;
   const sideDepth = Math.max(0.05, compiled.joinery.sideRunMm / 1000);
   const sideFrontHeight = Math.max(0.05, compiled.joinery.sideFrontHeightMm / 1000);
