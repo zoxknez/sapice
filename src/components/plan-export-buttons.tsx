@@ -79,6 +79,20 @@ export function PlanExportButtons({
 
     rows.push(
       [],
+      ["ROOF WEATHERING"],
+      ["Status", compiled.roofWeathering.status],
+      ["High edge", compiled.roofWeathering.highEdge],
+      ["Runoff edge", compiled.roofWeathering.runoffEdge],
+      ["Slope degrees", compiled.roofWeathering.slopeDegrees.toFixed(2)],
+      ["Rise mm", compiled.roofWeathering.riseMm],
+      ["Run mm", compiled.roofWeathering.runMm],
+      ["Rear drip edge m", compiled.roofWeathering.rearDripEdgeLengthM.toFixed(3)],
+      ["Full edge protection m", compiled.roofWeathering.fullEdgeProtectionLengthM.toFixed(3)],
+      ["Roofing compatibility", "VERIFY_SELECTED_PRODUCT_INSTRUCTIONS"]
+    );
+
+    rows.push(
+      [],
       ["VENTILATION PROVISION"],
       ["ID", "Chamber", "Wall", "Center X mm", "Bottom mm", "Zone width mm", "Zone height mm", "Provenance", "Actual opening"]
     );
