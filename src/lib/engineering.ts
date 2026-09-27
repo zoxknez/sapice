@@ -46,6 +46,7 @@ export function roofPanelGeometry(model: ShelterModel) {
   return {
     panelWidthMm,
     panelLengthMm,
+    areaM2: mm2ToM2(panelWidthMm * panelLengthMm),
     centerPlanOffsetMm,
     centerHeightOffsetMm
   };
@@ -56,8 +57,7 @@ export function surfaceAreas(model: ShelterModel) {
   const openingArea = model.layout.entrances * model.layout.entranceWidthMm * model.layout.entranceHeightMm;
   const wallAreaMm2 = w * hf + w * hr + 2 * d * ((hf + hr) / 2) - openingArea;
   const floorAreaMm2 = w * d;
-  const roofPanel = roofPanelGeometry(model);
-  const roofAreaMm2 = roofPanel.panelWidthMm * roofPanel.panelLengthMm;
+  const roofAreaMm2 = w * roofSlope(model).trueLengthMm;
 
   return {
     wallM2: mm2ToM2(wallAreaMm2),
