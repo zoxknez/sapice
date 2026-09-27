@@ -1,5 +1,25 @@
+import type {Metadata} from "next";
 import {setRequestLocale} from "next-intl/server";
 import type {AppLocale} from "@/i18n/routing";
+import {localizedMetadata} from "@/lib/seo";
+
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{locale: AppLocale}>;
+}): Promise<Metadata> {
+  const {locale} = await params;
+  return localizedMetadata({
+    locale,
+    titleSr: "Vodiči",
+    titleEn: "Guides",
+    descriptionSr: "Praktični vodiči o zimskim skloništima, vlazi, izolaciji, ulazima i bezbednom korišćenju grejanja.",
+    descriptionEn: "Practical guides on winter shelters, moisture, insulation, entrances and safe heating use.",
+    srPath: "/sr/vodici",
+    enPath: "/en/guides"
+  });
+}
 
 export default async function GuidesPage({params}: {params: Promise<{locale: AppLocale}>}) {
   const {locale} = await params;
