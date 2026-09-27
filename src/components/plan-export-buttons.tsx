@@ -34,6 +34,9 @@ export function PlanExportButtons({
     const rows: Array<Array<string | number>> = [
       ["Šapice", model.translations[locale].name, `v${model.version}`],
       ["Model ID", model.id],
+      ["Model version", model.version],
+      ["Compiler version", compiled.compilerVersion],
+      ["Plan fingerprint", compiled.planFingerprint],
       ["Validation", model.validationState],
       [],
       ["CUT PARTS"],
