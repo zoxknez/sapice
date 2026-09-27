@@ -8,7 +8,7 @@ export type CostLine = {
   labelSr: string;
   labelEn: string;
   quantity: number;
-  unit: "sheet" | "m2" | "item";
+  unit: "sheet" | "m2" | "m" | "item";
   noteSr: string;
   noteEn: string;
 };
@@ -72,13 +72,22 @@ export function costLinesForModel(model: ShelterModel): CostLine[] {
       noteEn: "Full sloped roof panel area + 15% allowance for overlap and waste."
     },
     {
+      id: "timber-frame",
+      labelSr: `Drvene letve ${compiled.framing.frameProfileMm[0]} × ${compiled.framing.frameProfileMm[1]} mm + baza ${compiled.framing.baseProfileMm[0]} × ${compiled.framing.baseProfileMm[1]} mm`,
+      labelEn: `Timber framing ${compiled.framing.frameProfileMm[0]} × ${compiled.framing.frameProfileMm[1]} mm + base ${compiled.framing.baseProfileMm[0]} × ${compiled.framing.baseProfileMm[1]} mm`,
+      quantity: compiled.framing.totalLinearM * 1.1,
+      unit: "m",
+      noteSr: "Ukupna linearna metraža framing schedule-a + 10% rezerve. Profili su PROVISIONAL do engineering review-a.",
+      noteEn: "Total framing schedule length + 10% allowance. Profiles remain PROVISIONAL until engineering review."
+    },
+    {
       id: "hardware",
-      labelSr: "Šrafovi, šarke, zaptivanje",
-      labelEn: "Fasteners, hinges, sealing",
+      labelSr: "Šrafovi, šarke i zaptivanje",
+      labelEn: "Fasteners, hinges and sealing",
       quantity: 1,
       unit: "item",
-      noteSr: "Privremena zbirna stavka dok framing/hardware BOM ne bude detaljno kompiliran.",
-      noteEn: "Temporary lump-sum line until the framing/hardware BOM is fully compiled."
+      noteSr: "Zbirna stavka; detaljni broj pričvršćivača još nije zaključen.",
+      noteEn: "Lump-sum line; detailed fastener quantities are not yet finalized."
     }
   ];
 
