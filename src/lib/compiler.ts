@@ -323,10 +323,11 @@ export function compileShelterModel(model: ShelterModel) {
       material: "plywood-12" as const,
       quantity: model.layout.chambers - 1,
       widthMm: internalDepthMm,
-      heightMm: internalRearHeightMm,
+      heightMm: internalFrontHeightMm,
+      trapezoidRearHeightMm: internalRearHeightMm,
       thicknessMm: model.layout.dividerThicknessMm,
-      shape: "rectangle" as const,
-      notes: "Dry-fit below the sloped roof; final top edge can be scribed to the roof lining."
+      shape: "trapezoid" as const,
+      notes: `Front clear edge ${internalFrontHeightMm} mm; rear clear edge ${internalRearHeightMm} mm. Cut the top edge to the compiled roof slope.`
     }] : [])
   ];
 
@@ -539,18 +540,32 @@ export function compileShelterModel(model: ShelterModel) {
       lengthMm: model.layout.entranceWidthMm + 2 * frameProfile[0],
       provenance: "GEOMETRY"
     },
-    ...(model.layout.chambers > 1 ? [{
-      id: "divider-cleat",
-      nameSr: "Letve za unutrašnje pregrade",
-      nameEn: "Divider cleats",
-      profileMm: frameProfile,
-      quantity: (model.layout.chambers - 1) * 2,
-      lengthMm: internalRearHeightMm,
-      provenance: "GEOMETRY" as const,
-      wall: "divider" as const,
-      notesSr: "Po dve vertikalne letve po pregradi; finalno uklapanje prati kosinu krova.",
-      notesEn: "Two vertical cleats per divider; final fitting follows the roof slope."
-    }] : []),
+    ...(model.layout.chambers > 1 ? [
+      {
+        id: "divider-cleat-front",
+        nameSr: "Prednje letve unutrašnjih pregrada",
+        nameEn: "Front divider cleats",
+        profileMm: frameProfile,
+        quantity: model.layout.chambers - 1,
+        lengthMm: internalFrontHeightMm,
+        provenance: "GEOMETRY" as const,
+        wall: "divider" as const,
+        notesSr: "Po jedna prednja vertikalna letva za svaku pregradu.",
+        notesEn: "One front vertical cleat for each divider."
+      },
+      {
+        id: "divider-cleat-rear",
+        nameSr: "Zadnje letve unutrašnjih pregrada",
+        nameEn: "Rear divider cleats",
+        profileMm: frameProfile,
+        quantity: model.layout.chambers - 1,
+        lengthMm: internalRearHeightMm,
+        provenance: "GEOMETRY" as const,
+        wall: "divider" as const,
+        notesSr: "Po jedna zadnja vertikalna letva za svaku pregradu.",
+        notesEn: "One rear vertical cleat for each divider."
+      }
+    ] : []),
     ...rearIntermediateStuds,
     ...sideIntermediateStuds
   ];
