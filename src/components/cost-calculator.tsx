@@ -1,9 +1,8 @@
 "use client";
 
-import {useEffect, useMemo, useState} from "react";
-import type {ShelterModel} from "@/lib/domain";
+import {useEffect, useState} from "react";
 import type {AppLocale} from "@/i18n/routing";
-import {costLinesForModel} from "@/lib/costing";
+import type {CostLine} from "@/lib/costing";
 
 type Currency = "RSD" | "EUR" | "USD" | "GBP";
 type PriceMap = Record<string, number>;
@@ -15,15 +14,22 @@ function unitLabel(unit: "sheet" | "m2" | "m" | "item", locale: AppLocale) {
   return locale === "sr" ? "stavka" : "item";
 }
 
-export function CostCalculator({model, locale}: {model: ShelterModel; locale: AppLocale}) {
+export function CostCalculator({
+  modelId,
+  lines,
+  locale
+}: {
+  modelId: string;
+  lines: CostLine[];
+  locale: AppLocale;
+}) {
   const isSr = locale === "sr";
-  const lines = useMemo(() => costLinesForModel(model), [model]);
   const [currency, setCurrency] = useState<Currency>("RSD");
   const [prices, setPrices] = useState<PriceMap>({});
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    const raw = window.localStorage.getItem(`sapice:cost:${model.id}`);
+    const raw = window.localStorage.getItem(`sapice:cost:${modelId}`);
     if (raw) {
       try {
         const parsed = JSON.parse(raw) as {currency?: Currency; prices?: PriceMap};
@@ -34,15 +40,15 @@ export function CostCalculator({model, locale}: {model: ShelterModel; locale: Ap
       }
     }
     setHydrated(true);
-  }, [model.id]);
+  }, [modelId]);
 
   useEffect(() => {
     if (!hydrated) return;
     window.localStorage.setItem(
-      `sapice:cost:${model.id}`,
+      `sapice:cost:${modelId}`,
       JSON.stringify({currency, prices})
     );
-  }, [currency, prices, model.id, hydrated]);
+  }, [currency, prices, modelId, hydrated]);
 
   const total = lines.reduce((sum, line) => {
     const price = prices[line.id] ?? 0;
