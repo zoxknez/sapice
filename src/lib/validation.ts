@@ -2,6 +2,7 @@ import type {ShelterModel} from "@/lib/domain";
 import {sources} from "@/data/sources";
 import {getAssembly} from "@/data/assemblies";
 import {compileShelterModel} from "@/lib/compiler";
+import {packCutParts} from "@/lib/nesting";
 
 export type ModelValidationIssue = {
   severity: "error" | "warning";
@@ -81,6 +82,66 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
         code: "INVALID_THERMAL_RESULT",
         message: "Thermal calculation returned an invalid value."
       });
+    }
+
+    for (const part of compiled.cutParts) {
+      if (
+        part.widthMm <= 0 ||
+        part.heightMm <= 0 ||
+        part.thicknessMm <= 0 ||
+        !Number.isFinite(part.widthMm) ||
+        !Number.isFinite(part.heightMm)
+      ) {
+        issues.push({
+          severity: "error",
+          code: "INVALID_CUT_PART",
+          message: `Invalid cut part geometry: ${part.id}`
+        });
+      }
+    }
+
+    const stockChecks = [
+      {
+        material: "plywood-12" as const,
+        widthMm: 2500,
+        heightMm: 1250,
+        kerfMm: 3,
+        marginMm: 10
+      },
+      {
+        material: "plywood-9" as const,
+        widthMm: 2500,
+        heightMm: 1250,
+        kerfMm: 3,
+        marginMm: 10
+      },
+      {
+        material: "xps" as const,
+        widthMm: 1250,
+        heightMm: 600,
+        kerfMm: 2,
+        marginMm: 5
+      }
+    ];
+
+    for (const stock of stockChecks) {
+      try {
+        packCutParts(
+          compiled.cutParts.filter((part) => part.material === stock.material),
+          {
+            sheetWidthMm: stock.widthMm,
+            sheetHeightMm: stock.heightMm,
+            kerfMm: stock.kerfMm,
+            marginMm: stock.marginMm
+          }
+        );
+      } catch (error) {
+        issues.push({
+          severity: "error",
+          code: "STOCK_FIT_FAILED",
+          message: error instanceof Error ? error.message : `Stock fit failed for ${stock.material}`
+        });
+      }
     }
   }
 
