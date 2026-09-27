@@ -160,7 +160,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
           <div>
             <span className="kicker">Geometry</span>
             <h2>{locale === "sr" ? "Mere i konstrukcija" : "Dimensions and construction"}</h2>
-            <TechnicalSketch model={model} locale={locale} />
+            <TechnicalSketch compiled={compiled} locale={locale} />
           </div>
           <div className="data-panel">
             <dl className="data-list">
