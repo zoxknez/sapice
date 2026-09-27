@@ -49,6 +49,9 @@ export const shelterModelSchema = z.object({
     frontOverhangMm: z.number().int().nonnegative(),
     rearOverhangMm: z.number().int().nonnegative()
   }),
+  maintenance: z.object({
+    roofAccess: z.enum(["HINGED", "REMOVABLE"])
+  }),
   heated: z.boolean(),
   climateProfile: z.enum([
     "SHELTERED_MILD",
