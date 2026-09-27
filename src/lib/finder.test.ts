@@ -49,6 +49,42 @@ describe("deterministic shelter matcher", () => {
     )).toBe(true);
   });
 
+  it("finds a severe heating-ready model for every dog size class", () => {
+    for (const dogSize of ["small", "medium", "large"] as const) {
+      const matches = matchShelterModels(shelterModels, {
+        animal: "dog",
+        count: 1,
+        dogSize,
+        heating: "heated",
+        climate: "severe",
+        maxWidthMm: 2500,
+        maxDepthMm: 2000
+      });
+
+      expect(matches.length).toBeGreaterThan(0);
+      expect(matches.every((model) => model.heated)).toBe(true);
+      expect(matches.every((model) => model.animalSizeClass === dogSize)).toBe(true);
+    }
+  });
+
+  it("finds severe heating-ready coverage across published cat capacities", () => {
+    for (const count of [1, 2, 4, 6, 8]) {
+      const matches = matchShelterModels(shelterModels, {
+        animal: "cat",
+        count,
+        dogSize: "medium",
+        heating: "heated",
+        climate: "severe",
+        maxWidthMm: 2600,
+        maxDepthMm: 2000
+      });
+
+      expect(matches.length).toBeGreaterThan(0);
+      expect(matches[0].capacity.max).toBeGreaterThanOrEqual(count);
+      expect(matches[0].heated).toBe(true);
+    }
+  });
+
   it("returns only heating-ready models when heating is required", () => {
     const matches = matchShelterModels(shelterModels, {
       animal: "dog",
