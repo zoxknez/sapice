@@ -442,6 +442,26 @@ export function compileShelterModel(model: ShelterModel) {
       provenance: "GEOMETRY"
     },
     {
+      id: "side-bottom-rail",
+      nameSr: "Donje letve bočnih zidova",
+      nameEn: "Side-wall lower rails",
+      profileMm: frameProfile,
+      quantity: 2,
+      lengthMm: model.dimensions.depthMm,
+      provenance: "GEOMETRY"
+    },
+    {
+      id: "side-top-rail",
+      nameSr: "Kose gornje letve bočnih zidova",
+      nameEn: "Sloped side-wall upper rails",
+      profileMm: frameProfile,
+      quantity: 2,
+      lengthMm: Math.round(roof.trueLengthMm),
+      provenance: "GEOMETRY",
+      notesSr: "Dužina prati stvarnu kosinu od prednje do zadnje ravni zida, bez krovnih prepusta.",
+      notesEn: "Length follows the true wall-top slope from front to rear wall plane, excluding roof overhangs."
+    },
+    {
       id: "corner-front",
       nameSr: "Prednje ugaone letve",
       nameEn: "Front corner studs",
