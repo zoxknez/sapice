@@ -140,6 +140,20 @@ describe("engineering model derivations", () => {
     }
   });
 
+  it("keeps service-roof hinges off the rear runoff edge", () => {
+    for (const model of shelterModels) {
+      const compiled = compileShelterModel(model);
+
+      expect(model.maintenance.roofAccess).toBe("HINGED");
+      expect(compiled.hardware.hingeEdge).toBe("FRONT");
+      expect(compiled.hardware.latchEdge).toBe("REAR");
+      expect(compiled.hardware.hingeEdge)
+        .toBe(compiled.roofWeathering.highEdge);
+      expect(compiled.hardware.latchEdge)
+        .toBe(compiled.roofWeathering.runoffEdge);
+    }
+  });
+
   it("keeps roof runoff behind the shelter and edge protection synchronized", () => {
     for (const model of shelterModels) {
       const compiled = compileShelterModel(model);
