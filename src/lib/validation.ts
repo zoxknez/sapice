@@ -104,6 +104,23 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
           message: `Invalid cut part geometry: ${part.id}`
         });
       }
+
+      for (const cutout of part.cutouts ?? []) {
+        if (
+          cutout.xMm < 0 ||
+          cutout.yMm < 0 ||
+          cutout.widthMm <= 0 ||
+          cutout.heightMm <= 0 ||
+          cutout.xMm + cutout.widthMm > part.widthMm ||
+          cutout.yMm + cutout.heightMm > part.heightMm
+        ) {
+          issues.push({
+            severity: "error",
+            code: "CUTOUT_OUT_OF_BOUNDS",
+            message: `Cutout on ${part.id} exceeds its host panel geometry.`
+          });
+        }
+      }
     }
 
     if (
@@ -363,6 +380,17 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
         });
       }
     }
+  }
+
+  if (
+    compiled &&
+    compiled.internal.entranceSillAboveFinishedFloorMm < 0
+  ) {
+    issues.push({
+      severity: "error",
+      code: "ENTRANCE_BELOW_FINISHED_FLOOR",
+      message: "External entrance threshold is lower than the finished floor assembly."
+    });
   }
 
   if (model.layout.entranceWidthMm >= model.dimensions.widthMm) {
