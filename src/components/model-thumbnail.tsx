@@ -1,13 +1,15 @@
 import type {ShelterModel} from "@/lib/domain";
 import type {AppLocale} from "@/i18n/routing";
-import {entranceGeometry, layoutGeometry} from "@/lib/engineering";
+import type {ModelComparisonSummary} from "@/lib/catalog-summary";
 
 export function ModelThumbnail({
   model,
-  locale
+  locale,
+  summary
 }: {
   model: ShelterModel;
   locale: AppLocale;
+  summary: ModelComparisonSummary;
 }) {
   const maxW = 215;
   const maxH = 105;
@@ -18,16 +20,15 @@ export function ModelThumbnail({
   const w = width * scale;
   const hf = frontH * scale;
   const hr = rearH * scale;
-  const entrance = entranceGeometry(model);
-  const entranceW = entrance.widthMm * scale;
-  const entranceH = entrance.heightMm * scale;
-  const threshold = entrance.thresholdHeightMm * scale;
-  const entranceRadius = entrance.radiusMm * scale;
+  const entranceW = summary.thumbnail.entranceWidthMm * scale;
+  const entranceH = summary.thumbnail.entranceHeightMm * scale;
+  const threshold = summary.thumbnail.thresholdHeightMm * scale;
+  const entranceRadius = summary.thumbnail.entranceRadiusMm * scale;
   const originX = 36;
   const originY = 132;
   const depthOffsetX = Math.min(48, model.dimensions.depthMm * scale * 0.22);
   const depthOffsetY = -22;
-  const layout = layoutGeometry(model);
+
 
   return (
     <svg
@@ -64,7 +65,7 @@ export function ModelThumbnail({
         fill={`url(#wood-${model.id})`}
       />
 
-      {layout.entranceCentersXmm.map((centerXmm, index) => {
+      {summary.thumbnail.entranceCentersXmm.map((centerXmm, index) => {
         const centerX = originX + centerXmm * scale;
         return (
           <rect
