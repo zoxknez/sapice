@@ -2011,7 +2011,7 @@ button { cursor: pointer; }
 }
 .technical-sheet-head {
   display: grid;
-  grid-template-columns: 1.8fr repeat(3, minmax(120px, .7fr));
+  grid-template-columns: 1.8fr repeat(4, minmax(110px, .7fr));
   border-bottom: 1px solid var(--line);
   background: #f2ece3;
 }
@@ -2174,7 +2174,7 @@ button { cursor: pointer; }
     break-inside: avoid;
   }
   .technical-sheet-head {
-    grid-template-columns: 1.8fr repeat(3, .7fr);
+    grid-template-columns: 1.8fr repeat(4, .7fr);
   }
   .technical-sheet > svg {
     width: 100% !important;
@@ -2310,7 +2310,7 @@ button { cursor: pointer; }
 }
 .validation-overview {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 10px;
   margin-bottom: 18px;
 }
