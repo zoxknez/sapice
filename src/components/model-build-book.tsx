@@ -41,8 +41,8 @@ export function ModelBuildBook({model, locale}: {model: ShelterModel; locale: Ap
             </div>
             <p>
               {locale === "sr"
-                ? "Spisak trenutno pokriva osnovne pločaste elemente. Ram, detaljni otvori i nesting ulaze u sledeći engineering sloj pre statusa GEOMETRY_VALIDATED."
-                : "The current list covers primary sheet components. Framing, detailed cut-outs and nesting are the next engineering layer before GEOMETRY_VALIDATED status."}
+                ? "Spisak uključuje spoljašnje ploče, unutrašnje obloge, segmentiranu izolaciju i pregrade. Otvori ulaza se izvode iz istog kanonskog modela."
+                : "The list includes exterior panels, interior linings, segmented insulation and dividers. Entrance cutouts are derived from the same canonical model."}
             </p>
           </div>
           <div className="cut-table" role="table" aria-label={locale === "sr" ? "Krojna lista" : "Cut list"}>
@@ -60,6 +60,57 @@ export function ModelBuildBook({model, locale}: {model: ShelterModel; locale: Ap
                   <small>{part.shape === "trapezoid" ? (locale === "sr" ? "trapezni profil" : "trapezoid profile") : part.material}</small>
                 </span>
                 <span role="cell">{part.widthMm} × {part.heightMm} × {part.thicknessMm} mm</span>
+                <strong role="cell">{part.quantity}</strong>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section framing-section" id="framing">
+        <div className="shell">
+          <div className="section-heading">
+            <div>
+              <span className="kicker">Framing · {compiled.framing.status}</span>
+              <h2>{locale === "sr" ? "Raspored letvi i nosača" : "Framing and support schedule"}</h2>
+            </div>
+            <p>
+              {locale === "sr"
+                ? "Dužine su izvedene iz geometrije modela. Profil rama i baze je V1 projektantska pretpostavka i ostaje jasno označen kao PROVISIONAL dok ne prođe engineering review i fizičku proveru."
+                : "Lengths are derived from model geometry. Frame and base profiles are a V1 design assumption and remain explicitly PROVISIONAL until engineering review and physical validation."}
+            </p>
+          </div>
+
+          <div className="framing-summary">
+            <div>
+              <span>{locale === "sr" ? "Profil rama" : "Frame profile"}</span>
+              <strong>{compiled.framing.frameProfileMm[0]} × {compiled.framing.frameProfileMm[1]} mm</strong>
+            </div>
+            <div>
+              <span>{locale === "sr" ? "Profil baze" : "Base profile"}</span>
+              <strong>{compiled.framing.baseProfileMm[0]} × {compiled.framing.baseProfileMm[1]} mm</strong>
+            </div>
+            <div>
+              <span>{locale === "sr" ? "Ukupna linearna dužina" : "Total linear length"}</span>
+              <strong>{compiled.framing.totalLinearM.toFixed(1)} m</strong>
+            </div>
+          </div>
+
+          <div className="cut-table framing-table" role="table" aria-label={locale === "sr" ? "Raspored letvi" : "Framing schedule"}>
+            <div className="cut-row cut-head" role="row">
+              <span role="columnheader">ID</span>
+              <span role="columnheader">{locale === "sr" ? "Element" : "Member"}</span>
+              <span role="columnheader">{locale === "sr" ? "Profil × dužina" : "Profile × length"}</span>
+              <span role="columnheader">{locale === "sr" ? "Kom." : "Qty"}</span>
+            </div>
+            {compiled.linearParts.map((part) => (
+              <div className="cut-row" role="row" key={part.id}>
+                <code role="cell">{part.id}</code>
+                <span role="cell">
+                  <strong>{locale === "sr" ? part.nameSr : part.nameEn}</strong>
+                  <small>{part.provenance}</small>
+                </span>
+                <span role="cell">{part.profileMm[0]} × {part.profileMm[1]} mm · {part.lengthMm} mm</span>
                 <strong role="cell">{part.quantity}</strong>
               </div>
             ))}
