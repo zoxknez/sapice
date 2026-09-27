@@ -3,7 +3,6 @@ import {notFound} from "next/navigation";
 import {setRequestLocale} from "next-intl/server";
 import type {AppLocale} from "@/i18n/routing";
 import {shelterModels, getShelterModel} from "@/data/models";
-import {constructionSummary, getModelAssemblies, materialSummary, thermalSummary, roofSlope} from "@/lib/engineering";
 import {assemblyInsulationMm} from "@/data/assemblies";
 import {sources} from "@/data/sources";
 import {ShelterViewer} from "@/components/shelter-viewer";
@@ -68,12 +67,12 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
   if (!model) notFound();
 
   const copy = model.translations[locale];
-  const thermal = thermalSummary(model);
-  const materials = materialSummary(model);
-  const roof = roofSlope(model);
   const compiled = compileShelterModel(model);
-  const construction = constructionSummary(model);
-  const assemblies = getModelAssemblies(model);
+  const thermal = compiled.thermal;
+  const materials = compiled.fabricationMaterials;
+  const roof = compiled.roof;
+  const construction = compiled.construction;
+  const assemblies = compiled.assemblies;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const modelUrl = `${siteUrl}/${locale}/${locale === "sr" ? "modeli" : "models"}/${model.slug}`;
   const structuredData = {
@@ -86,7 +85,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
     supply: materials.map((item) => ({
       "@type": "HowToSupply",
       name: locale === "sr" ? item.nameSr : item.nameEn,
-      requiredQuantity: `${item.purchaseM2.toFixed(2)} m²`
+      requiredQuantity: `${item.netAreaM2.toFixed(2)} m² net cut area`
     })),
     step: compiled.buildSteps.map((step, index) => ({
       "@type": "HowToStep",
@@ -244,14 +243,18 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
 
       <section className="section" id="materials">
         <div className="shell">
-          <span className="kicker">BOM preview</span>
-          <h2>{locale === "sr" ? "Osnovni materijali" : "Core materials"}</h2>
+          <span className="kicker">Fabrication BOM · compiler output</span>
+          <h2>{locale === "sr" ? "Materijali za krojenje" : "Fabrication materials"}</h2>
           <div className="material-table">
             {materials.map((item) => (
               <div key={item.id}>
                 <strong>{locale === "sr" ? item.nameSr : item.nameEn}</strong>
-                <span>{item.calculatedM2.toFixed(2)} m²</span>
-                <span>{locale === "sr" ? "sa 10% rezervom" : "with 10% allowance"}: {item.purchaseM2.toFixed(2)} m²</span>
+                <span>{item.netAreaM2.toFixed(2)} m²</span>
+                <span>
+                  {locale === "sr"
+                    ? "neto površina stvarnih krojnih delova"
+                    : "net area of actual cut geometry"}
+                </span>
               </div>
             ))}
           </div>
