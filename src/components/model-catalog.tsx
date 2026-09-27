@@ -4,10 +4,17 @@ import {useMemo, useState} from "react";
 import type {ShelterModel} from "@/lib/domain";
 import type {AppLocale} from "@/i18n/routing";
 import {ModelCard} from "./model-card";
-import {compileShelterModel} from "@/lib/compiler";
-import {assemblyInsulationMm} from "@/data/assemblies";
+import type {ModelComparisonSummary} from "@/lib/catalog-summary";
 
-export function ModelCatalog({models, locale}: {models: ShelterModel[]; locale: AppLocale}) {
+export function ModelCatalog({
+  models,
+  comparisonSummaries,
+  locale
+}: {
+  models: ShelterModel[];
+  comparisonSummaries: Record<string, ModelComparisonSummary>;
+  locale: AppLocale;
+}) {
   const isSr = locale === "sr";
   const [animal, setAnimal] = useState<"all" | "cat" | "dog">("all");
   const [heating, setHeating] = useState<"all" | "heated" | "passive">("all");
@@ -26,6 +33,14 @@ export function ModelCatalog({models, locale}: {models: ShelterModel[]; locale: 
     () => selectedIds.map((id) => models.find((model) => model.id === id)).filter((model): model is ShelterModel => Boolean(model)),
     [selectedIds, models]
   );
+
+  function summaryFor(model: ShelterModel) {
+    const summary = comparisonSummaries[model.id];
+    if (!summary) {
+      throw new Error(`Missing comparison summary for ${model.id}`);
+    }
+    return summary;
+  }
 
   function toggleCompare(id: string) {
     setSelectedIds((current) => {
@@ -105,27 +120,26 @@ export function ModelCatalog({models, locale}: {models: ShelterModel[]; locale: 
                 <tr>
                   <th>{isSr ? "Korisna podna površina" : "Usable floor area"}</th>
                   {selected.map((model) => (
-                    <td key={model.id}>{compileShelterModel(model).internal.usableFloorAreaM2.toFixed(2)} m²</td>
+                    <td key={model.id}>{summaryFor(model).usableFloorAreaM2.toFixed(2)} m²</td>
                   ))}
                 </tr>
                 <tr>
                   <th>{isSr ? "Čista širina komore" : "Clear chamber width"}</th>
                   {selected.map((model) => (
-                    <td key={model.id}>{compileShelterModel(model).internal.chamberClearWidthMm.toFixed(0)} mm</td>
+                    <td key={model.id}>{summaryFor(model).chamberClearWidthMm.toFixed(0)} mm</td>
                   ))}
                 </tr>
                 <tr>
                   <th>{isSr ? "Površina po preporučenoj životinji" : "Area per recommended animal"}</th>
                   {selected.map((model) => (
-                    <td key={model.id}>{compileShelterModel(model).internal.floorAreaPerRecommendedAnimalM2.toFixed(2)} m²</td>
+                    <td key={model.id}>{summaryFor(model).floorAreaPerRecommendedAnimalM2.toFixed(2)} m²</td>
                   ))}
                 </tr>
                 <tr>
                   <th>{isSr ? "Izolacija zida" : "Wall insulation"}</th>
-                  {selected.map((model) => {
-                    const compiled = compileShelterModel(model);
-                    return <td key={model.id}>{assemblyInsulationMm(compiled.assemblies.wall)} mm</td>;
-                  })}
+                  {selected.map((model) => (
+                    <td key={model.id}>{summaryFor(model).wallInsulationMm} mm</td>
+                  ))}
                 </tr>
                 <tr>
                   <th>{isSr ? "Komore / ulazi" : "Chambers / entrances"}</th>
@@ -137,7 +151,7 @@ export function ModelCatalog({models, locale}: {models: ShelterModel[]; locale: 
                 </tr>
                 <tr>
                   <th>Wall U</th>
-                  {selected.map((model) => <td key={model.id}>{compileShelterModel(model).thermal.wallU.toFixed(2)} W/m²K</td>)}
+                  {selected.map((model) => <td key={model.id}>{summaryFor(model).wallU.toFixed(2)} W/m²K</td>)}
                 </tr>
                 <tr>
                   <th>{isSr ? "Validacija" : "Validation"}</th>
