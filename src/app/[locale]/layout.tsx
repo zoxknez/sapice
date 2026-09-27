@@ -72,10 +72,13 @@ export default async function LocaleLayout({
   return (
     <html lang={locale === "sr" ? "sr-Latn" : "en"}>
       <body>
+        <a className="skip-link" href="#main-content">
+          {locale === "sr" ? "Preskoči na sadržaj" : "Skip to content"}
+        </a>
         <NextIntlClientProvider>
           <PwaRegistration />
           <SiteHeader locale={locale as AppLocale} />
-          <main>{children}</main>
+          <main id="main-content">{children}</main>
           <footer className="site-footer">
             <div className="shell footer-grid">
               <div>
