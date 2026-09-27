@@ -285,6 +285,7 @@ export const thermalMethod = {
   } satisfies Record<"wall" | "roof" | "floor", HeatFlowDirection>,
   limitations: [
     "No validated entrance infiltration model",
+    "No validated airflow model for the provisional ventilation insert zones",
     "No wind pressure model",
     "No animal metabolic heat credit",
     "No transient heat-storage model",
