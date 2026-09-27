@@ -2443,3 +2443,20 @@ button { cursor: pointer; }
     grid-template-columns: 1fr 1fr;
   }
 }
+
+
+.drawing-assembly-zone {
+  stroke: none;
+  opacity: .28;
+}
+.drawing-roof-zone {
+  fill: #9e8e7e;
+}
+.drawing-floor-zone {
+  fill: #c7a77f;
+}
+.drawing-interface {
+  stroke: #8f8174;
+  stroke-width: 1.1;
+  stroke-dasharray: 3 3;
+}
