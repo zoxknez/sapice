@@ -117,11 +117,23 @@ export function surfaceAreas(model: ShelterModel) {
   };
 }
 
+export type HeatFlowDirection = "horizontal" | "upward" | "downward";
+
 export const thermalMethod = {
-  version: "1.0.0",
-  interiorSurfaceResistanceM2KW: 0.13,
+  version: "1.1.0",
+  surfaceResistanceSourceId: "iso-6946-2017",
+  interiorSurfaceResistanceM2KW: {
+    horizontal: 0.13,
+    upward: 0.10,
+    downward: 0.17
+  },
   exteriorSurfaceResistanceM2KW: 0.04,
   comparisonDeltaTK: 20,
+  assemblyHeatFlow: {
+    wall: "horizontal",
+    roof: "upward",
+    floor: "downward"
+  } satisfies Record<"wall" | "roof" | "floor", HeatFlowDirection>,
   limitations: [
     "No validated entrance infiltration model",
     "No wind pressure model",
@@ -133,7 +145,8 @@ export const thermalMethod = {
 
 function assemblyUValueWithLambdaMode(
   assembly: ConstructionAssembly,
-  mode: "min" | "typical" | "max"
+  mode: "min" | "typical" | "max",
+  heatFlow: HeatFlowDirection
 ) {
   const rLayers = assembly.layers.reduce((sum, layer) => {
     const material = materials[layer.materialId];
@@ -148,30 +161,54 @@ function assemblyUValueWithLambdaMode(
   }, 0);
 
   return 1 / (
-    thermalMethod.interiorSurfaceResistanceM2KW +
+    thermalMethod.interiorSurfaceResistanceM2KW[heatFlow] +
     rLayers +
     thermalMethod.exteriorSurfaceResistanceM2KW
   );
 }
 
-export function assemblyUValue(assembly: ConstructionAssembly) {
-  return assemblyUValueWithLambdaMode(assembly, "typical");
+export function assemblyUValue(
+  assembly: ConstructionAssembly,
+  heatFlow: HeatFlowDirection = "horizontal"
+) {
+  return assemblyUValueWithLambdaMode(assembly, "typical", heatFlow);
 }
 
-export function assemblyUValueRange(assembly: ConstructionAssembly) {
-  const low = assemblyUValueWithLambdaMode(assembly, "min");
-  const high = assemblyUValueWithLambdaMode(assembly, "max");
+export function assemblyUValueRange(
+  assembly: ConstructionAssembly,
+  heatFlow: HeatFlowDirection = "horizontal"
+) {
+  const low = assemblyUValueWithLambdaMode(assembly, "min", heatFlow);
+  const high = assemblyUValueWithLambdaMode(assembly, "max", heatFlow);
   return [Math.min(low, high), Math.max(low, high)] as const;
 }
 
 export function thermalSummary(model: ShelterModel) {
   const assemblies = getModelAssemblies(model);
-  const wallU = assemblyUValue(assemblies.wall);
-  const floorU = assemblyUValue(assemblies.floor);
-  const roofU = assemblyUValue(assemblies.roof);
-  const wallURange = assemblyUValueRange(assemblies.wall);
-  const floorURange = assemblyUValueRange(assemblies.floor);
-  const roofURange = assemblyUValueRange(assemblies.roof);
+  const wallU = assemblyUValue(
+    assemblies.wall,
+    thermalMethod.assemblyHeatFlow.wall
+  );
+  const floorU = assemblyUValue(
+    assemblies.floor,
+    thermalMethod.assemblyHeatFlow.floor
+  );
+  const roofU = assemblyUValue(
+    assemblies.roof,
+    thermalMethod.assemblyHeatFlow.roof
+  );
+  const wallURange = assemblyUValueRange(
+    assemblies.wall,
+    thermalMethod.assemblyHeatFlow.wall
+  );
+  const floorURange = assemblyUValueRange(
+    assemblies.floor,
+    thermalMethod.assemblyHeatFlow.floor
+  );
+  const roofURange = assemblyUValueRange(
+    assemblies.roof,
+    thermalMethod.assemblyHeatFlow.roof
+  );
   const area = surfaceAreas(model);
   const deltaTK = thermalMethod.comparisonDeltaTK;
 
@@ -200,6 +237,13 @@ export function thermalSummary(model: ShelterModel) {
     envelopeTransmissionW,
     envelopeTransmissionRangeW,
     deltaTK,
+    surfaceResistances: {
+      wallRsi: thermalMethod.interiorSurfaceResistanceM2KW.horizontal,
+      roofRsi: thermalMethod.interiorSurfaceResistanceM2KW.upward,
+      floorRsi: thermalMethod.interiorSurfaceResistanceM2KW.downward,
+      rse: thermalMethod.exteriorSurfaceResistanceM2KW
+    },
+    surfaceResistanceSourceId: thermalMethod.surfaceResistanceSourceId,
     limitations: thermalMethod.limitations
   };
 }
