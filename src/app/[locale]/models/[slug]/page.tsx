@@ -41,6 +41,11 @@ export async function generateMetadata({
         "x-default": srPath
       }
     },
+    twitter: {
+      card: "summary_large_image",
+      title: copy.name,
+      description: copy.description
+    },
     openGraph: {
       type: "article",
       title: copy.name,
