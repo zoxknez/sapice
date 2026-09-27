@@ -61,6 +61,51 @@ export function constructionInterfaceGeometry(model: ShelterModel) {
   };
 }
 
+export function wallJoineryGeometry(model: ShelterModel) {
+  const construction = constructionSummary(model);
+  const interfaces = constructionInterfaceGeometry(model);
+  const wallThicknessMm = construction.wallThicknessMm;
+  const depthMm = model.dimensions.depthMm;
+  const sideStartZmm = wallThicknessMm;
+  const sideEndZmm = Math.max(sideStartZmm, depthMm - wallThicknessMm);
+  const sideRunMm = Math.max(0, sideEndZmm - sideStartZmm);
+
+  const heightAtZ = (zMm: number) => {
+    if (depthMm <= 0) return interfaces.wallFrontHeightMm;
+    const ratio = zMm / depthMm;
+    return (
+      interfaces.wallFrontHeightMm +
+      (interfaces.wallRearHeightMm - interfaces.wallFrontHeightMm) * ratio
+    );
+  };
+
+  const sideFrontHeightMm = heightAtZ(sideStartZmm);
+  const sideRearHeightMm = heightAtZ(sideEndZmm);
+  const sideTopSlopeLengthMm = Math.hypot(
+    sideRunMm,
+    sideFrontHeightMm - sideRearHeightMm
+  );
+
+  return {
+    convention: "FRONT_REAR_FULL_WIDTH_SIDES_BETWEEN" as const,
+    wallThicknessMm,
+    frontRearWidthMm: model.dimensions.widthMm,
+    sideStartZmm,
+    sideEndZmm,
+    sideRunMm,
+    sideFrontHeightMm,
+    sideRearHeightMm,
+    sideTopSlopeLengthMm,
+    internalWidthMm: Math.max(
+      0,
+      model.dimensions.widthMm - 2 * wallThicknessMm
+    ),
+    internalDepthMm: sideRunMm,
+    internalFrontHeightMm: sideFrontHeightMm,
+    internalRearHeightMm: sideRearHeightMm
+  };
+}
+
 export function layoutGeometry(model: ShelterModel) {
   const wallThicknessMm = constructionSummary(model).wallThicknessMm;
   const clearLeftMm = wallThicknessMm;
@@ -319,13 +364,17 @@ export function roofPanelGeometry(model: ShelterModel) {
 export function surfaceAreas(model: ShelterModel) {
   const {widthMm: w, depthMm: d} = model.dimensions;
   const interfaces = constructionInterfaceGeometry(model);
+  const joinery = wallJoineryGeometry(model);
   const entrance = entranceGeometry(model);
   const openingArea = entrance.totalOpeningAreaMm2;
-  const wallAreaMm2 =
+  const frontRearAreaMm2 =
     w * interfaces.wallFrontHeightMm +
-    w * interfaces.wallRearHeightMm +
-    2 * d * ((interfaces.wallFrontHeightMm + interfaces.wallRearHeightMm) / 2) -
-    openingArea;
+    w * interfaces.wallRearHeightMm;
+  const sideAreaMm2 =
+    2 *
+    joinery.sideRunMm *
+    ((joinery.sideFrontHeightMm + joinery.sideRearHeightMm) / 2);
+  const wallAreaMm2 = frontRearAreaMm2 + sideAreaMm2 - openingArea;
   const floorAreaMm2 = w * d;
   const roofAreaMm2 = w * roofSlope(model).trueLengthMm;
 
@@ -333,14 +382,15 @@ export function surfaceAreas(model: ShelterModel) {
     wallM2: mm2ToM2(wallAreaMm2),
     floorM2: mm2ToM2(floorAreaMm2),
     roofM2: mm2ToM2(roofAreaMm2),
-    openingM2: mm2ToM2(openingArea)
+    openingM2: mm2ToM2(openingArea),
+    wallJoineryConvention: joinery.convention
   };
 }
 
 export type HeatFlowDirection = "horizontal" | "upward" | "downward";
 
 export const thermalMethod = {
-  version: "1.1.0",
+  version: "1.2.0",
   surfaceResistanceSourceId: "iso-6946-2017",
   interiorSurfaceResistanceM2KW: {
     horizontal: 0.13,
@@ -360,7 +410,8 @@ export const thermalMethod = {
     "No wind pressure model",
     "No animal metabolic heat credit",
     "No transient heat-storage model",
-    "No 2D framing thermal-bridge correction"
+    "No 2D framing thermal-bridge correction",
+    "No explicit corner/end-grain edge-return thermal-bridge model"
   ]
 } as const;
 
