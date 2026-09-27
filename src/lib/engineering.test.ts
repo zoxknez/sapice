@@ -59,6 +59,31 @@ describe("engineering model derivations", () => {
     }
   });
 
+  it("keeps fabrication parts on the same floor-wall-roof interface datum", () => {
+    for (const model of shelterModels) {
+      const compiled = compileShelterModel(model);
+      const frontOuter = compiled.cutParts.find((part) => part.id === "front-outer");
+      const rearOuter = compiled.cutParts.find((part) => part.id === "rear-outer");
+      const sideOuter = compiled.cutParts.find((part) => part.id === "side-outer");
+      const roofInner = compiled.cutParts.find((part) => part.id === "roof-inner");
+      const floorXps = compiled.cutParts.find((part) => part.id.startsWith("xps-floor"));
+
+      expect(frontOuter?.heightMm).toBe(Math.round(compiled.interfaces.wallFrontHeightMm));
+      expect(rearOuter?.heightMm).toBe(Math.round(compiled.interfaces.wallRearHeightMm));
+      expect(sideOuter?.heightMm).toBe(Math.round(compiled.interfaces.wallFrontHeightMm));
+      expect(sideOuter?.trapezoidRearHeightMm)
+        .toBe(Math.round(compiled.interfaces.wallRearHeightMm));
+
+      for (const cutout of frontOuter?.cutouts ?? []) {
+        expect(cutout.yMm).toBe(compiled.internal.entranceSillAboveFinishedFloorMm);
+      }
+
+      expect(roofInner?.widthMm).toBe(model.dimensions.widthMm);
+      expect(roofInner?.heightMm).toBe(Math.ceil(compiled.roof.trueLengthMm));
+      expect(floorXps).toBeDefined();
+    }
+  });
+
   it("uses rounded entrance area consistently in wall surface calculations", () => {
     for (const model of shelterModels) {
       const entrance = entranceGeometry(model);
