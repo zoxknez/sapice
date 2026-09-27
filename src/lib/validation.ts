@@ -155,6 +155,23 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
       }
     }
 
+    const frontPoints = [
+      0,
+      ...compiled.framing.frontSupportPositionsXmm,
+      model.dimensions.widthMm
+    ].sort((a, b) => a - b);
+
+    for (let index = 1; index < frontPoints.length; index++) {
+      const gap = frontPoints[index] - frontPoints[index - 1];
+      if (gap > compiled.framing.maxStudSpacingMm + 1) {
+        issues.push({
+          severity: "error",
+          code: "FRONT_STUD_SPACING_EXCEEDED",
+          message: `Front wall support gap ${gap} mm exceeds V1 maximum ${compiled.framing.maxStudSpacingMm} mm.`
+        });
+      }
+    }
+
     const checkStudSpacing = (
       wallName: "rear" | "left" | "right",
       spanMm: number
