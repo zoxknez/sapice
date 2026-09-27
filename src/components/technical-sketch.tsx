@@ -203,16 +203,42 @@ export function TechnicalSketch({
           <line x1={frontX} y1={frontFloorTopY} x2={frontX + fw} y2={frontFloorTopY} className="drawing-interface" />
           <line x1={frontX} y1={frontGround} x2={frontX + fw} y2={frontGround} className="drawing-ground" />
 
-          {[0.22, 0.78].map((ratio) => (
-            <rect
-              key={ratio}
-              x={frontX + fw * ratio - Math.max(3, 45 * frontScale / 2)}
-              y={frontBottom}
-              width={Math.max(6, 45 * frontScale)}
-              height={fgc}
-              className="drawing-runner"
-            />
-          ))}
+          {compiled.framing.baseRunnerPositionsXmm.map((positionMm, index) => {
+            const runnerWidthPx =
+              compiled.framing.baseProfileMm[0] * frontScale;
+            const runnerHeightPx =
+              compiled.framing.baseProfileMm[1] * frontScale;
+            const postHeightPx =
+              compiled.framing.baseSupportPostHeightMm * frontScale;
+            const x = frontX + positionMm * frontScale - runnerWidthPx / 2;
+
+            return (
+              <g key={`front-base-${index + 1}`}>
+                <rect
+                  x={x}
+                  y={frontBottom}
+                  width={runnerWidthPx}
+                  height={runnerHeightPx}
+                  className="drawing-runner"
+                />
+                <rect
+                  x={x}
+                  y={frontBottom + runnerHeightPx}
+                  width={runnerWidthPx}
+                  height={postHeightPx}
+                  className="drawing-base-post"
+                />
+                <text
+                  x={x + runnerWidthPx / 2}
+                  y={frontGround - 7}
+                  textAnchor="middle"
+                  className="drawing-axis-label"
+                >
+                  B{index + 1}
+                </text>
+              </g>
+            );
+          })}
 
           <line x1={frontX + 3} y1={frontRoofUndersideY + 3} x2={frontX + 3} y2={frontFloorTopY - 3} className="drawing-frame" />
           <line x1={frontX + fw - 3} y1={frontRoofUndersideY + 3} x2={frontX + fw - 3} y2={frontFloorTopY - 3} className="drawing-frame" />
@@ -333,16 +359,43 @@ export function TechnicalSketch({
           <line x1={roofFrontX} y1={roofFrontY} x2={roofRearX} y2={roofRearY} className="drawing-roof" />
           <line x1={bodyX} y1={sideGround} x2={bodyX + sd} y2={sideGround} className="drawing-ground" />
 
-          {[0.22, 0.78].map((ratio) => (
-            <rect
-              key={ratio}
-              x={bodyX + sd * ratio - Math.max(3, 45 * sideScale / 2)}
-              y={sideBodyBottom}
-              width={Math.max(6, 45 * sideScale)}
-              height={sgc}
-              className="drawing-runner"
-            />
-          ))}
+          <rect
+            x={bodyX}
+            y={sideBodyBottom}
+            width={sd}
+            height={compiled.framing.baseProfileMm[1] * sideScale}
+            className="drawing-runner"
+          />
+          {compiled.framing.baseSupportPositionsZmm.map((positionMm, index) => {
+            const postWidthPx =
+              compiled.framing.baseProfileMm[0] * sideScale;
+            const postHeightPx =
+              compiled.framing.baseSupportPostHeightMm * sideScale;
+            const runnerHeightPx =
+              compiled.framing.baseProfileMm[1] * sideScale;
+            const x =
+              bodyX + positionMm * sideScale - postWidthPx / 2;
+
+            return (
+              <g key={`side-base-${index + 1}`}>
+                <rect
+                  x={x}
+                  y={sideBodyBottom + runnerHeightPx}
+                  width={postWidthPx}
+                  height={postHeightPx}
+                  className="drawing-base-post"
+                />
+                <text
+                  x={x + postWidthPx / 2}
+                  y={sideGround - 7}
+                  textAnchor="middle"
+                  className="drawing-axis-label"
+                >
+                  P{index + 1}
+                </text>
+              </g>
+            );
+          })}
 
           {sideStuds.map((part) => {
             const x = bodyX + (part.positionMm ?? 0) * sideScale;
@@ -502,6 +555,8 @@ export function TechnicalSketch({
           <text x="686" y="4" className="drawing-legend">{isSr ? "šarka" : "hinge"}</text>
           <line x1="785" y1="0" x2="813" y2="0" className="drawing-vent-provision" />
           <text x="821" y="4" className="drawing-legend">{isSr ? "vent. PROVISION zona" : "vent PROVISION zone"}</text>
+          <rect x="955" y="-5" width="20" height="10" className="drawing-base-post" />
+          <text x="983" y="4" className="drawing-legend">{isSr ? "oslonac baze" : "base support"}</text>
         </g>
       </svg>
 
