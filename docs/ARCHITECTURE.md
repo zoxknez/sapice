@@ -11,7 +11,7 @@ Canonical shelter definitions live in Git and are validated before publication.
 ```text
 ShelterModel
   -> construction assemblies
-  -> compiler v1.6
+  -> compiler v1.7
      -> construction-interface geometry
      -> entrance geometry
      -> chamber/divider geometry
