@@ -23,12 +23,21 @@ export function ModelBuildBook({model, locale}: {model: ShelterModel; locale: Ap
                 : "These values are not manually duplicated. The compiler derives them from external dimensions and construction thickness."}
             </p>
           </div>
-          <div className="thermal-grid">
+          <div className="thermal-grid interior-metrics">
             <div><span>{locale === "sr" ? "Unutrašnja širina" : "Internal width"}</span><strong>{compiled.internal.widthMm} mm</strong></div>
             <div><span>{locale === "sr" ? "Unutrašnja dubina" : "Internal depth"}</span><strong>{compiled.internal.depthMm} mm</strong></div>
-            <div><span>{locale === "sr" ? "Visina napred" : "Front clear height"}</span><strong>{compiled.internal.frontHeightMm} mm</strong></div>
+            <div><span>{locale === "sr" ? "Prosečna korisna visina" : "Average clear height"}</span><strong>{compiled.internal.averageHeightMm.toFixed(0)} mm</strong></div>
+            <div><span>{locale === "sr" ? "Čista širina komore" : "Clear chamber width"}</span><strong>{compiled.internal.chamberClearWidthMm.toFixed(0)} mm</strong></div>
             <div><span>{locale === "sr" ? "Korisna podna površina" : "Usable floor area"}</span><strong>{compiled.internal.usableFloorAreaM2.toFixed(2)} m²</strong></div>
+            <div><span>{locale === "sr" ? "Približan korisni volumen" : "Approx. usable volume"}</span><strong>{compiled.internal.usableVolumeM3.toFixed(2)} m³</strong></div>
+            <div><span>{locale === "sr" ? "Po preporučenoj životinji" : "Per recommended animal"}</span><strong>{compiled.internal.floorAreaPerRecommendedAnimalM2.toFixed(2)} m²</strong></div>
+            <div><span>{locale === "sr" ? "Po max kapacitetu" : "Per max capacity animal"}</span><strong>{compiled.internal.floorAreaPerMaxAnimalM2.toFixed(2)} m²</strong></div>
           </div>
+          <p className="metric-disclaimer">
+            {locale === "sr"
+              ? "Površina i volumen po životinji su geometrijske metrike za poređenje modela. Nisu veterinarski, zakonski ili welfare minimum."
+              : "Per-animal area and volume are geometric comparison metrics. They are not veterinary, legal or welfare minimums."}
+          </p>
         </div>
       </section>
 
