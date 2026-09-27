@@ -85,6 +85,14 @@ export function ModelValidationPanel({
             <strong>v{compiled.model.version}</strong>
           </div>
           <div>
+            <span>{isSr ? "Compiler" : "Compiler"}</span>
+            <strong>v{compiled.compilerVersion}</strong>
+          </div>
+          <div>
+            <span>{isSr ? "Plan ID" : "Plan ID"}</span>
+            <strong><code>{compiled.planFingerprint}</code></strong>
+          </div>
+          <div>
             <span>{isSr ? "Izvora u compiled planu" : "Sources in compiled plan"}</span>
             <strong>{sourceCount}</strong>
           </div>
