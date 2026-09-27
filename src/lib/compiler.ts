@@ -466,7 +466,7 @@ export function compileShelterModel(model: ShelterModel) {
           : 4
       : 0;
 
-  const hardwareItems: HardwareItem[] = [
+  const hardwareItems: HardwareItem[] = ([
     {
       id: "panel-fasteners",
       nameSr: "Spoljašnji pričvršćivači za drvene ploče",
@@ -517,7 +517,7 @@ export function compileShelterModel(model: ShelterModel) {
       notesSr: "Samo za namenski pet-heating proizvod i prema njegovom uputstvu; aplikacija ne definiše DIY mrežno ožičenje.",
       notesEn: "Only for a purpose-built pet-heating product and its instructions; the app does not specify DIY mains wiring."
     }] : [])
-  ].filter((item) => item.quantity > 0);
+  ] satisfies HardwareItem[]).filter((item) => item.quantity > 0);
 
   const hardware = {
     status: "PROVISIONAL" as const,
