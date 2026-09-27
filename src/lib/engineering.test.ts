@@ -140,6 +140,28 @@ describe("engineering model derivations", () => {
     }
   });
 
+  it("keeps roof runoff behind the shelter and edge protection synchronized", () => {
+    for (const model of shelterModels) {
+      const compiled = compileShelterModel(model);
+
+      expect(compiled.roofWeathering.highEdge).toBe("FRONT");
+      expect(compiled.roofWeathering.runoffEdge).toBe("REAR");
+      expect(compiled.roofWeathering.runoffAwayFromEntrances).toBe(true);
+      expect(compiled.roofWeathering.slopeDegrees).toBeGreaterThan(0);
+      expect(compiled.roofWeathering.riseMm).toBe(
+        model.dimensions.frontHeightMm - model.dimensions.rearHeightMm
+      );
+
+      const edgeItem = compiled.hardwareItems.find(
+        (item) => item.id === "roof-edge-weathering-profile"
+      );
+      expect(edgeItem?.quantity).toBeCloseTo(
+        compiled.roofWeathering.fullEdgeProtectionLengthM,
+        8
+      );
+    }
+  });
+
   it("calculates a true roof length at least as long as plan depth", () => {
     for (const model of shelterModels) {
       expect(roofSlope(model).trueLengthMm).toBeGreaterThanOrEqual(model.dimensions.depthMm);
