@@ -76,13 +76,24 @@ export const thermalMethod = {
     "No validated entrance infiltration model",
     "No wind pressure model",
     "No animal metabolic heat credit",
-    "No transient heat-storage model"
+    "No transient heat-storage model",
+    "No 2D framing thermal-bridge correction"
   ]
 } as const;
 
-export function assemblyUValue(assembly: ConstructionAssembly) {
+function assemblyUValueWithLambdaMode(
+  assembly: ConstructionAssembly,
+  mode: "min" | "typical" | "max"
+) {
   const rLayers = assembly.layers.reduce((sum, layer) => {
-    const lambda = materialLambda(layer.materialId, layer.thicknessMm);
+    const material = materials[layer.materialId];
+    const lambda =
+      mode === "typical"
+        ? materialLambda(layer.materialId, layer.thicknessMm)
+        : mode === "min"
+          ? material.lambdaRangeWmK[0]
+          : material.lambdaRangeWmK[1];
+
     return sum + mmToM(layer.thicknessMm) / lambda;
   }, 0);
 
@@ -93,11 +104,24 @@ export function assemblyUValue(assembly: ConstructionAssembly) {
   );
 }
 
+export function assemblyUValue(assembly: ConstructionAssembly) {
+  return assemblyUValueWithLambdaMode(assembly, "typical");
+}
+
+export function assemblyUValueRange(assembly: ConstructionAssembly) {
+  const low = assemblyUValueWithLambdaMode(assembly, "min");
+  const high = assemblyUValueWithLambdaMode(assembly, "max");
+  return [Math.min(low, high), Math.max(low, high)] as const;
+}
+
 export function thermalSummary(model: ShelterModel) {
   const assemblies = getModelAssemblies(model);
   const wallU = assemblyUValue(assemblies.wall);
   const floorU = assemblyUValue(assemblies.floor);
   const roofU = assemblyUValue(assemblies.roof);
+  const wallURange = assemblyUValueRange(assemblies.wall);
+  const floorURange = assemblyUValueRange(assemblies.floor);
+  const roofURange = assemblyUValueRange(assemblies.roof);
   const area = surfaceAreas(model);
   const deltaTK = thermalMethod.comparisonDeltaTK;
 
@@ -106,13 +130,27 @@ export function thermalSummary(model: ShelterModel) {
     floorU * area.floorM2 * deltaTK +
     roofU * area.roofM2 * deltaTK;
 
+  const envelopeTransmissionRangeW = [
+    wallURange[0] * area.wallM2 * deltaTK +
+      floorURange[0] * area.floorM2 * deltaTK +
+      roofURange[0] * area.roofM2 * deltaTK,
+    wallURange[1] * area.wallM2 * deltaTK +
+      floorURange[1] * area.floorM2 * deltaTK +
+      roofURange[1] * area.roofM2 * deltaTK
+  ] as const;
+
   return {
     methodVersion: thermalMethod.version,
     wallU,
     floorU,
     roofU,
+    wallURange,
+    floorURange,
+    roofURange,
     envelopeTransmissionW,
-    deltaTK
+    envelopeTransmissionRangeW,
+    deltaTK,
+    limitations: thermalMethod.limitations
   };
 }
 
