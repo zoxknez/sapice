@@ -1,0 +1,26 @@
+{
+  "Nav": {
+    "home": "Home",
+    "models": "Models",
+    "finder": "Find a model",
+    "materials": "Materials",
+    "guides": "Guides"
+  },
+  "Home": {
+    "eyebrow": "Open winter shelter engineering plans",
+    "title": "Warmer, safer shelters for cats and dogs.",
+    "lead": "Choose a pre-designed model and get a 3D view, real dimensions, construction layers, materials and transparent calculations.",
+    "primary": "Find a model",
+    "secondary": "Browse models",
+    "catalogTitle": "Reference models",
+    "catalogLead": "We start with a small set of carefully defined constructions. Every future model uses the same verifiable engineering system."
+  },
+  "Models": {
+    "title": "Shelter models",
+    "lead": "Filter ready-made constructions by animal, capacity and heating strategy."
+  },
+  "Finder": {
+    "title": "Find a suitable shelter",
+    "lead": "No AI. Matching is based on deterministic rules and properties of validated models."
+  }
+}
