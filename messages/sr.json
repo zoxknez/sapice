@@ -4,7 +4,8 @@
     "models": "Modeli",
     "finder": "Pronađi model",
     "materials": "Materijali",
-    "guides": "Vodiči"
+    "guides": "Vodiči",
+    "methodology": "Metodologija"
   },
   "Home": {
     "eyebrow": "Otvoreni tehnički planovi za zimu",
@@ -13,7 +14,7 @@
     "primary": "Pronađite model",
     "secondary": "Pregledajte modele",
     "catalogTitle": "Referentni modeli",
-    "catalogLead": "Počinjemo od malog broja pažljivo definisanih konstrukcija. Svaki sledeći model koristi isti proverljivi engineering sistem."
+    "catalogLead": "Referentni modeli za mačke i pse, od kompaktnih do višekomornih i grejanih varijanti, svi na istom proverljivom engineering sistemu."
   },
   "Models": {
     "title": "Modeli kućica",
