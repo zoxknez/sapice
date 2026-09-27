@@ -115,6 +115,22 @@ export function TechnicalSketch({
     sideTop +
     slopeRise +
     compiled.interfaces.roofVerticalThicknessMm * sideScale;
+  const sideJoineryFrontX =
+    bodyX + compiled.joinery.sideStartZmm * sideScale;
+  const sideJoineryRearX =
+    bodyX + compiled.joinery.sideEndZmm * sideScale;
+  const sideJoineryFrontRatio =
+    d > 0 ? compiled.joinery.sideStartZmm / d : 0;
+  const sideJoineryRearRatio =
+    d > 0 ? compiled.joinery.sideEndZmm / d : 1;
+  const sideJoineryFrontTopY =
+    sideFrontRoofUndersideY +
+    (sideRearRoofUndersideY - sideFrontRoofUndersideY) *
+      sideJoineryFrontRatio;
+  const sideJoineryRearTopY =
+    sideFrontRoofUndersideY +
+    (sideRearRoofUndersideY - sideFrontRoofUndersideY) *
+      sideJoineryRearRatio;
   const roofFrontX = sideX;
   const roofRearX = sideX + sideTotalDepth * sideScale;
   const roofFrontY = sideTop - model.roof.frontOverhangMm * Math.tan(compiled.roof.angleRad) * sideScale;
@@ -360,6 +376,30 @@ export function TechnicalSketch({
           />
           <line x1={bodyX} y1={sideFrontRoofUndersideY} x2={bodyX + sd} y2={sideRearRoofUndersideY} className="drawing-interface" />
           <line x1={bodyX} y1={sideFloorTopY} x2={bodyX + sd} y2={sideFloorTopY} className="drawing-interface" />
+          <line
+            x1={sideJoineryFrontX}
+            y1={sideJoineryFrontTopY}
+            x2={sideJoineryFrontX}
+            y2={sideFloorTopY}
+            className="drawing-joinery"
+          />
+          <line
+            x1={sideJoineryRearX}
+            y1={sideJoineryRearTopY}
+            x2={sideJoineryRearX}
+            y2={sideFloorTopY}
+            className="drawing-joinery"
+          />
+          <text
+            x={(sideJoineryFrontX + sideJoineryRearX) / 2}
+            y={sideFloorTopY - 10}
+            textAnchor="middle"
+            className="drawing-axis-label"
+          >
+            {isSr
+              ? `BOČNI PANEL ${compiled.joinery.sideRunMm.toFixed(0)} mm`
+              : `SIDE PANEL ${compiled.joinery.sideRunMm.toFixed(0)} mm`}
+          </text>
           <line x1={roofFrontX} y1={roofFrontY} x2={roofRearX} y2={roofRearY} className="drawing-roof" />
           {(() => {
             const x1 = roofFrontX + (roofRearX - roofFrontX) * 0.42;
