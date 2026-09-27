@@ -1,5 +1,5 @@
 import type {ShelterModel} from "@/lib/domain";
-import {constructionInterfaceGeometry, constructionSummary, entranceGeometry, framingMethod, getModelAssemblies, layoutGeometry, provisionalIntermediatePositions, roofPanelGeometry, roofSlope, surfaceAreas, thermalSummary, ventilationProvisionGeometry} from "@/lib/engineering";
+import {constructionInterfaceGeometry, constructionSummary, entranceGeometry, framingMethod, getModelAssemblies, heatingProvisionGeometry, layoutGeometry, provisionalIntermediatePositions, roofPanelGeometry, roofSlope, surfaceAreas, thermalSummary, ventilationProvisionGeometry} from "@/lib/engineering";
 import {cutGeometryAreaMm2, cutGeometryCutoutPerimeterMm, cutGeometryOuterPerimeterMm} from "@/lib/cut-geometry";
 import {materials} from "@/data/materials";
 import {deterministicFingerprint} from "@/lib/fingerprint";
@@ -141,6 +141,7 @@ export function compileShelterModel(model: ShelterModel) {
   const layout = layoutGeometry(model);
   const entrance = entranceGeometry(model);
   const ventilation = ventilationProvisionGeometry(model);
+  const heating = heatingProvisionGeometry(model);
 
   const entranceCutouts = layout.entranceCentersXmm.map((centerX) => {
     return {
@@ -902,7 +903,7 @@ export function compileShelterModel(model: ShelterModel) {
       id: "protected-cable-entry",
       nameSr: "Zaštićen uvod kabla",
       nameEn: "Protected cable entry",
-      quantity: 1,
+      quantity: heating.zones.length,
       unit: "piece" as const,
       provenance: "ASSUMPTION" as const,
       notesSr: "Samo za namenski pet-heating proizvod i prema njegovom uputstvu; aplikacija ne definiše DIY mrežno ožičenje.",
@@ -1003,6 +1004,7 @@ export function compileShelterModel(model: ShelterModel) {
     layout,
     entrance,
     ventilation,
+    heating,
     construction,
     roof,
     roofPanel,
@@ -1026,6 +1028,7 @@ export function compileShelterModel(model: ShelterModel) {
     layout,
     entrance,
     ventilation,
+    heating,
     assemblies,
     construction,
     internal: {
