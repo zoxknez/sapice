@@ -10,6 +10,13 @@ export type ModelComparisonSummary = {
   floorAreaPerRecommendedAnimalM2: number;
   wallInsulationMm: number;
   wallU: number;
+  thumbnail: {
+    entranceCentersXmm: number[];
+    entranceWidthMm: number;
+    entranceHeightMm: number;
+    entranceRadiusMm: number;
+    thresholdHeightMm: number;
+  };
 };
 
 export function modelComparisonSummary(
@@ -25,7 +32,14 @@ export function modelComparisonSummary(
     floorAreaPerRecommendedAnimalM2:
       compiled.internal.floorAreaPerRecommendedAnimalM2,
     wallInsulationMm: assemblyInsulationMm(compiled.assemblies.wall),
-    wallU: compiled.thermal.wallU
+    wallU: compiled.thermal.wallU,
+    thumbnail: {
+      entranceCentersXmm: compiled.layout.entranceCentersXmm,
+      entranceWidthMm: compiled.entrance.widthMm,
+      entranceHeightMm: compiled.entrance.heightMm,
+      entranceRadiusMm: compiled.entrance.radiusMm,
+      thresholdHeightMm: compiled.entrance.thresholdHeightMm
+    }
   };
 }
 
