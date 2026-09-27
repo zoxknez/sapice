@@ -57,7 +57,7 @@ Canonical model definitions live in Git.
 ```text
 ShelterModel
   -> construction assemblies
-  -> compiler v1.3 plan fingerprint
+  -> compiler v1.5 plan fingerprint
   -> compiled internal / interface geometry
   -> 3D viewer
   -> technical drawing
@@ -65,6 +65,8 @@ ShelterModel
   -> stock nesting
   -> framing + hardware schedule
   -> ventilation provision geometry
+  -> heating provision geometry (heated models)
+  -> roof weathering / runoff gate
   -> thermal estimate
   -> cost lines
   -> build guide
@@ -120,7 +122,13 @@ The selected real-world product data sheet should replace generic planning value
 
 Heated models do not define improvised electrical heaters.
 
-They only reserve geometry for a compatible, purpose-built animal-heating product. Manufacturer instructions remain authoritative for installation, cable routing, protection, thermostat behavior and wet-location suitability.
+They compile one product-placement provision zone per chamber plus a matching protected cable-entry BOM item. Each zone deliberately leaves a positive unheated floor-choice area. The zone is coordination geometry only: manufacturer instructions remain authoritative for actual product footprint, power, voltage, thermostat behavior, cable routing, protection and wet-location suitability.
+
+## Roof weathering
+
+The roof compiler explicitly identifies the front edge as the high side and the rear edge as the runoff side, so normal water shedding is directed behind the shelter and away from entrances.
+
+The final roof covering remains **PRODUCT_SPECIFIC**. The selected membrane, roll roofing, shingle or other covering must explicitly permit the compiled slope and define its own underlayment, overlaps, fastening and edge/drip details. The compiler exposes rear drip-edge length and full roof-edge protection length for planning, but does not invent a universal minimum roof slope.
 
 ## Ventilation
 
