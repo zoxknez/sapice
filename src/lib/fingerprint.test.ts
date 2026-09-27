@@ -1,6 +1,7 @@
 import {describe, expect, it} from "vitest";
 import {getShelterModel, shelterModels} from "@/data/models";
 import {compileShelterModel, compilerMethod} from "@/lib/compiler";
+import {deterministicFingerprint} from "@/lib/fingerprint";
 
 describe("compiled plan identity", () => {
   it("is deterministic for repeated compilation of the same model", () => {
@@ -12,6 +13,11 @@ describe("compiled plan identity", () => {
       expect(first.planFingerprint).toMatch(/^[0-9a-f]{16}$/);
       expect(first.planFingerprint).toBe(second.planFingerprint);
     }
+  });
+
+  it("is stable across object key ordering", () => {
+    expect(deterministicFingerprint({a: 1, b: 2}))
+      .toBe(deterministicFingerprint({b: 2, a: 1}));
   });
 
   it("keeps plan fingerprints unique across the published reference catalog", () => {
