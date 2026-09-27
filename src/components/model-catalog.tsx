@@ -81,6 +81,16 @@ export function ModelCatalog({models, locale}: {models: ShelterModel[]; locale: 
                   {selected.map((model) => <td key={model.id}>{model.capacity.recommended} / max {model.capacity.max}</td>)}
                 </tr>
                 <tr>
+                  <th>{isSr ? "Veličina životinje" : "Animal size"}</th>
+                  {selected.map((model) => (
+                    <td key={model.id}>
+                      {model.animal === "cat"
+                        ? (isSr ? "standardna odrasla mačka" : "standard adult cat")
+                        : model.animalSizeClass}
+                    </td>
+                  ))}
+                </tr>
+                <tr>
                   <th>{isSr ? "Spoljašnje mere" : "External size"}</th>
                   {selected.map((model) => (
                     <td key={model.id}>{model.dimensions.widthMm} × {model.dimensions.depthMm} × {model.dimensions.frontHeightMm} mm</td>
