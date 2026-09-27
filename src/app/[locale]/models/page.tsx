@@ -4,6 +4,7 @@ import type {AppLocale} from "@/i18n/routing";
 import {shelterModels} from "@/data/models";
 import {ModelCatalog} from "@/components/model-catalog";
 import {localizedMetadata} from "@/lib/seo";
+import {modelComparisonSummaryMap} from "@/lib/catalog-summary";
 
 
 export async function generateMetadata({
@@ -27,6 +28,7 @@ export default async function ModelsPage({params}: {params: Promise<{locale: App
   const {locale} = await params;
   setRequestLocale(locale);
   const t = await getTranslations({locale, namespace: "Models"});
+  const comparisonSummaries = modelComparisonSummaryMap(shelterModels);
 
   return (
     <section className="page-hero">
@@ -34,7 +36,7 @@ export default async function ModelsPage({params}: {params: Promise<{locale: App
         <span className="kicker">Engineering catalog</span>
         <h1>{t("title")}</h1>
         <p className="page-lead">{t("lead")}</p>
-        <ModelCatalog models={shelterModels} locale={locale} />
+        <ModelCatalog models={shelterModels} comparisonSummaries={comparisonSummaries} locale={locale} />
       </div>
     </section>
   );
