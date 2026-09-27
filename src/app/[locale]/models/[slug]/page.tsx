@@ -17,6 +17,7 @@ import {OperatingGuidance} from "@/components/operating-guidance";
 import {StructuredData} from "@/components/structured-data";
 import {ThermalScenario} from "@/components/thermal-scenario";
 import {compileShelterModel} from "@/lib/compiler";
+import {compiledSourceIds} from "@/lib/provenance";
 
 export function generateStaticParams() {
   return shelterModels.map((model) => ({slug: model.slug}));
@@ -93,7 +94,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
       name: locale === "sr" ? step.titleSr : step.titleEn,
       text: locale === "sr" ? step.detailSr : step.detailEn
     })),
-    isBasedOn: model.sourceIds
+    isBasedOn: compiledSourceIds(compiled)
       .map((sourceId) => sources[sourceId]?.url)
       .filter(Boolean)
   };
