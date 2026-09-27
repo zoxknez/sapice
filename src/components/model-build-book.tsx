@@ -291,7 +291,7 @@ export function ModelBuildBook({
           </div>
           <BuildGuide
             modelId={model.id}
-            version={model.version}
+            planFingerprint={compiled.planFingerprint}
             steps={compiled.buildSteps}
             locale={locale}
           />
