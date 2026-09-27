@@ -304,6 +304,142 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
       }
     }
 
+    const baseRunners = compiled.linearParts.filter(
+      (part) =>
+        part.wall === "base" &&
+        part.id.startsWith("base-runner-") &&
+        typeof part.positionMm === "number"
+    );
+    const basePosts = compiled.linearParts.filter(
+      (part) =>
+        part.wall === "base" &&
+        part.id.startsWith("base-post-") &&
+        typeof part.positionXmm === "number" &&
+        typeof part.positionZmm === "number"
+    );
+    const floorJoists = compiled.linearParts.filter(
+      (part) =>
+        part.wall === "floor" &&
+        part.id.startsWith("floor-joist-") &&
+        typeof part.positionMm === "number"
+    );
+    const roofRafters = compiled.linearParts.filter(
+      (part) =>
+        part.wall === "roof" &&
+        part.id.startsWith("roof-rafter-") &&
+        typeof part.positionMm === "number"
+    );
+
+    if (
+      Math.abs(
+        compiled.framing.baseSupportPostHeightMm +
+          compiled.framing.baseProfileMm[1] -
+          model.dimensions.groundClearanceMm
+      ) > 0.001
+    ) {
+      issues.push({
+        severity: "error",
+        code: "BASE_CLEARANCE_MISMATCH",
+        message: "Base post height plus runner height does not rebuild the declared ground clearance."
+      });
+    }
+
+    if (
+      baseRunners.length !== compiled.framing.baseRunnerPositionsXmm.length ||
+      floorJoists.length !== compiled.framing.floorJoistPositionsZmm.length ||
+      roofRafters.length !== compiled.framing.roofRafterPositionsXmm.length
+    ) {
+      issues.push({
+        severity: "error",
+        code: "SUPPORT_SCHEDULE_COUNT_MISMATCH",
+        message: "Compiled base/floor/roof member counts do not match their framing position arrays."
+      });
+    }
+
+    const expectedBasePosts =
+      compiled.framing.baseRunnerPositionsXmm.length *
+      compiled.framing.baseSupportPositionsZmm.length;
+
+    if (basePosts.length !== expectedBasePosts) {
+      issues.push({
+        severity: "error",
+        code: "BASE_POST_GRID_COUNT_MISMATCH",
+        message: `Base support grid has ${basePosts.length} posts; expected ${expectedBasePosts}.`
+      });
+    }
+
+    for (const post of basePosts) {
+      if (Math.abs(post.lengthMm - compiled.framing.baseSupportPostHeightMm) > 0.001) {
+        issues.push({
+          severity: "error",
+          code: "BASE_POST_HEIGHT_MISMATCH",
+          message: `${post.id} does not match the compiled base support post height.`
+        });
+      }
+
+      if (
+        !compiled.framing.baseRunnerPositionsXmm.includes(post.positionXmm as number) ||
+        !compiled.framing.baseSupportPositionsZmm.includes(post.positionZmm as number)
+      ) {
+        issues.push({
+          severity: "error",
+          code: "BASE_POST_GRID_POSITION_MISMATCH",
+          message: `${post.id} is not positioned on the compiled runner/support grid.`
+        });
+      }
+    }
+
+    const validateSupportGaps = (
+      positionsMm: number[],
+      spanMm: number,
+      maximumMm: number,
+      code: string,
+      label: string
+    ) => {
+      const points = [0, ...positionsMm].sort((a, b) => a - b);
+      if (points[points.length - 1] !== spanMm) points.push(spanMm);
+
+      for (let index = 1; index < points.length; index++) {
+        const gap = points[index] - points[index - 1];
+        if (gap > maximumMm + 1) {
+          issues.push({
+            severity: "error",
+            code,
+            message: `${label} gap ${gap} mm exceeds V1 maximum ${maximumMm} mm.`
+          });
+        }
+      }
+    };
+
+    validateSupportGaps(
+      compiled.framing.baseRunnerPositionsXmm,
+      model.dimensions.widthMm,
+      compiled.framing.maxBaseRunnerSpacingMm,
+      "BASE_RUNNER_SPACING_EXCEEDED",
+      "Base runner"
+    );
+    validateSupportGaps(
+      compiled.framing.baseSupportPositionsZmm,
+      model.dimensions.depthMm,
+      compiled.framing.maxBasePostSpacingMm,
+      "BASE_POST_SPACING_EXCEEDED",
+      "Base support row"
+    );
+    validateSupportGaps(
+      compiled.framing.floorJoistPositionsZmm,
+      model.dimensions.depthMm,
+      compiled.framing.maxFloorJoistSpacingMm,
+      "FLOOR_JOIST_SPACING_EXCEEDED",
+      "Floor joist"
+    );
+    validateSupportGaps(
+      compiled.framing.roofRafterPositionsXmm,
+      model.dimensions.widthMm,
+      compiled.framing.maxRoofRafterSpacingMm,
+      "ROOF_RAFTER_SPACING_EXCEEDED",
+      "Roof rafter"
+    );
+
     const frontPoints = [
       0,
       ...compiled.framing.frontSupportPositionsXmm,
