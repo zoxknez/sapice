@@ -176,40 +176,47 @@ function FramingSkeleton({
   const frameColor = "#4d705f";
   const assumedColor = "#aa754e";
 
-  const entranceSupports = compiled.layout.entranceCentersXmm.flatMap((centerMm, index) => {
-    const half = model.layout.entranceWidthMm / 2000;
-    const supportLength = (model.layout.thresholdHeightMm + model.layout.entranceHeightMm) / 1000;
-    const y = gc + floorT + supportLength / 2;
-    const centerM = centerMm / 1000;
-    return [
+  const entranceVerticals = compiled.linearParts
+    .filter(
+      (part) =>
+        part.wall === "front" &&
+        typeof part.positionMm === "number" &&
+        !part.id.endsWith("-header")
+    )
+    .map((part) => (
       <Box
-        key={`entry-${index}-l`}
-        position={[centerM - half, y, wallInset]}
-        size={[profileFace, supportLength, profileDepth]}
-        color={assumedColor}
-      />,
-      <Box
-        key={`entry-${index}-r`}
-        position={[centerM + half, y, wallInset]}
-        size={[profileFace, supportLength, profileDepth]}
-        color={assumedColor}
-      />,
-      <Box
-        key={`entry-${index}-h`}
+        key={part.id}
         position={[
-          centerM,
-          gc + floorT + supportLength,
+          (part.positionMm ?? 0) / 1000,
+          gc + floorT + part.lengthMm / 2000,
           wallInset
         ]}
-        size={[
-          model.layout.entranceWidthMm / 1000 + 2 * profileFace,
-          profileFace,
-          profileDepth
-        ]}
+        size={[profileFace, part.lengthMm / 1000, profileDepth]}
         color={assumedColor}
       />
-    ];
-  });
+    ));
+
+  const entranceHeaders = compiled.linearParts
+    .filter(
+      (part) =>
+        part.wall === "front" &&
+        typeof part.positionMm === "number" &&
+        part.id.endsWith("-header")
+    )
+    .map((part) => (
+      <Box
+        key={part.id}
+        position={[
+          (part.positionMm ?? 0) / 1000,
+          gc +
+            floorT +
+            (model.layout.thresholdHeightMm + model.layout.entranceHeightMm) / 1000,
+          wallInset
+        ]}
+        size={[part.lengthMm / 1000, profileFace, profileDepth]}
+        color={assumedColor}
+      />
+    ));
 
   const rearStuds = compiled.linearParts
     .filter((part) => part.wall === "rear" && typeof part.positionMm === "number")
@@ -308,7 +315,8 @@ function FramingSkeleton({
         color={frameColor}
       />
 
-      {entranceSupports}
+      {entranceVerticals}
+      {entranceHeaders}
       {rearStuds}
       {sideStuds}
 
