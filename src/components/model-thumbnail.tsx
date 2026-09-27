@@ -1,6 +1,6 @@
 import type {ShelterModel} from "@/lib/domain";
 import type {AppLocale} from "@/i18n/routing";
-import {layoutGeometry} from "@/lib/engineering";
+import {entranceGeometry, layoutGeometry} from "@/lib/engineering";
 
 export function ModelThumbnail({
   model,
@@ -18,9 +18,11 @@ export function ModelThumbnail({
   const w = width * scale;
   const hf = frontH * scale;
   const hr = rearH * scale;
-  const entranceW = model.layout.entranceWidthMm * scale;
-  const entranceH = model.layout.entranceHeightMm * scale;
-  const threshold = model.layout.thresholdHeightMm * scale;
+  const entrance = entranceGeometry(model);
+  const entranceW = entrance.widthMm * scale;
+  const entranceH = entrance.heightMm * scale;
+  const threshold = entrance.thresholdHeightMm * scale;
+  const entranceRadius = entrance.radiusMm * scale;
   const originX = 36;
   const originY = 132;
   const depthOffsetX = Math.min(48, model.dimensions.depthMm * scale * 0.22);
@@ -71,7 +73,7 @@ export function ModelThumbnail({
             y={originY - threshold - entranceH}
             width={entranceW}
             height={entranceH}
-            rx={Math.min(12, entranceW * 0.3)}
+            rx={entranceRadius}
             fill="#26211e"
           />
         );
