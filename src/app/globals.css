@@ -397,7 +397,8 @@ button { cursor: pointer; }
   border-radius: 0 12px 12px 0;
 }
 
-.detail-content { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: start; }
+.detail-content { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 40px; align-items: start; }
+.detail-content > * { min-width: 0; }
 .technical-sketch {
   margin: 24px 0 0;
   background: var(--surface);
@@ -455,6 +456,7 @@ button { cursor: pointer; }
   .detail-content,
   .section-heading,
   .finder-layout { grid-template-columns: 1fr; }
+  .detail-content { grid-template-columns: minmax(0, 1fr); }
   .hero-grid { padding: 80px 0; min-height: auto; }
   .hero-object { min-height: 420px; }
   .model-grid,
