@@ -3,7 +3,7 @@
 import {Canvas} from "@react-three/fiber";
 import {ContactShadows, OrbitControls} from "@react-three/drei";
 import type {ShelterModel} from "@/lib/domain";
-import {roofSlope} from "@/lib/engineering";
+import {constructionSummary, roofSlope} from "@/lib/engineering";
 
 function Box({
   position,
@@ -36,7 +36,7 @@ function Shelter({model}: {model: ShelterModel}) {
   const hf = model.dimensions.frontHeightMm / 1000;
   const hr = model.dimensions.rearHeightMm / 1000;
   const gc = model.dimensions.groundClearanceMm / 1000;
-  const t = Math.min(model.construction.wallThicknessMm / 1000, 0.08);
+  const t = Math.min(constructionSummary(model).wallThicknessMm / 1000, 0.09);
   const avgH = (hf + hr) / 2;
   const roof = roofSlope(model);
   const roofLength = roof.trueLengthMm / 1000;
