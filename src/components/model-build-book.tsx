@@ -66,9 +66,18 @@ export function ModelBuildBook({model, locale}: {model: ShelterModel; locale: Ap
                 <code role="cell">{part.id}</code>
                 <span role="cell">
                   <strong>{locale === "sr" ? part.nameSr : part.nameEn}</strong>
-                  <small>{part.shape === "trapezoid" ? (locale === "sr" ? "trapezni profil" : "trapezoid profile") : part.material}</small>
+                  <small>
+                    {part.shape === "trapezoid"
+                      ? (locale === "sr" ? "trapezni profil" : "trapezoid profile")
+                      : part.material}
+                    {part.notes ? ` · ${part.notes}` : ""}
+                  </small>
                 </span>
-                <span role="cell">{part.widthMm} × {part.heightMm} × {part.thicknessMm} mm</span>
+                <span role="cell">
+                  {part.shape === "trapezoid" && part.trapezoidRearHeightMm !== undefined
+                    ? `${part.widthMm} × Hf ${part.heightMm} / Hr ${part.trapezoidRearHeightMm} × ${part.thicknessMm} mm`
+                    : `${part.widthMm} × ${part.heightMm} × ${part.thicknessMm} mm`}
+                </span>
                 <strong role="cell">{part.quantity}</strong>
               </div>
             ))}
