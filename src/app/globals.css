@@ -1724,3 +1724,86 @@ button { cursor: pointer; }
 @media (max-width: 800px) {
   .operation-layout { grid-template-columns: 1fr; gap: 24px; }
 }
+
+
+.guides-page { min-height: auto; }
+.guide-articles {
+  display: grid;
+  gap: 12px;
+  margin-top: 42px;
+}
+.guide-article {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+}
+.guide-article summary {
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  gap: 16px;
+  align-items: start;
+  padding: 22px 24px;
+  cursor: pointer;
+  list-style: none;
+}
+.guide-article summary::-webkit-details-marker { display: none; }
+.guide-article summary > span {
+  color: var(--accent);
+  font: 800 11px ui-monospace, monospace;
+  padding-top: 5px;
+}
+.guide-article summary h2 {
+  margin: 0 0 6px;
+  font-size: 24px;
+  letter-spacing: -.035em;
+}
+.guide-article summary p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+  font-size: 13px;
+}
+.guide-article summary > strong {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #eee7dc;
+  color: var(--accent-dark);
+  font-size: 18px;
+  transition: transform .16s ease;
+}
+.guide-article[open] summary > strong { transform: rotate(45deg); }
+.guide-article-body {
+  padding: 0 24px 24px 82px;
+}
+.guide-article-body ol {
+  margin: 0;
+  padding-left: 20px;
+  color: #4f4943;
+}
+.guide-article-body li {
+  padding: 8px 0;
+  line-height: 1.6;
+}
+.guide-source-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 18px;
+}
+.guide-source-row a {
+  padding: 7px 9px;
+  border-radius: 999px;
+  background: #eee7dc;
+  color: var(--accent-dark);
+  font-size: 9px;
+  font-weight: 760;
+}
+
+@media (max-width: 640px) {
+  .guide-article summary { grid-template-columns: 30px 1fr auto; padding: 18px 16px; gap: 10px; }
+  .guide-article-body { padding: 0 16px 18px 56px; }
+}
