@@ -134,6 +134,10 @@ export function TechnicalSketch({
   const roofY = 495;
   const rpw = compiled.roofPanel.panelWidthMm * roofScale;
   const rpl = compiled.roofPanel.panelLengthMm * roofScale;
+  const roofHingeY =
+    roofY + compiled.hardware.hingeAxisFromPanelFrontMm * roofScale;
+  const roofLatchY =
+    roofY + compiled.hardware.latchAxisFromPanelFrontMm * roofScale;
 
   const entranceW = compiled.entrance.widthMm * frontScale;
   const entranceH = compiled.entrance.heightMm * frontScale;
@@ -529,49 +533,51 @@ export function TechnicalSketch({
         <ViewTitle x={636} y={470} code="D" title={isSr ? "KROVNI PANEL + SERVIS" : "ROOF PANEL + SERVICE"} />
         <g className="drawing-shape">
           <rect x={roofX} y={roofY} width={rpw} height={rpl} />
-          {compiled.hardware.hingeEdge === "FRONT" && (
-            <line x1={roofX} y1={roofY} x2={roofX + rpw} y2={roofY} className="drawing-hinge" />
-          )}
-          {compiled.hardware.hingeEdge === "REAR" && (
-            <line x1={roofX} y1={roofY + rpl} x2={roofX + rpw} y2={roofY + rpl} className="drawing-hinge" />
-          )}
-          {compiled.hardware.latchEdge === "FRONT" && (
-            <line x1={roofX} y1={roofY} x2={roofX + rpw} y2={roofY} className="drawing-latch" />
-          )}
-          {compiled.hardware.latchEdge === "REAR" && (
-            <line x1={roofX} y1={roofY + rpl} x2={roofX + rpw} y2={roofY + rpl} className="drawing-latch" />
-          )}
+          <line
+            x1={roofX}
+            y1={roofHingeY}
+            x2={roofX + rpw}
+            y2={roofHingeY}
+            className="drawing-hinge"
+          />
+          <line
+            x1={roofX}
+            y1={roofLatchY}
+            x2={roofX + rpw}
+            y2={roofLatchY}
+            className="drawing-latch"
+          />
+          <line
+            x1={roofX}
+            y1={roofY + rpl}
+            x2={roofX + rpw}
+            y2={roofY + rpl}
+            className="drawing-drip-edge"
+          />
 
-          <text x={roofX + rpw / 2} y={roofY + 18} textAnchor="middle" className="drawing-label">
-            {compiled.hardware.hingeEdge === "FRONT"
-              ? (isSr ? "ŠARKE · PREDNJA VISOKA IVICA" : "HINGES · FRONT HIGH EDGE")
-              : (isSr ? "ZATVARAČI · PREDNJA IVICA" : "LATCHES · FRONT EDGE")}
+          <text x={roofX + rpw / 2} y={roofHingeY + 16} textAnchor="middle" className="drawing-label">
+            {isSr ? "OSA ŠARKE · LINIJA PREDNJEG ZIDA" : "HINGE AXIS · FRONT WALL LINE"}
           </text>
-          <text x={roofX + rpw / 2} y={roofY + rpl - 9} textAnchor="middle" className="drawing-label">
-            {compiled.hardware.latchEdge === "REAR"
-              ? (isSr ? "ZATVARAČI · ZADNJA RUNOFF IVICA" : "LATCHES · REAR RUNOFF EDGE")
-              : (isSr ? "ŠARKE · ZADNJA IVICA" : "HINGES · REAR EDGE")}
+          <text x={roofX + rpw / 2} y={roofLatchY - 8} textAnchor="middle" className="drawing-label">
+            {isSr ? "ZATVARAČI · LINIJA ZADNJEG ZIDA" : "LATCHES · REAR WALL LINE"}
+          </text>
+          <text x={roofX + rpw / 2} y={roofY + rpl - 7} textAnchor="middle" className="drawing-axis-label">
+            {isSr ? "SLOBODNA ZADNJA DRIP / RUNOFF IVICA" : "CLEAR REAR DRIP / RUNOFF EDGE"}
           </text>
 
           {compiled.hardware.hingePositionsAcrossRoofMm.map((positionMm, index) => {
             const x = roofX + positionMm * roofScale;
-            const front = compiled.hardware.hingeEdge === "FRONT";
             return (
               <g key={`hinge-${index + 1}`}>
                 <rect
                   x={x - 8}
-                  y={front ? roofY - 4 : roofY + rpl - 4}
+                  y={roofHingeY - 4}
                   width="16"
                   height="8"
                   rx="2"
                   className="drawing-hardware-hinge"
                 />
-                <text
-                  x={x}
-                  y={front ? roofY - 10 : roofY + rpl + 15}
-                  textAnchor="middle"
-                  className="drawing-axis-label"
-                >
+                <text x={x} y={roofHingeY - 10} textAnchor="middle" className="drawing-axis-label">
                   H{index + 1}
                 </text>
               </g>
@@ -580,23 +586,17 @@ export function TechnicalSketch({
 
           {compiled.hardware.latchPositionsAcrossRoofMm.map((positionMm, index) => {
             const x = roofX + positionMm * roofScale;
-            const front = compiled.hardware.latchEdge === "FRONT";
             return (
               <g key={`latch-${index + 1}`}>
                 <rect
                   x={x - 6}
-                  y={front ? roofY - 4 : roofY + rpl - 4}
+                  y={roofLatchY - 4}
                   width="12"
                   height="8"
                   rx="2"
                   className="drawing-hardware-latch"
                 />
-                <text
-                  x={x}
-                  y={front ? roofY - 10 : roofY + rpl + 15}
-                  textAnchor="middle"
-                  className="drawing-axis-label"
-                >
+                <text x={x} y={roofLatchY + 16} textAnchor="middle" className="drawing-axis-label">
                   L{index + 1}
                 </text>
               </g>
