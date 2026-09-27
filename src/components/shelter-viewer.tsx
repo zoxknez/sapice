@@ -179,14 +179,16 @@ function FramingSkeleton({
       (part) =>
         part.wall === "front" &&
         typeof part.positionMm === "number" &&
-        !part.id.endsWith("-header")
+        part.startHeightMm !== undefined
     )
     .map((part) => (
       <Box
         key={part.id}
         position={[
           (part.positionMm ?? 0) / 1000,
-          gc + floorT + part.lengthMm / 2000,
+          gc +
+            floorT +
+            ((part.startHeightMm ?? 0) + part.lengthMm / 2) / 1000,
           wallInset
         ]}
         size={[profileFace, part.lengthMm / 1000, profileDepth]}
@@ -199,7 +201,7 @@ function FramingSkeleton({
       (part) =>
         part.wall === "front" &&
         typeof part.positionMm === "number" &&
-        part.id.endsWith("-header")
+        part.elevationMm !== undefined
     )
     .map((part) => (
       <Box
@@ -208,10 +210,7 @@ function FramingSkeleton({
           (part.positionMm ?? 0) / 1000,
           gc +
             floorT +
-            (
-              compiled.internal.entranceSillAboveFinishedFloorMm +
-              model.layout.entranceHeightMm
-            ) / 1000,
+            (part.elevationMm ?? 0) / 1000,
           wallInset
         ]}
         size={[part.lengthMm / 1000, profileFace, profileDepth]}
