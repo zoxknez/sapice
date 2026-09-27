@@ -124,6 +124,40 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
       });
     }
 
+    if (!sources[compiled.hardware.fastenerReferenceSourceId]) {
+      issues.push({
+        severity: "error",
+        code: "MISSING_HARDWARE_SOURCE",
+        message: `Unknown hardware reference source: ${compiled.hardware.fastenerReferenceSourceId}`
+      });
+    }
+
+    if (
+      compiled.hardware.edgeSpacingMm <= 0 ||
+      compiled.hardware.fieldSpacingMm <= 0 ||
+      compiled.hardware.edgeOffsetMm < 0 ||
+      compiled.hardware.panelJointGapMm < 0
+    ) {
+      issues.push({
+        severity: "error",
+        code: "INVALID_HARDWARE_GEOMETRY",
+        message: "Hardware spacing or joint-gap values are invalid."
+      });
+    }
+
+    for (const item of compiled.hardwareItems) {
+      if (
+        item.quantity <= 0 ||
+        !Number.isFinite(item.quantity)
+      ) {
+        issues.push({
+          severity: "error",
+          code: "INVALID_HARDWARE_ITEM",
+          message: `Invalid hardware quantity: ${item.id}`
+        });
+      }
+    }
+
     const stockChecks = [
       {
         material: "plywood-12" as const,
