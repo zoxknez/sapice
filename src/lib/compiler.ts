@@ -14,7 +14,8 @@ export type CutPart = {
   thicknessMm: number;
   shape: "rectangle" | "trapezoid";
   trapezoidRearHeightMm?: number;
-  notes?: string;
+  notesSr?: string;
+  notesEn?: string;
   cutouts?: Array<{
     type: "roundedRectangle";
     xMm: number;
@@ -68,7 +69,8 @@ function splitInsulationPanel({
   widthMm,
   heightMm,
   thicknessMm,
-  notes
+  notesSr,
+  notesEn
 }: {
   id: string;
   nameSr: string;
@@ -76,7 +78,8 @@ function splitInsulationPanel({
   widthMm: number;
   heightMm: number;
   thicknessMm: number;
-  notes?: string;
+  notesSr?: string;
+  notesEn?: string;
 }): CutPart[] {
   // Matches the current XPS planning profile: 1250 × 600 mm,
   // 5 mm perimeter margin and 2 mm kerf.
@@ -102,7 +105,8 @@ function splitInsulationPanel({
         heightMm: Math.min(segmentHeight, remainingHeight),
         thicknessMm,
         shape: "rectangle",
-        notes
+        notesSr,
+        notesEn
       });
     }
   }
@@ -171,7 +175,8 @@ export function compileShelterModel(model: ShelterModel) {
       thicknessMm: 12,
       shape: "rectangle",
       cutouts: entranceCutouts,
-      notes: "Entrance cut-outs are derived from the canonical shelter layout."
+      notesSr: "Otvori ulaza su izvedeni iz kanonskog layout-a modela.",
+      notesEn: "Entrance cut-outs are derived from the canonical shelter layout."
     },
     {
       id: "rear-outer",
@@ -195,7 +200,8 @@ export function compileShelterModel(model: ShelterModel) {
       thicknessMm: 12,
       shape: "trapezoid",
       trapezoidRearHeightMm: model.dimensions.rearHeightMm,
-      notes: `Front edge ${model.dimensions.frontHeightMm} mm; rear edge ${model.dimensions.rearHeightMm} mm.`
+      notesSr: `Prednja ivica ${model.dimensions.frontHeightMm} mm; zadnja ivica ${model.dimensions.rearHeightMm} mm.`,
+      notesEn: `Front edge ${model.dimensions.frontHeightMm} mm; rear edge ${model.dimensions.rearHeightMm} mm.`
     },
     {
       id: "roof-outer",
@@ -246,7 +252,8 @@ export function compileShelterModel(model: ShelterModel) {
       thicknessMm: 9,
       shape: "trapezoid",
       trapezoidRearHeightMm: internalRearHeightMm,
-      notes: `Front clear edge ${internalFrontHeightMm} mm; rear clear edge ${internalRearHeightMm} mm.`
+      notesSr: `Prednja čista ivica ${internalFrontHeightMm} mm; zadnja čista ivica ${internalRearHeightMm} mm.`,
+      notesEn: `Front clear edge ${internalFrontHeightMm} mm; rear clear edge ${internalRearHeightMm} mm.`
     },
     {
       id: "roof-inner",
@@ -269,7 +276,8 @@ export function compileShelterModel(model: ShelterModel) {
       widthMm: internalWidthMm,
       heightMm: internalFrontHeightMm,
       thicknessMm: assemblies.wall.layers.find((layer) => layer.role === "insulation")?.thicknessMm ?? 0,
-      notes: "Trim entrance openings after dry fitting against the compiled front-panel cutouts."
+      notesSr: "Otvor ulaza obeležiti i iseći posle suvog uklapanja prema kompajliranim otvorima prednje ploče.",
+      notesEn: "Trim entrance openings after dry fitting against the compiled front-panel cutouts."
     }),
     ...splitInsulationPanel({
       id: "xps-rear",
@@ -286,7 +294,8 @@ export function compileShelterModel(model: ShelterModel) {
       widthMm: internalDepthMm,
       heightMm: internalFrontHeightMm,
       thicknessMm: assemblies.wall.layers.find((layer) => layer.role === "insulation")?.thicknessMm ?? 0,
-      notes: `Final top edge follows the roof slope down to ${internalRearHeightMm} mm.`
+      notesSr: `Finalna gornja ivica prati kosinu krova do zadnje visine ${internalRearHeightMm} mm.`,
+      notesEn: `Final top edge follows the roof slope down to ${internalRearHeightMm} mm.`
     }),
     ...splitInsulationPanel({
       id: "xps-side-b",
@@ -295,7 +304,8 @@ export function compileShelterModel(model: ShelterModel) {
       widthMm: internalDepthMm,
       heightMm: internalFrontHeightMm,
       thicknessMm: assemblies.wall.layers.find((layer) => layer.role === "insulation")?.thicknessMm ?? 0,
-      notes: `Final top edge follows the roof slope down to ${internalRearHeightMm} mm.`
+      notesSr: `Finalna gornja ivica prati kosinu krova do zadnje visine ${internalRearHeightMm} mm.`,
+      notesEn: `Final top edge follows the roof slope down to ${internalRearHeightMm} mm.`
     }),
     ...splitInsulationPanel({
       id: "xps-floor",
@@ -327,7 +337,8 @@ export function compileShelterModel(model: ShelterModel) {
       trapezoidRearHeightMm: internalRearHeightMm,
       thicknessMm: model.layout.dividerThicknessMm,
       shape: "trapezoid" as const,
-      notes: `Front clear edge ${internalFrontHeightMm} mm; rear clear edge ${internalRearHeightMm} mm. Cut the top edge to the compiled roof slope.`
+      notesSr: `Prednja čista ivica ${internalFrontHeightMm} mm; zadnja čista ivica ${internalRearHeightMm} mm. Gornju ivicu iseći po kompajliranoj kosini krova.`,
+      notesEn: `Front clear edge ${internalFrontHeightMm} mm; rear clear edge ${internalRearHeightMm} mm. Cut the top edge to the compiled roof slope.`
     }] : [])
   ];
 
