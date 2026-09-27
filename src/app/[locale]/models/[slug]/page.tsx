@@ -87,6 +87,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
     description: copy.description,
     url: modelUrl,
     inLanguage: locale === "sr" ? "sr-Latn" : "en",
+    identifier: `sapice:${model.id}:v${model.version}:${compiled.planFingerprint}`,
     supply: materials.map((item) => ({
       "@type": "HowToSupply",
       name: locale === "sr" ? item.nameSr : item.nameEn,
@@ -123,7 +124,9 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
               <div><span>{locale === "sr" ? "Izolacija" : "Insulation"}</span><strong>{assemblyInsulationMm(assemblies.wall)} mm</strong></div>
             </div>
             <div className="model-meta-line">
-              <span>v{model.version}</span>
+              <span>model v{model.version}</span>
+              <span>compiler v{compiled.compilerVersion}</span>
+              <span>plan {compiled.planFingerprint}</span>
               <span>{model.climateProfile.replaceAll("_", " ")}</span>
               <span>{locale === "sr" ? "referentni spoljašnji scenario, nije rejting" : "reference outdoor scenario, not a rating"} {model.referenceOutsideC} °C</span>
             </div>
