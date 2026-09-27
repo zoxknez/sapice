@@ -1,5 +1,10 @@
 import type {ShelterModel} from "@/lib/domain";
 import {materials} from "@/data/materials";
+import {
+  assemblyThicknessMm,
+  getAssembly,
+  type ConstructionAssembly
+} from "@/data/assemblies";
 
 const MM_PER_M = 1000;
 const MM2_PER_M2 = 1_000_000;
@@ -10,6 +15,14 @@ export function mmToM(value: number) {
 
 export function mm2ToM2(value: number) {
   return value / MM2_PER_M2;
+}
+
+export function getModelAssemblies(model: ShelterModel) {
+  return {
+    wall: getAssembly(model.construction.wallAssemblyId),
+    floor: getAssembly(model.construction.floorAssemblyId),
+    roof: getAssembly(model.construction.roofAssemblyId)
+  };
 }
 
 export function roofSlope(model: ShelterModel) {
@@ -36,49 +49,103 @@ export function surfaceAreas(model: ShelterModel) {
   };
 }
 
-type Layer = {thicknessMm: number; lambdaWmK: number};
+export const thermalMethod = {
+  version: "1.0.0",
+  interiorSurfaceResistanceM2KW: 0.13,
+  exteriorSurfaceResistanceM2KW: 0.04,
+  comparisonDeltaTK: 20,
+  limitations: [
+    "No validated entrance infiltration model",
+    "No wind pressure model",
+    "No animal metabolic heat credit",
+    "No transient heat-storage model"
+  ]
+} as const;
 
-function uValue(layers: Layer[]) {
-  const rsi = 0.13;
-  const rse = 0.04;
-  const rLayers = layers.reduce((sum, layer) => sum + mmToM(layer.thicknessMm) / layer.lambdaWmK, 0);
-  return 1 / (rsi + rLayers + rse);
+export function assemblyUValue(assembly: ConstructionAssembly) {
+  const rLayers = assembly.layers.reduce((sum, layer) => {
+    const material = materials[layer.materialId];
+    return sum + mmToM(layer.thicknessMm) / material.lambdaTypicalWmK;
+  }, 0);
+
+  return 1 / (
+    thermalMethod.interiorSurfaceResistanceM2KW +
+    rLayers +
+    thermalMethod.exteriorSurfaceResistanceM2KW
+  );
 }
 
 export function thermalSummary(model: ShelterModel) {
-  const plywood = materials.plywood.lambdaTypicalWmK;
-  const xps = materials.xps.lambdaTypicalWmK;
-  const wallU = uValue([
-    {thicknessMm: 12, lambdaWmK: plywood},
-    {thicknessMm: model.construction.wallInsulationMm, lambdaWmK: xps},
-    {thicknessMm: 9, lambdaWmK: plywood}
-  ]);
-  const floorU = uValue([
-    {thicknessMm: 12, lambdaWmK: plywood},
-    {thicknessMm: model.construction.floorInsulationMm, lambdaWmK: xps},
-    {thicknessMm: 12, lambdaWmK: plywood}
-  ]);
-  const roofU = uValue([
-    {thicknessMm: 12, lambdaWmK: plywood},
-    {thicknessMm: model.construction.roofInsulationMm, lambdaWmK: xps},
-    {thicknessMm: 9, lambdaWmK: plywood}
-  ]);
+  const assemblies = getModelAssemblies(model);
+  const wallU = assemblyUValue(assemblies.wall);
+  const floorU = assemblyUValue(assemblies.floor);
+  const roofU = assemblyUValue(assemblies.roof);
   const area = surfaceAreas(model);
-  const deltaTK = 20;
+  const deltaTK = thermalMethod.comparisonDeltaTK;
+
   const envelopeTransmissionW =
     wallU * area.wallM2 * deltaTK +
     floorU * area.floorM2 * deltaTK +
     roofU * area.roofM2 * deltaTK;
 
-  return {wallU, floorU, roofU, envelopeTransmissionW, deltaTK};
+  return {
+    methodVersion: thermalMethod.version,
+    wallU,
+    floorU,
+    roofU,
+    envelopeTransmissionW,
+    deltaTK
+  };
 }
 
 export function materialSummary(model: ShelterModel) {
+  const assemblies = getModelAssemblies(model);
   const area = surfaceAreas(model);
-  const panelArea = area.wallM2 + area.floorM2 + area.roofM2;
-  return [
-    {id: "outer-plywood", nameSr: "Spoljašnja šperploča", nameEn: "Exterior plywood", calculatedM2: panelArea, purchaseM2: panelArea * 1.1},
-    {id: "xps", nameSr: "XPS izolacija", nameEn: "XPS insulation", calculatedM2: panelArea, purchaseM2: panelArea * 1.1},
-    {id: "inner-plywood", nameSr: "Unutrašnja obloga", nameEn: "Interior lining", calculatedM2: panelArea, purchaseM2: panelArea * 1.1}
-  ];
+  const groups = new Map<string, {
+    id: string;
+    materialId: string;
+    thicknessMm: number;
+    calculatedM2: number;
+  }>();
+
+  const addAssembly = (assembly: ConstructionAssembly, surfaceM2: number) => {
+    for (const layer of assembly.layers) {
+      const key = `${layer.materialId}-${layer.thicknessMm}`;
+      const existing = groups.get(key);
+      if (existing) {
+        existing.calculatedM2 += surfaceM2;
+      } else {
+        groups.set(key, {
+          id: key,
+          materialId: layer.materialId,
+          thicknessMm: layer.thicknessMm,
+          calculatedM2: surfaceM2
+        });
+      }
+    }
+  };
+
+  addAssembly(assemblies.wall, area.wallM2);
+  addAssembly(assemblies.floor, area.floorM2);
+  addAssembly(assemblies.roof, area.roofM2);
+
+  return Array.from(groups.values()).map((item) => {
+    const material = materials[item.materialId];
+    return {
+      id: item.id,
+      nameSr: `${material.nameSr} · ${item.thicknessMm} mm`,
+      nameEn: `${material.nameEn} · ${item.thicknessMm} mm`,
+      calculatedM2: item.calculatedM2,
+      purchaseM2: item.calculatedM2 * 1.1
+    };
+  });
+}
+
+export function constructionSummary(model: ShelterModel) {
+  const assemblies = getModelAssemblies(model);
+  return {
+    wallThicknessMm: assemblyThicknessMm(assemblies.wall),
+    floorThicknessMm: assemblyThicknessMm(assemblies.floor),
+    roofThicknessMm: assemblyThicknessMm(assemblies.roof)
+  };
 }
