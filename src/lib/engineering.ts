@@ -26,25 +26,30 @@ export function getModelAssemblies(model: ShelterModel) {
 }
 
 export function layoutGeometry(model: ShelterModel) {
+  const wallThicknessMm = constructionSummary(model).wallThicknessMm;
+  const clearLeftMm = wallThicknessMm;
+  const clearWidthMm = Math.max(0, model.dimensions.widthMm - 2 * wallThicknessMm);
+  const chamberWidthMm = clearWidthMm / model.layout.chambers;
+
   const entranceCentersXmm = Array.from(
     {length: model.layout.entrances},
     (_, index) => {
       if (model.layout.entrances === model.layout.chambers) {
-        return model.dimensions.widthMm * ((index + 0.5) / model.layout.chambers);
+        return clearLeftMm + chamberWidthMm * (index + 0.5);
       }
 
-      return model.dimensions.widthMm * ((index + 1) / (model.layout.entrances + 1));
+      return clearLeftMm + clearWidthMm * ((index + 1) / (model.layout.entrances + 1));
     }
   );
 
   const dividerPositionsXmm = Array.from(
     {length: Math.max(0, model.layout.chambers - 1)},
-    (_, index) => model.dimensions.widthMm * ((index + 1) / model.layout.chambers)
+    (_, index) => clearLeftMm + chamberWidthMm * (index + 1)
   );
 
-  const chamberWidthMm = model.dimensions.widthMm / model.layout.chambers;
-
   return {
+    clearLeftMm,
+    clearWidthMm,
     entranceCentersXmm,
     dividerPositionsXmm,
     chamberWidthMm
