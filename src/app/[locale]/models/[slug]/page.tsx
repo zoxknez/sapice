@@ -68,7 +68,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
     <>
       <section className="model-detail-hero">
         <div className="shell detail-grid">
-          <ShelterViewer model={model} />
+          <ShelterViewer model={model} locale={locale} />
           <div className="detail-summary">
             <span className="kicker">{model.validationState.replaceAll("_", " ")}</span>
             <h1>{copy.name}</h1>
