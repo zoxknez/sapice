@@ -224,6 +224,14 @@ export function ModelBuildBook({
               <span>{locale === "sr" ? "Drip ivica pozadi" : "Rear drip edge"}</span>
               <strong>{compiled.roofWeathering.rearDripEdgeLengthM.toFixed(2)} m</strong>
             </div>
+            <div>
+              <span>{locale === "sr" ? "Osa šarke od prednje ivice" : "Hinge axis from front edge"}</span>
+              <strong>{compiled.hardware.hingeAxisFromPanelFrontMm.toFixed(0)} mm</strong>
+            </div>
+            <div>
+              <span>{locale === "sr" ? "Osa zatvarača od prednje ivice" : "Latch axis from front edge"}</span>
+              <strong>{compiled.hardware.latchAxisFromPanelFrontMm.toFixed(0)} mm</strong>
+            </div>
           </div>
 
           <div className="cut-table hardware-table" role="table" aria-label={locale === "sr" ? "Hardware lista" : "Hardware schedule"}>
