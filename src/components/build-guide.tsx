@@ -6,17 +6,17 @@ import type {AppLocale} from "@/i18n/routing";
 
 export function BuildGuide({
   modelId,
-  version,
+  planFingerprint,
   steps,
   locale
 }: {
   modelId: string;
-  version: string;
+  planFingerprint: string;
   steps: BuildStep[];
   locale: AppLocale;
 }) {
   const isSr = locale === "sr";
-  const storageKey = `sapice:build:${modelId}:${version}`;
+  const storageKey = `sapice:build:${modelId}:${planFingerprint}`;
   const [completed, setCompleted] = useState<string[]>([]);
   const [focusIndex, setFocusIndex] = useState<number | null>(null);
   const [ready, setReady] = useState(false);
@@ -40,6 +40,19 @@ export function BuildGuide({
     if (!ready) return;
     window.localStorage.setItem(storageKey, JSON.stringify(completed));
   }, [completed, ready, storageKey]);
+
+  useEffect(() => {
+    if (focusIndex === null) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setFocusIndex(null);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [focusIndex]);
 
   const completeSet = useMemo(() => new Set(completed), [completed]);
   const doneCount = steps.filter((step) => completeSet.has(step.id)).length;
@@ -77,6 +90,11 @@ export function BuildGuide({
                 type="button"
                 className="step-check"
                 aria-pressed={done}
+                aria-label={
+                  isSr
+                    ? `${done ? "Označi kao nezavršeno" : "Označi kao završeno"}: ${step.titleSr}`
+                    : `${done ? "Mark incomplete" : "Mark complete"}: ${step.titleEn}`
+                }
                 onClick={() => toggle(step.id)}
               >
                 {done ? "✓" : String(index + 1).padStart(2, "0")}
@@ -103,7 +121,14 @@ export function BuildGuide({
                 </span>
                 <h2 id="build-focus-title">{isSr ? focused.titleSr : focused.titleEn}</h2>
               </div>
-              <button type="button" className="focus-close" onClick={() => setFocusIndex(null)}>×</button>
+              <button
+                type="button"
+                className="focus-close"
+                aria-label={isSr ? "Zatvori režim izrade" : "Close build mode"}
+                onClick={() => setFocusIndex(null)}
+              >
+                ×
+              </button>
             </header>
 
             <p>{isSr ? focused.detailSr : focused.detailEn}</p>
