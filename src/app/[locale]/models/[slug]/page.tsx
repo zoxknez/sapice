@@ -20,6 +20,7 @@ import {ModelValidationPanel} from "@/components/model-validation-panel";
 import {VentilationProvision} from "@/components/ventilation-provision";
 import {compileShelterModel} from "@/lib/compiler";
 import {compiledSourceIds} from "@/lib/provenance";
+import {costLinesForCompiled} from "@/lib/costing";
 
 export function generateStaticParams() {
   return shelterModels.map((model) => ({slug: model.slug}));
@@ -76,6 +77,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
   const roof = compiled.roof;
   const construction = compiled.construction;
   const assemblies = compiled.assemblies;
+  const costLines = costLinesForCompiled(compiled);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const modelUrl = `${siteUrl}/${locale}/${locale === "sr" ? "modeli" : "models"}/${model.slug}`;
   const structuredData = {
@@ -106,7 +108,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
       <StructuredData data={structuredData} />
       <section className="model-detail-hero">
         <div className="shell detail-grid">
-          <ShelterViewer model={model} locale={locale} />
+          <ShelterViewer compiled={compiled} locale={locale} />
           <div className="detail-summary">
             <span className="kicker">{model.validationState.replaceAll("_", " ")}</span>
             <h1>{copy.name}</h1>
@@ -128,7 +130,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
             <div className="detail-actions">
               <PrintPlanButton locale={locale} />
               <SharePlanButton locale={locale} title={copy.name} />
-              <PlanExportButtons model={model} locale={locale} />
+              <PlanExportButtons compiled={compiled} locale={locale} />
             </div>
             <div className="notice">
               {model.heated
@@ -301,7 +303,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
       </section>
 
       <SheetLayout compiled={compiled} locale={locale} />
-      <CostCalculator model={model} locale={locale} />
+      <CostCalculator modelId={model.id} lines={costLines} locale={locale} />
       <OperatingGuidance model={model} locale={locale} />
       <ModelBuildBook compiled={compiled} locale={locale} />
     </>
