@@ -2216,3 +2216,15 @@ button { cursor: pointer; }
   font: 700 8px ui-monospace, SFMono-Regular, Menlo, monospace;
   pointer-events: none;
 }
+
+
+.drawing-hardware-hinge {
+  fill: #365f55;
+  stroke: #29473f;
+  stroke-width: 1;
+}
+.drawing-hardware-latch {
+  fill: #a87045;
+  stroke: #70482f;
+  stroke-width: 1;
+}
