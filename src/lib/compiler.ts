@@ -594,7 +594,16 @@ export function compileShelterModel(model: ShelterModel) {
     edgeSpacingMm: fastenerEdgeSpacingMm,
     fieldSpacingMm: fastenerFieldSpacingMm,
     edgeOffsetMm: 10,
-    panelJointGapMm: 3
+    panelJointGapMm: 3,
+    hingeEdge: model.maintenance.hingeEdge,
+    latchEdge:
+      model.maintenance.hingeEdge === "REAR"
+        ? "FRONT"
+        : model.maintenance.hingeEdge === "LEFT"
+          ? "RIGHT"
+          : model.maintenance.hingeEdge === "RIGHT"
+            ? "LEFT"
+            : null
   };
 
   const buildSteps: BuildStep[] = [
