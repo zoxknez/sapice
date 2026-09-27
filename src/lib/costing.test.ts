@@ -43,9 +43,14 @@ describe("costing compiler integration", () => {
 
   it("only adds a heating product line to heated models", () => {
     for (const model of shelterModels) {
-      const hasHeatingLine = costLinesForModel(model)
-        .some((item) => item.id === "heating-product");
-      expect(hasHeatingLine).toBe(model.heated);
+      const heatingLine = costLinesForModel(model)
+        .find((item) => item.id === "heating-product");
+      expect(Boolean(heatingLine)).toBe(model.heated);
+
+      if (model.heated) {
+        const compiled = compileShelterModel(model);
+        expect(heatingLine?.quantity).toBe(compiled.heating.zones.length);
+      }
     }
   });
 });
