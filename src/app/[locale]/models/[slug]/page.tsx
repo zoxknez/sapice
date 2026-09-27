@@ -13,6 +13,7 @@ import {SheetLayout} from "@/components/sheet-layout";
 import {CostCalculator} from "@/components/cost-calculator";
 import {PrintPlanButton} from "@/components/print-plan-button";
 import {SharePlanButton} from "@/components/share-plan-button";
+import {PlanExportButtons} from "@/components/plan-export-buttons";
 import {OperatingGuidance} from "@/components/operating-guidance";
 import {StructuredData} from "@/components/structured-data";
 import {compileShelterModel} from "@/lib/compiler";
@@ -124,6 +125,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
             <div className="detail-actions">
               <PrintPlanButton locale={locale} />
               <SharePlanButton locale={locale} title={copy.name} />
+              <PlanExportButtons model={model} locale={locale} />
             </div>
             <div className="notice">
               {model.heated
