@@ -90,6 +90,10 @@ export function TechnicalSketch({
   const fgc = gc * frontScale;
   const frontBottom = frontTop + fh;
   const frontGround = frontBottom + fgc;
+  const frontRoofUndersideY =
+    frontTop + compiled.interfaces.roofVerticalThicknessMm * frontScale;
+  const frontFloorTopY =
+    frontBottom - compiled.construction.floorThicknessMm * frontScale;
 
   const sideTotalDepth = d + model.roof.frontOverhangMm + model.roof.rearOverhangMm;
   const sideScale = Math.min(400 / sideTotalDepth, 220 / (hf + gc + 80));
@@ -103,6 +107,14 @@ export function TechnicalSketch({
   const sideBodyBottom = sideTop + shf;
   const sideGround = sideBodyBottom + sgc;
   const slopeRise = (hf - hr) * sideScale;
+  const sideFloorTopY =
+    sideBodyBottom - compiled.construction.floorThicknessMm * sideScale;
+  const sideFrontRoofUndersideY =
+    sideTop + compiled.interfaces.roofVerticalThicknessMm * sideScale;
+  const sideRearRoofUndersideY =
+    sideTop +
+    slopeRise +
+    compiled.interfaces.roofVerticalThicknessMm * sideScale;
   const roofFrontX = sideX;
   const roofRearX = sideX + sideTotalDepth * sideScale;
   const roofFrontY = sideTop - model.roof.frontOverhangMm * Math.tan(compiled.roof.angleRad) * sideScale;
@@ -167,6 +179,22 @@ export function TechnicalSketch({
         <ViewTitle x={54} y={58} code="A" title={isSr ? "POGLED SPREDA + RAM" : "FRONT ELEVATION + FRAME"} />
         <g className="drawing-shape">
           <rect x={frontX} y={frontTop} width={fw} height={fh} />
+          <rect
+            x={frontX}
+            y={frontTop}
+            width={fw}
+            height={compiled.interfaces.roofVerticalThicknessMm * frontScale}
+            className="drawing-assembly-zone drawing-roof-zone"
+          />
+          <rect
+            x={frontX}
+            y={frontFloorTopY}
+            width={fw}
+            height={compiled.construction.floorThicknessMm * frontScale}
+            className="drawing-assembly-zone drawing-floor-zone"
+          />
+          <line x1={frontX} y1={frontRoofUndersideY} x2={frontX + fw} y2={frontRoofUndersideY} className="drawing-interface" />
+          <line x1={frontX} y1={frontFloorTopY} x2={frontX + fw} y2={frontFloorTopY} className="drawing-interface" />
           <line x1={frontX} y1={frontGround} x2={frontX + fw} y2={frontGround} className="drawing-ground" />
 
           {[0.22, 0.78].map((ratio) => (
@@ -180,10 +208,10 @@ export function TechnicalSketch({
             />
           ))}
 
-          <line x1={frontX + 3} y1={frontTop + 3} x2={frontX + 3} y2={frontBottom - 3} className="drawing-frame" />
-          <line x1={frontX + fw - 3} y1={frontTop + 3} x2={frontX + fw - 3} y2={frontBottom - 3} className="drawing-frame" />
-          <line x1={frontX + 3} y1={frontTop + 4} x2={frontX + fw - 3} y2={frontTop + 4} className="drawing-frame" />
-          <line x1={frontX + 3} y1={frontBottom - 4} x2={frontX + fw - 3} y2={frontBottom - 4} className="drawing-frame" />
+          <line x1={frontX + 3} y1={frontRoofUndersideY + 3} x2={frontX + 3} y2={frontFloorTopY - 3} className="drawing-frame" />
+          <line x1={frontX + fw - 3} y1={frontRoofUndersideY + 3} x2={frontX + fw - 3} y2={frontFloorTopY - 3} className="drawing-frame" />
+          <line x1={frontX + 3} y1={frontRoofUndersideY + 4} x2={frontX + fw - 3} y2={frontRoofUndersideY + 4} className="drawing-frame" />
+          <line x1={frontX + 3} y1={frontFloorTopY - 4} x2={frontX + fw - 3} y2={frontFloorTopY - 4} className="drawing-frame" />
 
           {compiled.layout.entranceCentersXmm.map((centerMm, index) => {
             const cx = frontX + centerMm * frontScale;
@@ -192,8 +220,8 @@ export function TechnicalSketch({
             return (
               <g key={index}>
                 <rect x={x} y={y} width={entranceW} height={entranceH} rx={Math.min(12, entranceW * 0.22)} className="drawing-opening" />
-                <line x1={x - 3} y1={frontBottom - 4} x2={x - 3} y2={y - 3} className="drawing-frame drawing-frame-assumption" />
-                <line x1={x + entranceW + 3} y1={frontBottom - 4} x2={x + entranceW + 3} y2={y - 3} className="drawing-frame drawing-frame-assumption" />
+                <line x1={x - 3} y1={frontFloorTopY - 4} x2={x - 3} y2={y - 3} className="drawing-frame drawing-frame-assumption" />
+                <line x1={x + entranceW + 3} y1={frontFloorTopY - 4} x2={x + entranceW + 3} y2={y - 3} className="drawing-frame drawing-frame-assumption" />
                 <line x1={x - 3} y1={y - 3} x2={x + entranceW + 3} y2={y - 3} className="drawing-frame drawing-frame-assumption" />
                 <text x={cx} y={y + entranceH / 2} textAnchor="middle" className="drawing-label">
                   E{index + 1}
@@ -206,7 +234,7 @@ export function TechnicalSketch({
             const x = frontX + positionMm * frontScale;
             return (
               <g key={index}>
-                <line x1={x} y1={frontTop} x2={x} y2={frontBottom} className="drawing-divider-axis" />
+                <line x1={x} y1={frontRoofUndersideY} x2={x} y2={frontFloorTopY} className="drawing-divider-axis" />
                 <text x={x + 4} y={frontTop + 14} className="drawing-axis-label">D{index + 1}</text>
               </g>
             );
@@ -229,6 +257,24 @@ export function TechnicalSketch({
           <path
             d={`M ${bodyX} ${sideTop} L ${bodyX + sd} ${sideTop + slopeRise} L ${bodyX + sd} ${sideBodyBottom} L ${bodyX} ${sideBodyBottom} Z`}
           />
+          <polygon
+            points={[
+              `${bodyX},${sideTop}`,
+              `${bodyX + sd},${sideTop + slopeRise}`,
+              `${bodyX + sd},${sideRearRoofUndersideY}`,
+              `${bodyX},${sideFrontRoofUndersideY}`
+            ].join(" ")}
+            className="drawing-assembly-zone drawing-roof-zone"
+          />
+          <rect
+            x={bodyX}
+            y={sideFloorTopY}
+            width={sd}
+            height={compiled.construction.floorThicknessMm * sideScale}
+            className="drawing-assembly-zone drawing-floor-zone"
+          />
+          <line x1={bodyX} y1={sideFrontRoofUndersideY} x2={bodyX + sd} y2={sideRearRoofUndersideY} className="drawing-interface" />
+          <line x1={bodyX} y1={sideFloorTopY} x2={bodyX + sd} y2={sideFloorTopY} className="drawing-interface" />
           <line x1={roofFrontX} y1={roofFrontY} x2={roofRearX} y2={roofRearY} className="drawing-roof" />
           <line x1={bodyX} y1={sideGround} x2={bodyX + sd} y2={sideGround} className="drawing-ground" />
 
@@ -245,7 +291,7 @@ export function TechnicalSketch({
 
           {sideStuds.map((part) => {
             const x = bodyX + (part.positionMm ?? 0) * sideScale;
-            const topY = sideTop + ((hf - (part.lengthMm + compiled.construction.floorThicknessMm + compiled.construction.roofThicknessMm)) * sideScale);
+            const topY = sideFloorTopY - part.lengthMm * sideScale;
             return (
               <line
                 key={part.id}
