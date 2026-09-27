@@ -104,6 +104,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
           <a href="#cut-list">{locale === "sr" ? "Krojna lista" : "Cut list"}</a>
           <a href="#nesting">{locale === "sr" ? "Table" : "Sheets"}</a>
           <a href="#cost">{locale === "sr" ? "Trošak" : "Cost"}</a>
+          <a href="#framing">{locale === "sr" ? "Ram" : "Framing"}</a>
           <a href="#build-guide">{locale === "sr" ? "Izrada" : "Build"}</a>
           <a href="#sources">{locale === "sr" ? "Izvori" : "Sources"}</a>
         </div>
