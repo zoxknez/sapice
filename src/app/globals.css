@@ -823,3 +823,46 @@ button { cursor: pointer; }
   .footer-nav { width: 100%; }
   .empty-state { padding: 26px; }
 }
+
+
+.viewer-toolbar {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid #ffffffd6;
+  border-radius: 999px;
+  background: #fffdf8d9;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 8px 22px #3e332817;
+}
+.viewer-toolbar button {
+  min-height: 34px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 11px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .035em;
+}
+.viewer-toolbar button.active {
+  background: var(--ink);
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .viewer-toolbar {
+    left: 10px;
+    top: 10px;
+    max-width: calc(100% - 20px);
+  }
+  .viewer-toolbar button {
+    min-height: 32px;
+    padding-inline: 9px;
+    font-size: 9px;
+  }
+}
