@@ -50,3 +50,28 @@ test("English model route is directly addressable", async ({page}) => {
   await expect(page.getByText("Print / Save PDF")).toBeVisible();
   await expect(page.getByText("Share plan")).toBeVisible();
 });
+
+
+test("prototype evidence persists against the exact compiled plan", async ({page}) => {
+  await page.goto("/sr/modeli/nordic-quad-winter");
+
+  await expect(
+    page.getByRole("heading", {name: "Radni list fizičke provere"})
+  ).toBeVisible();
+
+  const prototypeId = page.getByLabel("ID / naziv prototipa");
+  await prototypeId.fill("P-E2E-001");
+
+  const stableCheck = page.getByLabel(
+    "Konstrukcija je stabilna na stvarnoj podlozi"
+  );
+  await stableCheck.check();
+
+  await page.reload();
+
+  await expect(page.getByLabel("ID / naziv prototipa"))
+    .toHaveValue("P-E2E-001");
+  await expect(
+    page.getByLabel("Konstrukcija je stabilna na stvarnoj podlozi")
+  ).toBeChecked();
+});
