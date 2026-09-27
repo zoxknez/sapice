@@ -70,6 +70,16 @@ export const sources: Record<string, SourceRecord> = {
     topics: ["plywood", "thermal-conductivity", "marine-plywood"],
     notes: "Manufacturer technical specification lists thermal conductivity of 0.17 W/mK for birch marine plywood."
   },
+  "iso-10456-2007": {
+    id: "iso-10456-2007",
+    publisher: "ISO",
+    title: "ISO 10456:2007 - Hygrothermal properties - Declared and design thermal values",
+    url: "https://www.iso.org/standard/40966.html",
+    accessedAt: "2026-09-27",
+    tier: 1,
+    topics: ["thermal", "materials", "design-values", "moisture"],
+    notes: "Current published edition, confirmed in 2023; provides procedures for declared/design thermal values and conversion for temperature and moisture conditions."
+  },
   "iso-6946-2017": {
     id: "iso-6946-2017",
     publisher: "ISO",
