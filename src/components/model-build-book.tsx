@@ -1,12 +1,17 @@
 import type {AppLocale} from "@/i18n/routing";
-import type {ShelterModel} from "@/lib/domain";
-import {compileShelterModel} from "@/lib/compiler";
+import type {CompiledShelterModel} from "@/lib/compiler";
 import {sources} from "@/data/sources";
 import {BuildGuide} from "@/components/build-guide";
 import {compiledSourceIds} from "@/lib/provenance";
 
-export function ModelBuildBook({model, locale}: {model: ShelterModel; locale: AppLocale}) {
-  const compiled = compileShelterModel(model);
+export function ModelBuildBook({
+  compiled,
+  locale
+}: {
+  compiled: CompiledShelterModel;
+  locale: AppLocale;
+}) {
+  const model = compiled.model;
   const referencedSources = compiledSourceIds(compiled).map((id) => sources[id]).filter(Boolean);
 
   return (
