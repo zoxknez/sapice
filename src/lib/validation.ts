@@ -193,6 +193,68 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
       }
     }
 
+    for (let index = 0; index < model.layout.entrances; index++) {
+      const number = index + 1;
+      const left = compiled.linearParts.find(
+        (part) => part.id === `entrance-${number}-left-support`
+      );
+      const right = compiled.linearParts.find(
+        (part) => part.id === `entrance-${number}-right-support`
+      );
+      const header = compiled.linearParts.find(
+        (part) => part.id === `entrance-${number}-header`
+      );
+      const cripple = compiled.linearParts.find(
+        (part) => part.id === `entrance-${number}-cripple`
+      );
+
+      if (!left || !right || !header || !cripple) {
+        issues.push({
+          severity: "error",
+          code: "INCOMPLETE_ENTRANCE_FRAMING",
+          message: `Entrance ${number} is missing a jack stud, header or cripple member.`
+        });
+        continue;
+      }
+
+      const frameFaceMm = compiled.framing.frameProfileMm[0];
+      const openingTopMm =
+        compiled.internal.entranceSillAboveFinishedFloorMm +
+        model.layout.entranceHeightMm;
+      const headerBottomMm =
+        (header.elevationMm ?? Number.NaN) - frameFaceMm / 2;
+      const headerTopMm =
+        (header.elevationMm ?? Number.NaN) + frameFaceMm / 2;
+      const crippleStartMm = cripple.startHeightMm ?? Number.NaN;
+      const crippleEndMm = crippleStartMm + cripple.lengthMm;
+      const topRailBottomMm =
+        compiled.interfaces.wallFrontHeightMm - frameFaceMm;
+
+      if (Math.abs(headerBottomMm - openingTopMm) > 0.001) {
+        issues.push({
+          severity: "error",
+          code: "HEADER_INTRUDES_ENTRANCE",
+          message: `Entrance ${number} header does not begin immediately above the opening.`
+        });
+      }
+
+      if (Math.abs(crippleStartMm - headerTopMm) > 0.001) {
+        issues.push({
+          severity: "error",
+          code: "CRIPPLE_HEADER_GAP",
+          message: `Entrance ${number} cripple stud does not start at the header top.`
+        });
+      }
+
+      if (Math.abs(crippleEndMm - topRailBottomMm) > 1.001) {
+        issues.push({
+          severity: "error",
+          code: "CRIPPLE_TOP_RAIL_GAP",
+          message: `Entrance ${number} cripple stud does not terminate at the top-rail underside.`
+        });
+      }
+    }
+
     const frontPoints = [
       0,
       ...compiled.framing.frontSupportPositionsXmm,
