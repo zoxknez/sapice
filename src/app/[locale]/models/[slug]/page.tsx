@@ -9,6 +9,7 @@ import {ShelterViewer} from "@/components/shelter-viewer";
 import {TechnicalSketch} from "@/components/technical-sketch";
 import {ModelBuildBook} from "@/components/model-build-book";
 import {SheetLayout} from "@/components/sheet-layout";
+import {CostCalculator} from "@/components/cost-calculator";
 import {compileShelterModel} from "@/lib/compiler";
 
 export function generateStaticParams() {
@@ -102,6 +103,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
           <a href="#inside">{locale === "sr" ? "Unutrašnjost" : "Interior"}</a>
           <a href="#cut-list">{locale === "sr" ? "Krojna lista" : "Cut list"}</a>
           <a href="#nesting">{locale === "sr" ? "Table" : "Sheets"}</a>
+          <a href="#cost">{locale === "sr" ? "Trošak" : "Cost"}</a>
           <a href="#build-guide">{locale === "sr" ? "Izrada" : "Build"}</a>
           <a href="#sources">{locale === "sr" ? "Izvori" : "Sources"}</a>
         </div>
@@ -171,6 +173,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
       </section>
 
       <SheetLayout compiled={compiled} locale={locale} />
+      <CostCalculator model={model} locale={locale} />
       <ModelBuildBook model={model} locale={locale} />
     </>
   );
