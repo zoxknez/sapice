@@ -239,6 +239,25 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
     });
   }
 
+  if (model.animal === "cat" && model.animalSizeClass !== "standard") {
+    issues.push({
+      severity: "error",
+      code: "INVALID_CAT_SIZE_CLASS",
+      message: "Cat models must use the standard size class."
+    });
+  }
+
+  if (
+    model.animal === "dog" &&
+    !["small", "medium", "large"].includes(model.animalSizeClass)
+  ) {
+    issues.push({
+      severity: "error",
+      code: "INVALID_DOG_SIZE_CLASS",
+      message: "Dog models must use small, medium or large size class."
+    });
+  }
+
   if (model.capacity.recommended > model.capacity.max) {
     issues.push({
       severity: "error",
