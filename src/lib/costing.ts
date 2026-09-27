@@ -80,16 +80,20 @@ export function costLinesForModel(model: ShelterModel): CostLine[] {
       noteSr: "Ukupna linearna metraža framing schedule-a + 10% rezerve. Profili su PROVISIONAL do engineering review-a.",
       noteEn: "Total framing schedule length + 10% allowance. Profiles remain PROVISIONAL until engineering review."
     },
-    {
-      id: "hardware",
-      labelSr: "Šrafovi, šarke i zaptivanje",
-      labelEn: "Fasteners, hinges and sealing",
-      quantity: 1,
-      unit: "item",
-      noteSr: "Zbirna stavka; detaljni broj pričvršćivača još nije zaključen.",
-      noteEn: "Lump-sum line; detailed fastener quantities are not yet finalized."
-    }
+
   ];
+
+  for (const item of compiled.hardwareItems) {
+    lines.push({
+      id: `hardware-${item.id}`,
+      labelSr: item.nameSr,
+      labelEn: item.nameEn,
+      quantity: item.quantity,
+      unit: item.unit === "m" ? "m" : "item",
+      noteSr: item.notesSr,
+      noteEn: item.notesEn
+    });
+  }
 
   if (model.heated) {
     lines.push({
