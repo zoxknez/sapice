@@ -2773,3 +2773,10 @@ button { cursor: pointer; }
   stroke-width: 1.5;
   stroke-dasharray: 5 3;
 }
+
+
+.drawing-drip-edge {
+  stroke: #3f6f79;
+  stroke-width: 2.5;
+  stroke-dasharray: 3 3;
+}
