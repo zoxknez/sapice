@@ -126,8 +126,8 @@ export function CostCalculator({model, locale}: {model: ShelterModel; locale: Ap
         </div>
         <p className="cost-disclaimer">
           {isSr
-            ? "Troškovnik još ne uključuje kompletan framing/hardware BOM, dostavu, alat, rad ni nepredviđene gubitke. Stavke koje nisu detaljno kompilirane su jasno označene."
-            : "The estimate does not yet include a fully compiled framing/hardware BOM, delivery, tools, labor or unforeseen losses. Items not yet compiled in detail are explicitly labeled."}
+            ? "Količine za table, XPS, framing i hardware dolaze iz compiler-a. Troškovnik i dalje ne uključuje dostavu, alat, rad, lokalne poreze ni nepredviđene gubitke izvan navedenih rezervi. PROVISIONAL i product-specific stavke ostaju jasno označene."
+            : "Sheet, XPS, framing and hardware quantities come from the compiler. The estimate still excludes delivery, tools, labor, local taxes and unforeseen losses beyond the stated allowances. PROVISIONAL and product-specific items remain explicitly labeled."}
         </p>
       </div>
     </section>
