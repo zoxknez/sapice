@@ -13,18 +13,27 @@ The repository currently includes:
 - deterministic rule-based finder
 - side-by-side model comparison
 - parametric WebGL 3D viewer
-- assembled / roof-off / exploded views
-- technical SVG elevations
+- assembled / roof-off / exploded / framing 3D views
+- compiler-driven workshop drawing sheet with front / side / plan / roof views
 - reusable wall / floor / roof assemblies
 - source-bound material thermal values
 - steady-state envelope transmission estimates
-- cut lists for exterior panels, interior linings, XPS and dividers
+- true-geometry cut lists for exterior panels, interior linings, XPS and sloped dividers
 - deterministic stock nesting for 12 mm plywood, 9 mm plywood and XPS
-- provisional framing / support schedule
-- local cost estimator with user-entered prices
+- true part-area vs conservative packing-envelope utilization
+- provisional framing / support schedule with stud-spacing invariants
+- provisional high-rear ventilation provision zones coordinated around framing
+- service-roof hinge / latch positions
+- compiler-derived BOM CSV and versioned JSON export
+- local cost estimator with nesting, framing, hardware, roof, finish and ventilation quantities
 - persistent workshop build mode
+- plan-bound prototype evidence worksheet stored locally in the browser
 - source / provenance library
+- dynamic model OG images, large social cards and Web Share support
+- schema.org WebApplication / HowTo structured data
 - sitemap, robots, manifest and locale-aware canonical / hreflang metadata
+- localized 404 / error states and accessibility baseline
+- Playwright desktop + mobile smoke suite
 - Neon runtime schema for mutable data
 
 ## Validation language
@@ -48,12 +57,14 @@ Canonical model definitions live in Git.
 ```text
 ShelterModel
   -> construction assemblies
-  -> compiled internal geometry
+  -> compiler v1.3 plan fingerprint
+  -> compiled internal / interface geometry
   -> 3D viewer
   -> technical drawing
   -> cut list
   -> stock nesting
-  -> framing schedule
+  -> framing + hardware schedule
+  -> ventilation provision geometry
   -> thermal estimate
   -> cost lines
   -> build guide
@@ -71,7 +82,7 @@ Canonical engineering geometry does **not** live in the database.
 
 The current engine is intentionally limited.
 
-It calculates approximate steady-state envelope transmission through the wall, floor and roof assemblies:
+Thermal method v1.1 calculates approximate steady-state envelope transmission through the wall, floor and roof assemblies. It uses orientation-specific ISO 6946 internal surface resistances (wall 0.13, upward roof flow 0.10, downward floor flow 0.17 m²K/W) and Rse 0.04 m²K/W:
 
 ```text
 R_layer = thickness / lambda
@@ -82,6 +93,7 @@ Q = U × area × deltaT
 Current public output does **not** claim:
 
 - a validated entrance infiltration model
+- a validated airflow model for the provisional ventilation insert zones
 - wind-pressure heat loss
 - animal metabolic heat contribution
 - transient thermal storage
@@ -110,6 +122,30 @@ Heated models do not define improvised electrical heaters.
 
 They only reserve geometry for a compatible, purpose-built animal-heating product. Manufacturer instructions remain authoritative for installation, cable routing, protection, thermostat behavior and wet-location suitability.
 
+## Ventilation
+
+V1 does not claim a universal vent-opening area.
+
+Each chamber receives one **PROVISIONAL high-rear coordination zone**. The compiler places that zone inside the chamber and away from provisional rear studs. The zone is not the actual cutout. A selected adjustable vent insert must define its own cutout and net free area.
+
+Physical validation must inspect condensation, moisture and localized drafts. Ventilation airflow is not currently included in the thermal model.
+
+## Plan identity
+
+Every compiled plan carries:
+
+- model version
+- compiler version
+- deterministic 16-character plan fingerprint
+
+The fingerprint is stamped into the web view, workshop drawing and exported plan files so prototype evidence can reference the exact generated plan. It is a reproducibility identifier, not a cryptographic signature.
+
+## Prototype evidence
+
+The model page includes a local-only physical-validation worksheet tied to the exact plan fingerprint. It records build/observation dates, environmental readings, deviations and inspection observations and can export a JSON evidence record.
+
+Completing the worksheet does **not** automatically change a model's public validation state.
+
 ## Stock nesting
 
 Current planning defaults:
@@ -119,13 +155,13 @@ Current planning defaults:
 - plywood kerf: 3 mm
 - XPS kerf: 2 mm
 
-Trapezoid parts are currently packed by bounding box, so V1 is deterministic and reproducible but not polygon-optimal.
+Trapezoid parts are currently packed by bounding box, so V1 is deterministic and reproducible but not polygon-optimal. The UI now draws the true trapezoid/cutout geometry separately from the dashed packing envelope and reports both true material utilization and envelope utilization.
 
 ## Framing
 
 The framing schedule is currently marked **PROVISIONAL**.
 
-Member lengths are geometry-derived. V1 timber profile selection remains a design assumption until engineering review and physical prototype validation.
+Member lengths and positions are geometry-derived where possible. Intermediate-stud positions and timber profile selection remain explicit design assumptions. V1 enforces a provisional maximum stud spacing and coordinates rear ventilation provision zones around those supports.
 
 ## Local development
 
@@ -149,6 +185,7 @@ pnpm typecheck
 pnpm lint
 pnpm test
 pnpm build
+pnpm test:e2e
 ```
 
 ## Environment
@@ -188,7 +225,9 @@ The schema is deliberately separate from canonical model definitions.
 
 The application code is under active construction.
 
-A build runner still needs to execute the full quality gate successfully before model status is promoted from `DATA_VALIDATED`. Physical prototype and field-test status require real-world evidence, not code completion.
+GitHub Actions currently fails before runner allocation, so the repository still lacks an independently executed full install/typecheck/test/build/E2E gate. The active environment also cannot reach GitHub directly for a fallback clone/build. The generated `pnpm-lock.yaml` remains a release gate once a real pnpm resolver is available.
+
+Physical prototype and field-test status require real-world evidence, not code completion.
 
 ## License
 
