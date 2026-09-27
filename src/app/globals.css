@@ -2302,3 +2302,106 @@ button { cursor: pointer; }
 @media (max-width: 560px) {
   .thermal-scenario-result { grid-template-columns: 1fr; }
 }
+
+
+.validation-section {
+  background: #f7f2ea;
+  border-block: 1px solid var(--line);
+}
+.validation-overview {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.validation-overview > div {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--surface);
+}
+.validation-overview span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--muted);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+.validation-overview strong {
+  font-size: 16px;
+}
+.validation-ladder {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.validation-ladder li {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: start;
+  padding: 17px 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.validation-ladder li.pending {
+  opacity: .66;
+}
+.validation-ladder li.current {
+  border-color: #9a6442;
+  box-shadow: inset 4px 0 0 #9a6442;
+  opacity: 1;
+}
+.validation-index {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: #eee7dc;
+  color: var(--accent-dark);
+  font: 800 10px ui-monospace, monospace;
+}
+.validation-ladder li.reached .validation-index {
+  background: #354f45;
+  color: #fff;
+}
+.validation-ladder li strong {
+  font-size: 14px;
+}
+.validation-ladder code {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 9px;
+}
+.validation-ladder p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.55;
+  font-size: 11px;
+}
+.validation-state {
+  align-self: center;
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: #eee7dc;
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: .06em;
+}
+.validation-ladder li.current .validation-state {
+  background: #9a6442;
+  color: #fff;
+}
+
+@media (max-width: 700px) {
+  .validation-overview { grid-template-columns: 1fr; }
+  .validation-ladder li { grid-template-columns: 38px 1fr; }
+  .validation-state { grid-column: 2; justify-self: start; }
+}
