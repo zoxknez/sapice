@@ -56,7 +56,7 @@ export type LinearPart = {
 
 
 export const compilerMethod = {
-  version: "1.5.0"
+  version: "1.6.0"
 } as const;
 
 export type HardwareItem = {
@@ -876,8 +876,8 @@ export function compileShelterModel(model: ShelterModel) {
       quantity: latchCount,
       unit: "piece",
       provenance: "ASSUMPTION",
-      notesSr: "Predviđeni za bezbedno zatvaranje servisnog krova protiv vetra.",
-      notesEn: "Intended to secure the service roof against wind uplift."
+      notesSr: "Predviđeni za bezbedno zatvaranje servisnog krova protiv vetra. Kod V1 prednje šarke ostavljaju zadnju runoff ivicu bez kontinualne šarke; zatvarači na zadnjoj ivici moraju biti montirani tako da ne prekidaju drip putanju vode.",
+      notesEn: "Intended to secure the service roof against wind uplift. In V1, front hinges keep the rear runoff edge free of a continuous hinge; rear-edge latches must be mounted so they do not interrupt the drip path."
     },
     {
       id: "roof-edge-weathering-profile",
@@ -922,13 +922,11 @@ export function compileShelterModel(model: ShelterModel) {
     hingePositionsAcrossRoofMm,
     latchPositionsAcrossRoofMm,
     latchEdge:
-      model.maintenance.hingeEdge === "REAR"
-        ? "FRONT"
-        : model.maintenance.hingeEdge === "LEFT"
-          ? "RIGHT"
-          : model.maintenance.hingeEdge === "RIGHT"
-            ? "LEFT"
-            : null
+      model.maintenance.hingeEdge === "FRONT"
+        ? "REAR"
+        : model.maintenance.hingeEdge === "REAR"
+          ? "FRONT"
+          : null
   };
 
   const buildSteps: BuildStep[] = [
