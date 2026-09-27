@@ -40,6 +40,16 @@ export const sources: Record<string, SourceRecord> = {
     topics: ["pets", "winter", "safety"],
     notes: "Supports the limitation that outdoor auxiliary shelters are not a substitute for keeping companion animals indoors during severe cold."
   },
+  "apa-panel-fastening-n335": {
+    id: "apa-panel-fastening-n335",
+    publisher: "APA - The Engineered Wood Association",
+    title: "Builder Tips: Proper Installation of APA Rated Sheathing for Roof Applications (N335)",
+    url: "https://www.apawood.org/buildertips/pdfs/N335.pdf",
+    accessedAt: "2026-09-27",
+    tier: 1,
+    topics: ["plywood", "fasteners", "spacing", "panel-edges"],
+    notes: "Reference starting point for panel fastening geometry: approximately 6 in edge spacing, 12 in intermediate spacing and about 3/8 in edge offset. Šapice does not treat this roof-sheathing guide as a certified fastening design for pet shelters."
+  },
   "fibran-xps-300": {
     id: "fibran-xps-300",
     publisher: "FIBRAN",
