@@ -5,6 +5,7 @@ import * as THREE from "three";
 import {Canvas} from "@react-three/fiber";
 import {ContactShadows, OrbitControls} from "@react-three/drei";
 import type {ShelterModel} from "@/lib/domain";
+import type {AppLocale} from "@/i18n/routing";
 import {constructionSummary, roofPanelGeometry, roofSlope} from "@/lib/engineering";
 
 type ViewMode = "assembled" | "roof-off" | "exploded";
@@ -249,7 +250,7 @@ function Shelter({model, mode}: {model: ShelterModel; mode: ViewMode}) {
   );
 }
 
-export function ShelterViewer({model}: {model: ShelterModel}) {
+export function ShelterViewer({model, locale}: {model: ShelterModel; locale: AppLocale}) {
   const [mode, setMode] = useState<ViewMode>("assembled");
 
   return (
@@ -269,11 +270,11 @@ export function ShelterViewer({model}: {model: ShelterModel}) {
         />
       </Canvas>
 
-      <div className="viewer-toolbar" aria-label="3D view controls">
+      <div className="viewer-toolbar" aria-label={locale === "sr" ? "Kontrole 3D prikaza" : "3D view controls"}>
         {([
           ["assembled", "3D"],
-          ["roof-off", "Roof off"],
-          ["exploded", "Exploded"]
+          ["roof-off", locale === "sr" ? "Bez krova" : "Roof off"],
+          ["exploded", locale === "sr" ? "Rastavljeno" : "Exploded"]
         ] as const).map(([value, label]) => (
           <button
             key={value}
