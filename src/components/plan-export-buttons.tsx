@@ -1,8 +1,7 @@
 "use client";
 
 import type {AppLocale} from "@/i18n/routing";
-import type {ShelterModel} from "@/lib/domain";
-import {compileShelterModel} from "@/lib/compiler";
+import type {CompiledShelterModel} from "@/lib/compiler";
 
 function csvCell(value: string | number) {
   const text = String(value);
@@ -22,16 +21,16 @@ function downloadBlob(filename: string, content: string, type: string) {
 }
 
 export function PlanExportButtons({
-  model,
+  compiled,
   locale
 }: {
-  model: ShelterModel;
+  compiled: CompiledShelterModel;
   locale: AppLocale;
 }) {
   const isSr = locale === "sr";
+  const model = compiled.model;
 
   function exportCsv() {
-    const compiled = compileShelterModel(model);
     const rows: Array<Array<string | number>> = [
       ["Šapice", model.translations[locale].name, `v${model.version}`],
       ["Model ID", model.id],
@@ -121,7 +120,6 @@ export function PlanExportButtons({
   }
 
   function exportJson() {
-    const compiled = compileShelterModel(model);
     const payload = {
       format: "sapice-compiled-plan",
       formatVersion: 1,
