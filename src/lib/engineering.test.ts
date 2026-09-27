@@ -283,6 +283,78 @@ describe("engineering model derivations", () => {
     }
   });
 
+  it("rebuilds ground clearance from base posts plus horizontal runners", () => {
+    for (const model of shelterModels) {
+      const compiled = compileShelterModel(model);
+      expect(
+        compiled.framing.baseSupportPostHeightMm +
+          compiled.framing.baseProfileMm[1]
+      ).toBe(model.dimensions.groundClearanceMm);
+
+      const posts = compiled.linearParts.filter(
+        (part) => part.id.startsWith("base-post-")
+      );
+      expect(posts).toHaveLength(
+        compiled.framing.baseRunnerPositionsXmm.length *
+          compiled.framing.baseSupportPositionsZmm.length
+      );
+
+      for (const post of posts) {
+        expect(post.lengthMm).toBe(compiled.framing.baseSupportPostHeightMm);
+      }
+    }
+  });
+
+  it("keeps base runner and support-row gaps within provisional limits", () => {
+    for (const model of shelterModels) {
+      const compiled = compileShelterModel(model);
+
+      for (const [positions, spanMm, limitMm] of [
+        [
+          compiled.framing.baseRunnerPositionsXmm,
+          model.dimensions.widthMm,
+          compiled.framing.maxBaseRunnerSpacingMm
+        ],
+        [
+          compiled.framing.baseSupportPositionsZmm,
+          model.dimensions.depthMm,
+          compiled.framing.maxBasePostSpacingMm
+        ]
+      ] as const) {
+        const points = [0, ...positions, spanMm].sort((a, b) => a - b);
+        for (let index = 1; index < points.length; index++) {
+          expect(points[index] - points[index - 1])
+            .toBeLessThanOrEqual(limitMm + 1);
+        }
+      }
+    }
+  });
+
+  it("keeps floor joist and roof rafter gaps within provisional limits", () => {
+    for (const model of shelterModels) {
+      const compiled = compileShelterModel(model);
+
+      for (const [positions, spanMm, limitMm] of [
+        [
+          compiled.framing.floorJoistPositionsZmm,
+          model.dimensions.depthMm,
+          compiled.framing.maxFloorJoistSpacingMm
+        ],
+        [
+          compiled.framing.roofRafterPositionsXmm,
+          model.dimensions.widthMm,
+          compiled.framing.maxRoofRafterSpacingMm
+        ]
+      ] as const) {
+        const points = [0, ...positions, spanMm].sort((a, b) => a - b);
+        for (let index = 1; index < points.length; index++) {
+          expect(points[index] - points[index - 1])
+            .toBeLessThanOrEqual(limitMm + 1);
+        }
+      }
+    }
+  });
+
   it("keeps front entrance-support gaps within the compiled maximum", () => {
     for (const model of shelterModels) {
       const compiled = compileShelterModel(model);
