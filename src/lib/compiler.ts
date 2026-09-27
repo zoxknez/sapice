@@ -56,7 +56,7 @@ export type LinearPart = {
 
 
 export const compilerMethod = {
-  version: "1.4.0"
+  version: "1.5.0"
 } as const;
 
 export type HardwareItem = {
