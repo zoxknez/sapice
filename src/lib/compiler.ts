@@ -444,6 +444,58 @@ export function compileShelterModel(model: ShelterModel) {
     })
   );
 
+  const entranceSupportPositionsXmm = layout.entranceCentersXmm
+    .flatMap((centerMm) => [
+      centerMm - model.layout.entranceWidthMm / 2,
+      centerMm + model.layout.entranceWidthMm / 2
+    ])
+    .sort((a, b) => a - b);
+
+  const entranceFrameParts: LinearPart[] = layout.entranceCentersXmm.flatMap(
+    (centerMm, index) => {
+      const leftXmm = centerMm - model.layout.entranceWidthMm / 2;
+      const rightXmm = centerMm + model.layout.entranceWidthMm / 2;
+      const supportLengthMm =
+        model.layout.thresholdHeightMm + model.layout.entranceHeightMm;
+
+      return [
+        {
+          id: `entrance-${index + 1}-left-support`,
+          nameSr: `Levo vertikalno ojačanje ulaza ${index + 1}`,
+          nameEn: `Entrance ${index + 1} left vertical support`,
+          profileMm: frameProfile,
+          quantity: 1,
+          lengthMm: supportLengthMm,
+          provenance: "GEOMETRY" as const,
+          wall: "front" as const,
+          positionMm: leftXmm
+        },
+        {
+          id: `entrance-${index + 1}-right-support`,
+          nameSr: `Desno vertikalno ojačanje ulaza ${index + 1}`,
+          nameEn: `Entrance ${index + 1} right vertical support`,
+          profileMm: frameProfile,
+          quantity: 1,
+          lengthMm: supportLengthMm,
+          provenance: "GEOMETRY" as const,
+          wall: "front" as const,
+          positionMm: rightXmm
+        },
+        {
+          id: `entrance-${index + 1}-header`,
+          nameSr: `Gornje ojačanje ulaza ${index + 1}`,
+          nameEn: `Entrance ${index + 1} header`,
+          profileMm: frameProfile,
+          quantity: 1,
+          lengthMm: model.layout.entranceWidthMm + 2 * frameProfile[0],
+          provenance: "GEOMETRY" as const,
+          wall: "front" as const,
+          positionMm: centerMm
+        }
+      ];
+    }
+  );
+
   const linearParts: LinearPart[] = [
     {
       id: "base-runner",
@@ -533,24 +585,7 @@ export function compileShelterModel(model: ShelterModel) {
       lengthMm: Math.max(1, model.dimensions.rearHeightMm - floorThicknessMm - roofThicknessMm),
       provenance: "GEOMETRY"
     },
-    {
-      id: "entrance-vertical",
-      nameSr: "Vertikalna ojačanja ulaza",
-      nameEn: "Entrance vertical supports",
-      profileMm: frameProfile,
-      quantity: model.layout.entrances * 2,
-      lengthMm: model.layout.entranceHeightMm + model.layout.thresholdHeightMm,
-      provenance: "GEOMETRY"
-    },
-    {
-      id: "entrance-header",
-      nameSr: "Gornje ojačanje ulaza",
-      nameEn: "Entrance headers",
-      profileMm: frameProfile,
-      quantity: model.layout.entrances,
-      lengthMm: model.layout.entranceWidthMm + 2 * frameProfile[0],
-      provenance: "GEOMETRY"
-    },
+    ...entranceFrameParts,
     ...(model.layout.chambers > 1 ? [
       {
         id: "divider-cleat-front",
@@ -586,6 +621,7 @@ export function compileShelterModel(model: ShelterModel) {
     frameProfileMm: frameProfile,
     baseProfileMm: baseProfile,
     maxStudSpacingMm,
+    frontSupportPositionsXmm: entranceSupportPositionsXmm,
     totalLinearM: linearParts.reduce(
       (sum, part) => sum + (part.quantity * part.lengthMm) / 1000,
       0
