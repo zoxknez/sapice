@@ -2,6 +2,7 @@ import type {Metadata} from "next";
 import {setRequestLocale} from "next-intl/server";
 import type {AppLocale} from "@/i18n/routing";
 import {materials} from "@/data/materials";
+import {sources} from "@/data/sources";
 import {localizedMetadata} from "@/lib/seo";
 
 
@@ -41,8 +42,29 @@ export default async function MaterialsPage({params}: {params: Promise<{locale: 
             <article key={material.id}>
               <span className="kicker">{material.id.toUpperCase()}</span>
               <h2>{locale === "sr" ? material.nameSr : material.nameEn}</h2>
-              <strong>λ ≈ {material.lambdaTypicalWmK} W/mK</strong>
+              <div className="material-thermal">
+                <strong>λ ≈ {material.lambdaTypicalWmK} W/mK</strong>
+                <span>{locale === "sr" ? "raspon" : "range"} {material.lambdaRangeWmK[0]}–{material.lambdaRangeWmK[1]} W/mK</span>
+              </div>
+              {material.lambdaByThicknessMm && (
+                <div className="lambda-chips">
+                  {Object.entries(material.lambdaByThicknessMm).map(([thickness, lambda]) => (
+                    <span key={thickness}>{thickness} mm → {lambda} W/mK</span>
+                  ))}
+                </div>
+              )}
               <p>{locale === "sr" ? material.notesSr : material.notesEn}</p>
+              <div className="material-source-links">
+                {material.sourceIds.map((sourceId) => {
+                  const source = sources[sourceId];
+                  if (!source) return null;
+                  return (
+                    <a key={sourceId} href={source.url} target="_blank" rel="noreferrer">
+                      {source.publisher} · {source.title}
+                    </a>
+                  );
+                })}
+              </div>
             </article>
           ))}
         </div>
