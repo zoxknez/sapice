@@ -903,6 +903,13 @@ export function compileShelterModel(model: ShelterModel) {
       detailEn: "Use the model entrance dimensions and protect every cut edge."
     },
     {
+      id: "ventilation-provision",
+      titleSr: "Sačuvajte high-rear zone za ventilacione umetke",
+      titleEn: "Reserve the high-rear ventilation insert zones",
+      detailSr: "Prenesite kompajlirane PROVISIONAL zone na zadnji zid i držite ih van stubova. Ne secite finalni otvor dok nije izabran konkretan podesivi ventilacioni umetak; njegov cutout i net free area određuje proizvođač.",
+      detailEn: "Transfer the compiled PROVISIONAL zones to the rear wall and keep them clear of studs. Do not cut the final opening until a specific adjustable vent insert is selected; its cutout and net free area are product-specific."
+    },
+    {
       id: "insulation",
       titleSr: "Ugradite izolaciju i unutrašnje obloge",
       titleEn: "Install insulation and interior linings",
