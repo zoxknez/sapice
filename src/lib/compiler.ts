@@ -56,7 +56,7 @@ export type LinearPart = {
 
 
 export const compilerMethod = {
-  version: "1.6.0"
+  version: "1.7.0"
 } as const;
 
 export type HardwareItem = {
@@ -834,6 +834,7 @@ export function compileShelterModel(model: ShelterModel) {
       "Follow product-specific overlap and fastening instructions",
       "Protect exposed roof-panel edges against water ingress",
       "Keep the low rear runoff edge clear so water sheds away from front entrances",
+      "Attach service-roof hardware on structural wall lines inside the overhangs, not on the outer drip edges",
       "Re-check water shedding after hinge and service-seal installation"
     ]
   };
@@ -866,8 +867,8 @@ export function compileShelterModel(model: ShelterModel) {
       quantity: hingeCount,
       unit: "piece" as const,
       provenance: "ASSUMPTION" as const,
-      notesSr: "Broj se izvodi iz širine krova; finalni tip šarke i nosivost proveriti pre ENGINEERING_REVIEWED statusa.",
-      notesEn: "Count is derived from roof width; verify final hinge type and load capacity before ENGINEERING_REVIEWED status."
+      notesSr: "Broj se izvodi iz širine krova. Osa šarke je na liniji prednjeg zida, uvučena od spoljne prednje ivice za krovni prepust. Finalni tip šarke i nosivost proveriti pre ENGINEERING_REVIEWED statusa.",
+      notesEn: "Count is derived from roof width. The hinge axis sits on the front-wall line, inset from the outer front edge by the roof overhang. Verify final hinge type and load capacity before ENGINEERING_REVIEWED status."
     }] : []),
     {
       id: "roof-latches",
@@ -876,8 +877,8 @@ export function compileShelterModel(model: ShelterModel) {
       quantity: latchCount,
       unit: "piece",
       provenance: "ASSUMPTION",
-      notesSr: "Predviđeni za bezbedno zatvaranje servisnog krova protiv vetra. Kod V1 prednje šarke ostavljaju zadnju runoff ivicu bez kontinualne šarke; zatvarači na zadnjoj ivici moraju biti montirani tako da ne prekidaju drip putanju vode.",
-      notesEn: "Intended to secure the service roof against wind uplift. In V1, front hinges keep the rear runoff edge free of a continuous hinge; rear-edge latches must be mounted so they do not interrupt the drip path."
+      notesSr: "Predviđeni za bezbedno zatvaranje servisnog krova protiv vetra. Zatvarači se postavljaju na liniju zadnjeg zida, uvučenu od spoljne runoff ivice za zadnji prepust, kako spoljašnja drip putanja ostaje slobodna.",
+      notesEn: "Intended to secure the service roof against wind uplift. Latches sit on the rear-wall line, inset from the outer runoff edge by the rear overhang so the exterior drip path remains clear."
     },
     {
       id: "roof-edge-weathering-profile",
@@ -919,8 +920,10 @@ export function compileShelterModel(model: ShelterModel) {
     edgeOffsetMm: 10,
     panelJointGapMm: 3,
     hingeEdge: model.maintenance.hingeEdge,
+    hingeAxisFromPanelFrontMm: roofPanel.frontWallLineFromPanelFrontMm,
     hingePositionsAcrossRoofMm,
     latchPositionsAcrossRoofMm,
+    latchAxisFromPanelFrontMm: roofPanel.rearWallLineFromPanelFrontMm,
     latchEdge:
       model.maintenance.hingeEdge === "FRONT"
         ? "REAR"
