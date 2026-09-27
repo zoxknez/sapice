@@ -13,6 +13,10 @@ describe("catalog comparison summaries", () => {
     for (const model of shelterModels) {
       expect(summaries[model.id]?.modelId).toBe(model.id);
       expect(summaries[model.id]?.planFingerprint).toMatch(/^[0-9a-f]{16}$/);
+      expect(summaries[model.id]?.thumbnail.entranceCentersXmm)
+        .toHaveLength(model.layout.entrances);
+      expect(summaries[model.id]?.thumbnail.entranceRadiusMm)
+        .toBeGreaterThan(0);
     }
   });
 
