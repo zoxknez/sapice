@@ -229,6 +229,11 @@ function FramingSkeleton({
 
   const frontStudHeight = Math.max(0.05, compiled.interfaces.wallFrontHeightMm / 1000);
   const rearStudHeight = Math.max(0.05, compiled.interfaces.wallRearHeightMm / 1000);
+  const sideStartZ = compiled.joinery.sideStartZmm / 1000;
+  const sideEndZ = compiled.joinery.sideEndZmm / 1000;
+  const sideRun = compiled.joinery.sideRunMm / 1000;
+  const sideFrontHeight = Math.max(0.05, compiled.joinery.sideFrontHeightMm / 1000);
+  const sideRearHeight = Math.max(0.05, compiled.joinery.sideRearHeightMm / 1000);
   const frontY = gc + floorT + frontStudHeight / 2;
   const rearY = gc + floorT + rearStudHeight / 2;
   const frameColor = "#4d705f";
@@ -391,13 +396,13 @@ function FramingSkeleton({
       </mesh>
     ));
 
-  const sideTopLength = compiled.roof.trueLengthMm / 1000;
+  const sideTopLength = compiled.joinery.sideTopSlopeLengthMm / 1000;
   const sideTopY =
     gc +
     floorT +
-    (frontStudHeight + rearStudHeight) / 2 -
+    (sideFrontHeight + sideRearHeight) / 2 -
     profileFace / 2;
-  const sideTopZ = d / 2;
+  const sideTopZ = (sideStartZ + sideEndZ) / 2;
 
   return (
     <group>
@@ -448,13 +453,13 @@ function FramingSkeleton({
       ))}
 
       <Box
-        position={[wallInset, gc + floorT + profileFace / 2, d / 2]}
-        size={[profileDepth, profileFace, d]}
+        position={[wallInset, gc + floorT + profileFace / 2, sideTopZ]}
+        size={[profileDepth, profileFace, sideRun]}
         color={frameColor}
       />
       <Box
-        position={[w - wallInset, gc + floorT + profileFace / 2, d / 2]}
-        size={[profileDepth, profileFace, d]}
+        position={[w - wallInset, gc + floorT + profileFace / 2, sideTopZ]}
+        size={[profileDepth, profileFace, sideRun]}
         color={frameColor}
       />
 
@@ -508,7 +513,11 @@ function Shelter({compiled, mode}: {compiled: CompiledShelterModel; mode: ViewMo
   const layout = compiled.layout;
   const wallFrontHeight = compiled.interfaces.wallFrontHeightMm / 1000;
   const wallRearHeight = compiled.interfaces.wallRearHeightMm / 1000;
-  const dividerDepth = Math.max(0.05, d - 2 * wallT);
+  const sideDepth = Math.max(0.05, compiled.joinery.sideRunMm / 1000);
+  const sideFrontHeight = Math.max(0.05, compiled.joinery.sideFrontHeightMm / 1000);
+  const sideRearHeight = Math.max(0.05, compiled.joinery.sideRearHeightMm / 1000);
+  const sideStartZ = compiled.joinery.sideStartZmm / 1000;
+  const dividerDepth = Math.max(0.05, compiled.joinery.internalDepthMm / 1000);
   const dividerFrontHeight = Math.max(0.05, compiled.internal.frontHeightMm / 1000);
   const dividerRearHeight = Math.max(0.05, compiled.internal.rearHeightMm / 1000);
 
@@ -548,18 +557,18 @@ function Shelter({compiled, mode}: {compiled: CompiledShelterModel; mode: ViewMo
       />
 
       <SidePanel
-        depth={d}
-        frontHeight={wallFrontHeight}
-        rearHeight={wallRearHeight}
+        depth={sideDepth}
+        frontHeight={sideFrontHeight}
+        rearHeight={sideRearHeight}
         thickness={wallT}
-        position={[wallT - wallOffset, gc + floorT, 0]}
+        position={[wallT - wallOffset, gc + floorT, sideStartZ]}
       />
       <SidePanel
-        depth={d}
-        frontHeight={wallFrontHeight}
-        rearHeight={wallRearHeight}
+        depth={sideDepth}
+        frontHeight={sideFrontHeight}
+        rearHeight={sideRearHeight}
         thickness={wallT}
-        position={[w + wallOffset, gc + floorT, 0]}
+        position={[w + wallOffset, gc + floorT, sideStartZ]}
       />
 
       {layout.dividerPositionsXmm.map((positionMm, index) => (
@@ -569,7 +578,7 @@ function Shelter({compiled, mode}: {compiled: CompiledShelterModel; mode: ViewMo
           frontHeight={dividerFrontHeight}
           rearHeight={dividerRearHeight}
           thickness={model.layout.dividerThicknessMm / 1000}
-          position={[positionMm / 1000, gc + floorT, wallT]}
+          position={[positionMm / 1000, gc + floorT, sideStartZ]}
         />
       ))}
 
