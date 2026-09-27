@@ -1,5 +1,5 @@
 import type {ShelterModel} from "@/lib/domain";
-import {constructionSummary, entranceGeometry, getModelAssemblies, layoutGeometry, roofPanelGeometry, roofSlope, surfaceAreas, thermalSummary} from "@/lib/engineering";
+import {constructionInterfaceGeometry, constructionSummary, entranceGeometry, getModelAssemblies, layoutGeometry, roofPanelGeometry, roofSlope, surfaceAreas, thermalSummary} from "@/lib/engineering";
 import {cutGeometryAreaMm2, cutGeometryCutoutPerimeterMm, cutGeometryOuterPerimeterMm} from "@/lib/cut-geometry";
 import {materials} from "@/data/materials";
 
@@ -120,10 +120,11 @@ export function compileShelterModel(model: ShelterModel) {
   const wall = construction.wallThicknessMm;
   const floorThicknessMm = construction.floorThicknessMm;
   const roofThicknessMm = construction.roofThicknessMm;
+  const interfaces = constructionInterfaceGeometry(model);
   const internalWidthMm = Math.max(0, model.dimensions.widthMm - 2 * wall);
   const internalDepthMm = Math.max(0, model.dimensions.depthMm - 2 * wall);
-  const internalFrontHeightMm = Math.max(0, model.dimensions.frontHeightMm - floorThicknessMm - roofThicknessMm);
-  const internalRearHeightMm = Math.max(0, model.dimensions.rearHeightMm - floorThicknessMm - roofThicknessMm);
+  const internalFrontHeightMm = interfaces.wallFrontHeightMm;
+  const internalRearHeightMm = interfaces.wallRearHeightMm;
   const roof = roofSlope(model);
   const roofPanel = roofPanelGeometry(model);
   const areas = surfaceAreas(model);
@@ -135,7 +136,7 @@ export function compileShelterModel(model: ShelterModel) {
     return {
       type: "roundedRectangle" as const,
       xMm: Math.round(centerX - model.layout.entranceWidthMm / 2),
-      yMm: model.layout.thresholdHeightMm,
+      yMm: model.layout.thresholdHeightMm - floorThicknessMm,
       widthMm: entrance.widthMm,
       heightMm: entrance.heightMm,
       radiusMm: entrance.radiusMm
@@ -172,7 +173,7 @@ export function compileShelterModel(model: ShelterModel) {
       material: "plywood-12",
       quantity: 1,
       widthMm: model.dimensions.widthMm,
-      heightMm: model.dimensions.frontHeightMm,
+      heightMm: Math.round(interfaces.wallFrontHeightMm),
       thicknessMm: 12,
       shape: "rectangle",
       cutouts: entranceCutouts,
@@ -186,7 +187,7 @@ export function compileShelterModel(model: ShelterModel) {
       material: "plywood-12",
       quantity: 1,
       widthMm: model.dimensions.widthMm,
-      heightMm: model.dimensions.rearHeightMm,
+      heightMm: Math.round(interfaces.wallRearHeightMm),
       thicknessMm: 12,
       shape: "rectangle"
     },
@@ -197,12 +198,12 @@ export function compileShelterModel(model: ShelterModel) {
       material: "plywood-12",
       quantity: 2,
       widthMm: model.dimensions.depthMm,
-      heightMm: model.dimensions.frontHeightMm,
+      heightMm: Math.round(interfaces.wallFrontHeightMm),
       thicknessMm: 12,
       shape: "trapezoid",
-      trapezoidRearHeightMm: model.dimensions.rearHeightMm,
-      notesSr: `Prednja ivica ${model.dimensions.frontHeightMm} mm; zadnja ivica ${model.dimensions.rearHeightMm} mm.`,
-      notesEn: `Front edge ${model.dimensions.frontHeightMm} mm; rear edge ${model.dimensions.rearHeightMm} mm.`
+      trapezoidRearHeightMm: Math.round(interfaces.wallRearHeightMm),
+      notesSr: `Prednja zidna ivica ${Math.round(interfaces.wallFrontHeightMm)} mm; zadnja zidna ivica ${Math.round(interfaces.wallRearHeightMm)} mm. Zid stoji na gotovom podu i završava ispod krovnog sklopa.`,
+      notesEn: `Front wall edge ${Math.round(interfaces.wallFrontHeightMm)} mm; rear wall edge ${Math.round(interfaces.wallRearHeightMm)} mm. The wall sits on the finished floor and terminates below the roof assembly.`
     },
     {
       id: "roof-outer",
@@ -222,13 +223,13 @@ export function compileShelterModel(model: ShelterModel) {
       material: "plywood-9",
       quantity: 1,
       widthMm: internalWidthMm,
-      heightMm: internalFrontHeightMm,
+      heightMm: Math.round(internalFrontHeightMm),
       thicknessMm: 9,
       shape: "rectangle",
       cutouts: entranceCutouts.map((cutout) => ({
         ...cutout,
         xMm: Math.max(0, cutout.xMm - wall),
-        yMm: Math.max(0, cutout.yMm - floorThicknessMm)
+        yMm: cutout.yMm
       }))
     },
     {
@@ -238,7 +239,7 @@ export function compileShelterModel(model: ShelterModel) {
       material: "plywood-9",
       quantity: 1,
       widthMm: internalWidthMm,
-      heightMm: internalRearHeightMm,
+      heightMm: Math.round(internalRearHeightMm),
       thicknessMm: 9,
       shape: "rectangle"
     },
@@ -249,10 +250,10 @@ export function compileShelterModel(model: ShelterModel) {
       material: "plywood-9",
       quantity: 2,
       widthMm: internalDepthMm,
-      heightMm: internalFrontHeightMm,
+      heightMm: Math.round(internalFrontHeightMm),
       thicknessMm: 9,
       shape: "trapezoid",
-      trapezoidRearHeightMm: internalRearHeightMm,
+      trapezoidRearHeightMm: Math.round(internalRearHeightMm),
       notesSr: `Prednja čista ivica ${internalFrontHeightMm} mm; zadnja čista ivica ${internalRearHeightMm} mm.`,
       notesEn: `Front clear edge ${internalFrontHeightMm} mm; rear clear edge ${internalRearHeightMm} mm.`
     },
@@ -262,11 +263,8 @@ export function compileShelterModel(model: ShelterModel) {
       nameEn: "Interior roof lining",
       material: "plywood-9",
       quantity: 1,
-      widthMm: internalWidthMm,
-      heightMm: Math.ceil(Math.hypot(
-        internalDepthMm,
-        Math.max(0, internalFrontHeightMm - internalRearHeightMm)
-      )),
+      widthMm: model.dimensions.widthMm,
+      heightMm: Math.ceil(roof.trueLengthMm),
       thicknessMm: 9,
       shape: "rectangle"
     },
@@ -312,19 +310,16 @@ export function compileShelterModel(model: ShelterModel) {
       id: "xps-floor",
       nameSr: "XPS poda",
       nameEn: "Floor XPS",
-      widthMm: internalWidthMm,
-      heightMm: internalDepthMm,
+      widthMm: model.dimensions.widthMm,
+      heightMm: model.dimensions.depthMm,
       thicknessMm: assemblies.floor.layers.find((layer) => layer.role === "insulation")?.thicknessMm ?? 0
     }),
     ...splitInsulationPanel({
       id: "xps-roof",
       nameSr: "XPS krova",
       nameEn: "Roof XPS",
-      widthMm: internalWidthMm,
-      heightMm: Math.ceil(Math.hypot(
-        internalDepthMm,
-        Math.max(0, internalFrontHeightMm - internalRearHeightMm)
-      )),
+      widthMm: model.dimensions.widthMm,
+      heightMm: Math.ceil(roof.trueLengthMm),
       thicknessMm: assemblies.roof.layers.find((layer) => layer.role === "insulation")?.thicknessMm ?? 0
     }),
     ...(model.layout.chambers > 1 ? [{
@@ -803,6 +798,7 @@ export function compileShelterModel(model: ShelterModel) {
 
   return {
     model,
+    interfaces,
     layout,
     entrance,
     assemblies,
