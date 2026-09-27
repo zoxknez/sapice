@@ -56,7 +56,7 @@ export type LinearPart = {
 
 
 export const compilerMethod = {
-  version: "1.3.0"
+  version: "1.4.0"
 } as const;
 
 export type HardwareItem = {
@@ -812,6 +812,31 @@ export function compileShelterModel(model: ShelterModel) {
       roofPanel.panelWidthMm * ((index + 1) / (latchCount + 1))
   );
 
+  const roofWeathering = {
+    status: "PRODUCT_SPECIFIC" as const,
+    referenceSourceId: "owens-corning-roof-installation",
+    highEdge: "FRONT" as const,
+    runoffEdge: "REAR" as const,
+    runoffAwayFromEntrances: true,
+    slopeDegrees: (roof.angleRad * 180) / Math.PI,
+    riseMm: model.dimensions.frontHeightMm - model.dimensions.rearHeightMm,
+    runMm: model.dimensions.depthMm,
+    ratioRisePerRun: model.dimensions.depthMm > 0
+      ? (model.dimensions.frontHeightMm - model.dimensions.rearHeightMm) /
+        model.dimensions.depthMm
+      : 0,
+    rearDripEdgeLengthM: roofPanel.panelWidthMm / 1000,
+    fullEdgeProtectionLengthM:
+      (2 * (roofPanel.panelWidthMm + roofPanel.panelLengthMm)) / 1000,
+    requirements: [
+      "Verify selected roof-covering minimum slope and substrate requirements",
+      "Follow product-specific overlap and fastening instructions",
+      "Protect exposed roof-panel edges against water ingress",
+      "Keep the low rear runoff edge clear so water sheds away from front entrances",
+      "Re-check water shedding after hinge and service-seal installation"
+    ]
+  };
+
   const hardwareItems: HardwareItem[] = ([
     {
       id: "base-isolation-pads",
@@ -852,6 +877,16 @@ export function compileShelterModel(model: ShelterModel) {
       provenance: "ASSUMPTION",
       notesSr: "Predviđeni za bezbedno zatvaranje servisnog krova protiv vetra.",
       notesEn: "Intended to secure the service roof against wind uplift."
+    },
+    {
+      id: "roof-edge-weathering-profile",
+      nameSr: "Krovna ivica / drip zaštita",
+      nameEn: "Roof edge / drip protection",
+      quantity: roofWeathering.fullEdgeProtectionLengthM,
+      unit: "m",
+      provenance: "ASSUMPTION",
+      notesSr: "Planerska dužina kompletnog oboda krovnog panela. Finalni profil, redosled slojeva i detalj niske zadnje ivice moraju pratiti izabrani krovni sistem.",
+      notesEn: "Planning length for the full roof-panel perimeter. Final profile, layer order and low rear-edge detail must follow the selected roofing system."
     },
     {
       id: "roof-weather-seal",
@@ -942,8 +977,8 @@ export function compileShelterModel(model: ShelterModel) {
       id: "roof",
       titleSr: "Montirajte krov i hidroizolaciju",
       titleEn: "Install roof and waterproofing",
-      detailSr: "Obezbedite odvod vode od ulaza i zaštitite ivice krova od prodora vlage.",
-      detailEn: "Direct runoff away from entrances and protect roof edges against water ingress."
+      detailSr: "Krov pada od prednje ka zadnjoj ivici, pa zadnja ivica služi kao prirodni runoff. Izaberite krovni sistem koji eksplicitno dozvoljava kompajlirani nagib, pratite njegovo uputstvo za slojeve/preklop i izvedite drip/edge zaštitu tako da voda odlazi iza kućice, dalje od ulaza.",
+      detailEn: "The roof falls from front to rear, making the rear edge the natural runoff edge. Select a roofing system that explicitly permits the compiled slope, follow its layer/overlap instructions and detail edge/drip protection so water sheds behind the shelter, away from entrances."
     },
     ...(model.heated ? [{
       id: "heating",
@@ -979,6 +1014,7 @@ export function compileShelterModel(model: ShelterModel) {
     framing,
     hardwareItems,
     hardware,
+    roofWeathering,
     buildSteps
   });
 
@@ -1034,6 +1070,7 @@ export function compileShelterModel(model: ShelterModel) {
     framing,
     hardwareItems,
     hardware,
+    roofWeathering,
     buildSteps
   };
 }
