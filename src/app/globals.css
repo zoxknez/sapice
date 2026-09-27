@@ -1328,3 +1328,33 @@ button { cursor: pointer; }
     flex-direction: column;
   }
 }
+
+
+.framing-section { background: #f8f4ed; border-block: 1px solid var(--line); }
+.framing-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.framing-summary > div {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--surface);
+}
+.framing-summary span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+.framing-summary strong { font-size: 17px; }
+.framing-table small { color: var(--accent-dark); font-weight: 780; letter-spacing: .04em; }
+
+@media (max-width: 700px) {
+  .framing-summary { grid-template-columns: 1fr; }
+}
