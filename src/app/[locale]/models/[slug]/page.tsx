@@ -1,3 +1,4 @@
+import type {Metadata} from "next";
 import {notFound} from "next/navigation";
 import {setRequestLocale} from "next-intl/server";
 import type {AppLocale} from "@/i18n/routing";
@@ -11,6 +12,39 @@ import {compileShelterModel} from "@/lib/compiler";
 
 export function generateStaticParams() {
   return shelterModels.map((model) => ({slug: model.slug}));
+}
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{locale: AppLocale; slug: string}>;
+}): Promise<Metadata> {
+  const {locale, slug} = await params;
+  const model = getShelterModel(slug);
+  if (!model) return {};
+  const copy = model.translations[locale];
+  const srPath = `/sr/modeli/${model.slug}`;
+  const enPath = `/en/models/${model.slug}`;
+
+  return {
+    title: copy.name,
+    description: copy.description,
+    alternates: {
+      canonical: locale === "sr" ? srPath : enPath,
+      languages: {
+        "sr-Latn": srPath,
+        en: enPath,
+        "x-default": srPath
+      }
+    },
+    openGraph: {
+      type: "article",
+      title: copy.name,
+      description: copy.description,
+      locale: locale === "sr" ? "sr_RS" : "en_US",
+      alternateLocale: locale === "sr" ? ["en_US"] : ["sr_RS"]
+    }
+  };
 }
 
 export default async function ModelPage({params}: {params: Promise<{locale: AppLocale; slug: string}>}) {
