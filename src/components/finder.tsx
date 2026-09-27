@@ -49,8 +49,9 @@ export function Finder({models, locale}: {models: ShelterModel[]; locale: AppLoc
       );
     })
     .sort((a, b) => {
-      const capacityWasteA = a.capacity.max - count;
-      const capacityWasteB = b.capacity.max - count;
+      const requestedCount = animal === "dog" ? 1 : count;
+      const capacityWasteA = a.capacity.max - requestedCount;
+      const capacityWasteB = b.capacity.max - requestedCount;
       if (capacityWasteA !== capacityWasteB) return capacityWasteA - capacityWasteB;
 
       const areaA = a.dimensions.widthMm * a.dimensions.depthMm;
