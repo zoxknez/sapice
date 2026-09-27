@@ -56,7 +56,7 @@ export const shelterModelSchema = z.object({
     "WINTER_COLD",
     "WINTER_SEVERE"
   ]),
-  designOutsideC: z.number(),
+  referenceOutsideC: z.number(),
   translations: z.object({
     sr: z.object({name: z.string(), description: z.string()}),
     en: z.object({name: z.string(), description: z.string()})
