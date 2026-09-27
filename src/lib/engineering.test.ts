@@ -5,6 +5,7 @@ import {
   assemblyUValue,
   constructionInterfaceGeometry,
   entranceGeometry,
+  ventilationProvisionGeometry,
   materialSummary,
   thermalMethod,
   roofPanelGeometry,
@@ -72,6 +73,45 @@ describe("engineering model derivations", () => {
         entrance.totalOpeningAreaMm2 / 1_000_000,
         8
       );
+    }
+  });
+
+  it("keeps one provisional high-rear ventilation zone inside each chamber", () => {
+    for (const model of shelterModels) {
+      const compiled = compileShelterModel(model);
+      const ventilation = ventilationProvisionGeometry(model);
+
+      expect(ventilation.zones).toHaveLength(model.layout.chambers);
+
+      for (const zone of ventilation.zones) {
+        const chamberIndex = zone.chamber - 1;
+        const chamberLeftMm = compiled.layout.chamberStartsXmm[chamberIndex];
+        const chamberRightMm = chamberLeftMm + compiled.layout.chamberWidthMm;
+
+        expect(zone.centerXmm - zone.widthMm / 2).toBeGreaterThanOrEqual(chamberLeftMm);
+        expect(zone.centerXmm + zone.widthMm / 2).toBeLessThanOrEqual(chamberRightMm);
+        expect(zone.bottomMm).toBeGreaterThanOrEqual(0);
+        expect(zone.bottomMm + zone.heightMm)
+          .toBeLessThanOrEqual(compiled.interfaces.wallRearHeightMm);
+        expect(zone.actualOpening).toBe("TBD_BY_SELECTED_VENT_INSERT");
+      }
+    }
+  });
+
+  it("keeps ventilation provision zones clear of provisional rear studs", () => {
+    for (const model of shelterModels) {
+      const compiled = compileShelterModel(model);
+      const rearStuds = compiled.linearParts
+        .filter((part) => part.wall === "rear" && typeof part.positionMm === "number")
+        .map((part) => part.positionMm as number);
+
+      for (const zone of compiled.ventilation.zones) {
+        for (const studXmm of rearStuds) {
+          expect(Math.abs(studXmm - zone.centerXmm)).toBeGreaterThanOrEqual(
+            zone.widthMm / 2 + compiled.framing.frameProfileMm[0] / 2
+          );
+        }
+      }
     }
   });
 
