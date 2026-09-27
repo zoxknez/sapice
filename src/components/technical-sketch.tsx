@@ -30,7 +30,8 @@ export function TechnicalSketch({model, locale}: {model: ShelterModel; locale: "
           <rect x="0" y="0" width={frontW} height={frontH} strokeWidth="2.2" />
           {Array.from({length: model.layout.entrances}).map((_, index) => {
             const x = frontW * ((index + 1) / (model.layout.entrances + 1)) - ew / 2;
-            return <rect key={index} x={x} y={frontH - eh - 14} width={ew} height={eh} rx="12" strokeWidth="2" />;
+            const y = frontH - (model.layout.thresholdHeightMm + model.layout.entranceHeightMm) * scale;
+            return <rect key={index} x={x} y={y} width={ew} height={eh} rx="12" strokeWidth="2" />;
           })}
           <line x1="0" y1={frontH + 30} x2={frontW} y2={frontH + 30} />
           <line x1="0" y1={frontH + 22} x2="0" y2={frontH + 38} />
