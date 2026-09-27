@@ -1333,7 +1333,7 @@ button { cursor: pointer; }
 .framing-section { background: #f8f4ed; border-block: 1px solid var(--line); }
 .framing-summary {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 10px;
   margin-bottom: 20px;
 }
@@ -2179,4 +2179,15 @@ button { cursor: pointer; }
   .technical-sheet > svg {
     width: 100% !important;
   }
+}
+
+
+.metric-disclaimer {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-left: 3px solid #b4977e;
+  background: #f4ede3;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.55;
 }
