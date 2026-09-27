@@ -75,7 +75,10 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
             <h1>{copy.name}</h1>
             <p>{copy.description}</p>
             <div className="metric-grid">
-              <div><span>{locale === "sr" ? "Kapacitet" : "Capacity"}</span><strong>{model.capacity.recommended}</strong></div>
+              <div>
+                <span>{locale === "sr" ? (model.animal === "dog" ? "Veličina psa" : "Kapacitet") : (model.animal === "dog" ? "Dog size" : "Capacity")}</span>
+                <strong>{model.animal === "dog" ? model.animalSizeClass : model.capacity.recommended}</strong>
+              </div>
               <div><span>{locale === "sr" ? "Širina" : "Width"}</span><strong>{model.dimensions.widthMm} mm</strong></div>
               <div><span>{locale === "sr" ? "Dubina" : "Depth"}</span><strong>{model.dimensions.depthMm} mm</strong></div>
               <div><span>{locale === "sr" ? "Izolacija" : "Insulation"}</span><strong>{assemblyInsulationMm(assemblies.wall)} mm</strong></div>
@@ -132,6 +135,12 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
               <div><dt>{locale === "sr" ? "Podignut pod" : "Ground clearance"}</dt><dd>{model.dimensions.groundClearanceMm} mm</dd></div>
               <div><dt>{locale === "sr" ? "Ulaz" : "Entrance"}</dt><dd>{model.layout.entranceWidthMm} × {model.layout.entranceHeightMm} mm × {model.layout.entrances}</dd></div>
               <div><dt>{locale === "sr" ? "Komore" : "Chambers"}</dt><dd>{model.layout.chambers}</dd></div>
+              {model.animal === "dog" && (
+                <div>
+                  <dt>{locale === "sr" ? "Napomena veličine" : "Sizing note"}</dt>
+                  <dd>{locale === "sr" ? "Proveriti stvarne mere psa pre izrade" : "Verify the dog's actual measurements before building"}</dd>
+                </div>
+              )}
               <div><dt>{locale === "sr" ? "Debljina zida" : "Wall thickness"}</dt><dd>{construction.wallThicknessMm} mm</dd></div>
               <div><dt>{locale === "sr" ? "Nagib krova" : "Roof angle"}</dt><dd>{(roof.angleRad * 180 / Math.PI).toFixed(1)}°</dd></div>
             </dl>
