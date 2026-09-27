@@ -77,6 +77,26 @@ export function PlanExportButtons({
 
     rows.push(
       [],
+      ["VENTILATION PROVISION"],
+      ["ID", "Chamber", "Wall", "Center X mm", "Bottom mm", "Zone width mm", "Zone height mm", "Provenance", "Actual opening"]
+    );
+
+    for (const zone of compiled.ventilation.zones) {
+      rows.push([
+        zone.id,
+        zone.chamber,
+        zone.wall,
+        zone.centerXmm.toFixed(0),
+        zone.bottomMm.toFixed(0),
+        zone.widthMm,
+        zone.heightMm,
+        zone.provenance,
+        zone.actualOpening
+      ]);
+    }
+
+    rows.push(
+      [],
       ["HARDWARE"],
       ["ID", "Name", "Quantity", "Unit", "Provenance", "Notes"]
     );
