@@ -5,52 +5,185 @@ import type {ShelterModel} from "@/lib/domain";
 import type {AppLocale} from "@/i18n/routing";
 import {ModelCard} from "./model-card";
 
+type ClimateNeed = "moderate" | "cold" | "severe";
+type HeatingNeed = "any" | "passive" | "heated";
+
+const climateRank: Record<ShelterModel["climateProfile"], number> = {
+  SHELTERED_MILD: 0,
+  WINTER_MODERATE: 1,
+  WINTER_COLD: 2,
+  WINTER_SEVERE: 3
+};
+
+const needRank: Record<ClimateNeed, number> = {
+  moderate: 1,
+  cold: 2,
+  severe: 3
+};
+
 export function Finder({models, locale}: {models: ShelterModel[]; locale: AppLocale}) {
+  const isSr = locale === "sr";
   const [animal, setAnimal] = useState<"cat" | "dog">("cat");
   const [count, setCount] = useState(2);
-  const [heated, setHeated] = useState(false);
+  const [heating, setHeating] = useState<HeatingNeed>("any");
+  const [climate, setClimate] = useState<ClimateNeed>("cold");
   const [maxWidth, setMaxWidth] = useState(1400);
+  const [maxDepth, setMaxDepth] = useState(1400);
 
-  const matches = useMemo(() => models.filter((model) =>
-    model.animal === animal &&
-    model.capacity.max >= count &&
-    (!heated || model.heated) &&
-    model.dimensions.widthMm <= maxWidth
-  ), [models, animal, count, heated, maxWidth]);
+  const matches = useMemo(() => models
+    .filter((model) => {
+      const heatingOk =
+        heating === "any" ||
+        (heating === "heated" && model.heated) ||
+        (heating === "passive" && !model.heated);
+
+      return (
+        model.animal === animal &&
+        model.capacity.max >= count &&
+        heatingOk &&
+        climateRank[model.climateProfile] >= needRank[climate] &&
+        model.dimensions.widthMm <= maxWidth &&
+        model.dimensions.depthMm <= maxDepth
+      );
+    })
+    .sort((a, b) => {
+      const capacityWasteA = a.capacity.max - count;
+      const capacityWasteB = b.capacity.max - count;
+      if (capacityWasteA !== capacityWasteB) return capacityWasteA - capacityWasteB;
+
+      const areaA = a.dimensions.widthMm * a.dimensions.depthMm;
+      const areaB = b.dimensions.widthMm * b.dimensions.depthMm;
+      return areaA - areaB;
+    }), [models, animal, count, heating, climate, maxWidth, maxDepth]);
+
+  function reasons(model: ShelterModel) {
+    const items = [
+      isSr
+        ? `Kapacitet: do ${model.capacity.max} životinja`
+        : `Capacity: up to ${model.capacity.max} animals`,
+      isSr
+        ? `Staje u ${maxWidth} × ${maxDepth} mm prostor`
+        : `Fits within ${maxWidth} × ${maxDepth} mm`,
+      isSr
+        ? `Profil: ${model.climateProfile.replaceAll("_", " ")}`
+        : `Profile: ${model.climateProfile.replaceAll("_", " ")}`
+    ];
+
+    if (heating === "heated") {
+      items.push(isSr ? "Predviđen je za namensko grejanje" : "Designed to accommodate purpose-built heating");
+    }
+
+    return items;
+  }
 
   return (
     <div className="finder-layout">
-      <section className="finder-panel">
+      <section className="finder-panel" aria-label={isSr ? "Uslovi za izbor modela" : "Model matching constraints"}>
         <label>
-          <span>{locale === "sr" ? "Životinja" : "Animal"}</span>
+          <span>{isSr ? "Životinja" : "Animal"}</span>
           <select value={animal} onChange={(event) => setAnimal(event.target.value as "cat" | "dog")}>
-            <option value="cat">{locale === "sr" ? "Mačka" : "Cat"}</option>
-            <option value="dog">{locale === "sr" ? "Pas" : "Dog"}</option>
+            <option value="cat">{isSr ? "Mačka" : "Cat"}</option>
+            <option value="dog">{isSr ? "Pas" : "Dog"}</option>
           </select>
         </label>
+
         <label>
-          <span>{locale === "sr" ? "Broj životinja" : "Number of animals"}</span>
-          <input type="number" min={1} max={8} value={count} onChange={(event) => setCount(Number(event.target.value))} />
+          <span>{isSr ? "Broj životinja" : "Number of animals"}</span>
+          <input
+            type="number"
+            min={1}
+            max={12}
+            value={count}
+            onChange={(event) => setCount(Math.max(1, Number(event.target.value) || 1))}
+          />
         </label>
+
         <label>
-          <span>{locale === "sr" ? "Maksimalna širina" : "Maximum width"}: {maxWidth} mm</span>
-          <input type="range" min={600} max={1800} step={50} value={maxWidth} onChange={(event) => setMaxWidth(Number(event.target.value))} />
+          <span>{isSr ? "Zimski profil" : "Winter profile"}</span>
+          <select value={climate} onChange={(event) => setClimate(event.target.value as ClimateNeed)}>
+            <option value="moderate">{isSr ? "Umerena zima" : "Moderate winter"}</option>
+            <option value="cold">{isSr ? "Hladna zima" : "Cold winter"}</option>
+            <option value="severe">{isSr ? "Vrlo hladni projektni uslovi" : "Severe design conditions"}</option>
+          </select>
         </label>
-        <label className="check-row">
-          <input type="checkbox" checked={heated} onChange={(event) => setHeated(event.target.checked)} />
-          <span>{locale === "sr" ? "Tražim model sa predviđenim grejanjem" : "I need a heating-ready model"}</span>
+
+        <label>
+          <span>{isSr ? "Grejanje" : "Heating"}</span>
+          <select value={heating} onChange={(event) => setHeating(event.target.value as HeatingNeed)}>
+            <option value="any">{isSr ? "Svejedno" : "Either"}</option>
+            <option value="passive">{isSr ? "Bez aktivnog grejanja" : "No active heating"}</option>
+            <option value="heated">{isSr ? "Model predviđen za grejanje" : "Heating-ready model"}</option>
+          </select>
         </label>
+
+        <label>
+          <span>{isSr ? "Maksimalna širina" : "Maximum width"}: {maxWidth} mm</span>
+          <input
+            type="range"
+            min={600}
+            max={2400}
+            step={50}
+            value={maxWidth}
+            onChange={(event) => setMaxWidth(Number(event.target.value))}
+          />
+        </label>
+
+        <label>
+          <span>{isSr ? "Maksimalna dubina" : "Maximum depth"}: {maxDepth} mm</span>
+          <input
+            type="range"
+            min={500}
+            max={1800}
+            step={50}
+            value={maxDepth}
+            onChange={(event) => setMaxDepth(Number(event.target.value))}
+          />
+        </label>
+
         <div className="finder-note">
-          {locale === "sr"
-            ? "Rezultati koriste tvrda ograničenja. Model se ne prikazuje ako nema dovoljan kapacitet ili ne staje u zadatu širinu."
-            : "Results use hard constraints. A model is excluded if it lacks capacity or exceeds the available width."}
+          {isSr
+            ? "Model se prikazuje samo kada prolazi sva tvrda ograničenja. Zimski profil je projektantski filter, a ne sertifikovana temperaturna garancija."
+            : "A model is shown only when it passes every hard constraint. The winter profile is a design filter, not a certified temperature guarantee."}
         </div>
       </section>
+
       <section>
-        <p className="result-summary">{matches.length} {locale === "sr" ? "kompatibilnih modela" : "compatible models"}</p>
-        <div className="model-grid compact">
-          {matches.map((model) => <ModelCard key={model.id} model={model} locale={locale} />)}
+        <div className="finder-results-head">
+          <p className="result-summary">
+            <strong>{matches.length}</strong> {isSr ? "kompatibilnih modela" : "compatible models"}
+          </p>
+          <small>
+            {isSr
+              ? "Najpre se prikazuje najmanji dovoljan kapacitet, zatim kompaktniji footprint."
+              : "Results prioritize the smallest sufficient capacity, then the more compact footprint."}
+          </small>
         </div>
+
+        {matches.length > 0 ? (
+          <div className="finder-results">
+            {matches.map((model) => (
+              <div className="finder-match" key={model.id}>
+                <ModelCard model={model} locale={locale} />
+                <div className="match-reasons">
+                  <strong>{isSr ? "Zašto odgovara" : "Why it matches"}</strong>
+                  <ul>
+                    {reasons(model).map((reason) => <li key={reason}>{reason}</li>)}
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <span className="kicker">0 matches</span>
+            <h2>{isSr ? "Trenutno nema modela koji prolazi sve uslove." : "No current model passes every constraint."}</h2>
+            <p>
+              {isSr
+                ? "Promenite prostor, zimski profil ili zahtev za grejanjem. Finder neće predložiti model koji ne ispunjava tvrda ograničenja."
+                : "Adjust available space, winter profile or heating requirement. The finder will not suggest a model that fails hard constraints."}
+            </p>
+          </div>
+        )}
       </section>
     </div>
   );
