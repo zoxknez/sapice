@@ -38,7 +38,7 @@ export const sources: Record<string, SourceRecord> = {
     accessedAt: "2026-09-27",
     tier: 1,
     topics: ["pets", "winter", "safety"],
-    notes: "Used for the limitation that outdoor auxiliary shelters are not a substitute for keeping companion animals indoors during severe cold."
+    notes: "Supports the limitation that outdoor auxiliary shelters are not a substitute for keeping companion animals indoors during severe cold."
   },
   "iso-6946-2017": {
     id: "iso-6946-2017",
@@ -58,7 +58,7 @@ export const sources: Record<string, SourceRecord> = {
     accessedAt: "2026-09-27",
     tier: 1,
     topics: ["thermal", "ventilation", "steady-state"],
-    notes: "Methodological reference for separating transmission and ventilation heat transfer. Current MVP does not claim a validated infiltration model."
+    notes: "Methodological reference for separating transmission and ventilation heat transfer. The MVP does not claim a validated infiltration model."
   },
   "iso-13788-2012": {
     id: "iso-13788-2012",
@@ -68,6 +68,16 @@ export const sources: Record<string, SourceRecord> = {
     accessedAt: "2026-09-27",
     tier: 1,
     topics: ["moisture", "condensation"],
-    notes: "Used to document limitations of simplified moisture indicators; a full hygrothermal model is outside the MVP scope."
+    notes: "Documents limitations of simplified moisture indicators; full hygrothermal simulation is outside the MVP."
+  },
+  "iec-60335-2-71-2018": {
+    id: "iec-60335-2-71-2018",
+    publisher: "IEC",
+    title: "IEC 60335-2-71:2018 - Particular requirements for electrical heating appliances for breeding and rearing animals",
+    url: "https://webstore.iec.ch/en/publication/60364",
+    accessedAt: "2026-09-27",
+    tier: 1,
+    topics: ["heating", "electrical-safety", "animals"],
+    notes: "Safety reference for electrical animal-heating appliances. The app only accommodates purpose-built products and does not claim product certification."
   }
 };
