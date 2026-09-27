@@ -11,6 +11,7 @@ export type CutPart = {
   heightMm: number;
   thicknessMm: number;
   shape: "rectangle" | "trapezoid";
+  trapezoidRearHeightMm?: number;
   notes?: string;
   cutouts?: Array<{
     type: "roundedRectangle";
@@ -191,6 +192,7 @@ export function compileShelterModel(model: ShelterModel) {
       heightMm: model.dimensions.frontHeightMm,
       thicknessMm: 12,
       shape: "trapezoid",
+      trapezoidRearHeightMm: model.dimensions.rearHeightMm,
       notes: `Front edge ${model.dimensions.frontHeightMm} mm; rear edge ${model.dimensions.rearHeightMm} mm.`
     },
     {
@@ -241,6 +243,7 @@ export function compileShelterModel(model: ShelterModel) {
       heightMm: internalFrontHeightMm,
       thicknessMm: 9,
       shape: "trapezoid",
+      trapezoidRearHeightMm: internalRearHeightMm,
       notes: `Front clear edge ${internalFrontHeightMm} mm; rear clear edge ${internalRearHeightMm} mm.`
     },
     {
