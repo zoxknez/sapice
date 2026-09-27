@@ -1535,3 +1535,112 @@ button { cursor: pointer; }
   font-size: 11px;
   line-height: 1.5;
 }
+
+
+.detail-actions {
+  display: flex;
+  gap: 10px;
+  margin: 0 0 18px;
+}
+.print-plan-button { min-height: 44px; }
+
+@media print {
+  :root {
+    --paper: #fff;
+    --surface: #fff;
+    --surface-2: #fff;
+    --line: #bbb;
+    --ink: #111;
+    --muted: #555;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #111 !important;
+    font-size: 10pt;
+  }
+
+  .site-header,
+  .site-footer,
+  .model-subnav,
+  .viewer-toolbar,
+  .viewer-badge,
+  .print-plan-button,
+  .cost-toolbar,
+  .compare-hint,
+  .step-focus-link,
+  .build-guide-head > button {
+    display: none !important;
+  }
+
+  .shell {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .model-detail-hero,
+  .section,
+  .page-hero {
+    padding: 20px 0 !important;
+  }
+
+  .viewer {
+    min-height: 320px !important;
+    break-inside: avoid;
+  }
+
+  .detail-grid,
+  .detail-content,
+  .section-heading,
+  .source-layout {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 24px !important;
+  }
+
+  .model-grid,
+  .sheet-grid,
+  .material-cards,
+  .guide-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .tone,
+  .tone-soft,
+  .framing-section,
+  .cost-section {
+    background: #fff !important;
+    color: #111 !important;
+  }
+
+  .cost-table,
+  .cost-row,
+  .cost-total,
+  .cost-section .section-heading p,
+  .cost-section .kicker {
+    color: #111 !important;
+    background: #fff !important;
+    border-color: #bbb !important;
+  }
+
+  .cost-total {
+    border: 1px solid #bbb !important;
+  }
+
+  .build-focus { display: none !important; }
+
+  .section,
+  .stock-layout,
+  .cut-table,
+  .technical-sketch,
+  .thermal-grid,
+  .framing-summary,
+  .source-list a {
+    break-inside: avoid;
+  }
+
+  a {
+    color: #111 !important;
+    text-decoration: none !important;
+  }
+}
