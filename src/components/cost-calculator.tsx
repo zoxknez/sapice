@@ -29,17 +29,21 @@ export function CostCalculator({
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    const raw = window.localStorage.getItem(`sapice:cost:${modelId}`);
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw) as {currency?: Currency; prices?: PriceMap};
-        if (parsed.currency) setCurrency(parsed.currency);
-        if (parsed.prices) setPrices(parsed.prices);
-      } catch {
-        // Invalid local draft is ignored.
+    const timeoutId = window.setTimeout(() => {
+      const raw = window.localStorage.getItem(`sapice:cost:${modelId}`);
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw) as {currency?: Currency; prices?: PriceMap};
+          if (parsed.currency) setCurrency(parsed.currency);
+          if (parsed.prices) setPrices(parsed.prices);
+        } catch {
+          // Invalid local draft is ignored.
+        }
       }
-    }
-    setHydrated(true);
+      setHydrated(true);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [modelId]);
 
   useEffect(() => {

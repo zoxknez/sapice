@@ -2,3 +2,5 @@ allowBuilds:
   '@parcel/watcher': true
   '@swc/core': true
   unrs-resolver: true
+patchedDependencies:
+  three-stdlib@2.36.1: patches/three-stdlib@2.36.1.patch

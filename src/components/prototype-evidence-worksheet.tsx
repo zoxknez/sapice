@@ -91,23 +91,27 @@ export function PrototypeEvidenceWorksheet({
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    const raw = window.localStorage.getItem(storageKey);
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw) as Partial<EvidenceState>;
-        setState({
-          ...initialState(),
-          ...parsed,
-          checklist: {
-            ...emptyChecklist,
-            ...(parsed.checklist ?? {})
-          }
-        });
-      } catch {
-        // Corrupt local evidence drafts are ignored.
+    const timeoutId = window.setTimeout(() => {
+      const raw = window.localStorage.getItem(storageKey);
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw) as Partial<EvidenceState>;
+          setState({
+            ...initialState(),
+            ...parsed,
+            checklist: {
+              ...emptyChecklist,
+              ...(parsed.checklist ?? {})
+            }
+          });
+        } catch {
+          // Corrupt local evidence drafts are ignored.
+        }
       }
-    }
-    setHydrated(true);
+      setHydrated(true);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [storageKey]);
 
   useEffect(() => {

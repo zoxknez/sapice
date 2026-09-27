@@ -11,7 +11,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit -p tsconfig.strict.json",
     "test": "vitest run",
     "test:e2e": "playwright test"
   },
@@ -32,12 +32,13 @@
     "@types/node": "^24.0.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
+    "@types/three": "0.186.0",
+    "@types/webpack": "5.28.0",
     "eslint": "^9.36.0",
     "eslint-config-next": "16.3.6",
     "tailwindcss": "4.3.0",
     "typescript": "^6.0.0",
-    "vitest": "^5.0.0",
-    "@types/three": "0.186.0"
+    "vitest": "^5.0.0"
   },
   "devEngines": {
     "runtime": {

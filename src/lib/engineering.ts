@@ -336,7 +336,6 @@ export function roofSlope(model: ShelterModel) {
 export function roofPanelGeometry(model: ShelterModel) {
   const slope = roofSlope(model);
   const cos = Math.cos(slope.angleRad);
-  const extraPlanDepthMm = model.roof.frontOverhangMm + model.roof.rearOverhangMm;
   const frontOverhangAlongSlopeMm = model.roof.frontOverhangMm / cos;
   const rearOverhangAlongSlopeMm = model.roof.rearOverhangMm / cos;
   const panelLengthMm =

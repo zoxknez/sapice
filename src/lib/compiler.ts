@@ -128,7 +128,6 @@ export function compileShelterModel(model: ShelterModel) {
   const assemblies = getModelAssemblies(model);
   const wall = construction.wallThicknessMm;
   const floorThicknessMm = construction.floorThicknessMm;
-  const roofThicknessMm = construction.roofThicknessMm;
   const interfaces = constructionInterfaceGeometry(model);
   const joinery = wallJoineryGeometry(model);
   const internalWidthMm = joinery.internalWidthMm;

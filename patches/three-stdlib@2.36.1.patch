@@ -1,0 +1,38 @@
+diff --git a/loaders/SVGLoader.d.ts b/loaders/SVGLoader.d.ts
+index 406ae30a9640ef1feda8779e73f0e0ac3f6a1d50..2c175a21c2c2e23fc3df9df40bfb2c81b1b931d3 100644
+--- a/loaders/SVGLoader.d.ts
++++ b/loaders/SVGLoader.d.ts
+@@ -1,15 +1,7 @@
+ import { Loader, LoadingManager, ShapePath, BufferGeometry, Vector2, Shape } from 'three'
+ 
+-export interface SVGResultPaths extends ShapePath {
+-  userData?:
+-    | {
+-        [key: string]: any
+-      }
+-    | undefined
+-}
+-
+ export interface SVGResult {
+-  paths: SVGResultPaths[]
++  paths: ShapePath[]
+   xml: XMLDocument
+ }
+ 
+diff --git a/loaders/TGALoader.d.ts b/loaders/TGALoader.d.ts
+index 16e035fbe77122c38efe6ef7db8efc106e194241..8fcec8186cb15bfcd01db3295b376df6ddbf8631 100644
+--- a/loaders/TGALoader.d.ts
++++ b/loaders/TGALoader.d.ts
+@@ -1,4 +1,4 @@
+-import { DataTexture, DataTextureLoader, LoadingManager } from 'three'
++import { DataTexture, DataTextureLoader, DataTextureLoaderTexData, LoadingManager } from 'three'
+ 
+ export class TGALoader extends DataTextureLoader {
+   constructor(manager?: LoadingManager)
+@@ -10,5 +10,5 @@ export class TGALoader extends DataTextureLoader {
+     onError?: (event: ErrorEvent) => void,
+   ): DataTexture
+   loadAsync(url: string, onProgress?: (event: ProgressEvent) => void): Promise<DataTexture>
+-  parse(data: ArrayBuffer): DataTexture
++  parse(data: ArrayBuffer): DataTextureLoaderTexData
+ }

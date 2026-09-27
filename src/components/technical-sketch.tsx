@@ -102,7 +102,6 @@ export function TechnicalSketch({
   const bodyX = sideX + model.roof.frontOverhangMm * sideScale;
   const sd = d * sideScale;
   const shf = hf * sideScale;
-  const shr = hr * sideScale;
   const sgc = gc * sideScale;
   const sideBodyBottom = sideTop + shf;
   const sideGround = sideBodyBottom + sgc;

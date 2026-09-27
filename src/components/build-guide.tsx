@@ -22,18 +22,22 @@ export function BuildGuide({
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const raw = window.localStorage.getItem(storageKey);
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) {
-          setCompleted(parsed.filter((value): value is string => typeof value === "string"));
+    const timeoutId = window.setTimeout(() => {
+      const raw = window.localStorage.getItem(storageKey);
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            setCompleted(parsed.filter((value): value is string => typeof value === "string"));
+          }
+        } catch {
+          // Invalid local progress is ignored.
         }
-      } catch {
-        // Invalid local progress is ignored.
       }
-    }
-    setReady(true);
+      setReady(true);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [storageKey]);
 
   useEffect(() => {

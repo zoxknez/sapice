@@ -1,6 +1,7 @@
 "use client";
 
 import {useLocale} from "next-intl";
+import {useRouter} from "next/navigation";
 import type {AppLocale} from "@/i18n/routing";
 
 const routePairs = [
@@ -38,6 +39,7 @@ export function switchLocalePath(pathname: string, from: AppLocale, to: AppLocal
 
 export function LocaleSwitcher() {
   const locale = useLocale() as AppLocale;
+  const router = useRouter();
   const nextLocale: AppLocale = locale === "sr" ? "en" : "sr";
 
   return (
@@ -46,7 +48,7 @@ export function LocaleSwitcher() {
       className="locale-switch"
       onClick={() => {
         const nextPath = switchLocalePath(window.location.pathname, locale, nextLocale);
-        window.location.assign(`${nextPath}${window.location.search}${window.location.hash}`);
+        router.replace(`${nextPath}${window.location.search}${window.location.hash}`);
       }}
       aria-label={locale === "sr" ? "Switch to English" : "Prebaci na srpski"}
     >
