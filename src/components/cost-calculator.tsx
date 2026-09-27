@@ -8,9 +8,10 @@ import {costLinesForModel} from "@/lib/costing";
 type Currency = "RSD" | "EUR" | "USD" | "GBP";
 type PriceMap = Record<string, number>;
 
-function unitLabel(unit: "sheet" | "m2" | "item", locale: AppLocale) {
+function unitLabel(unit: "sheet" | "m2" | "m" | "item", locale: AppLocale) {
   if (unit === "sheet") return locale === "sr" ? "tabla" : "sheet";
   if (unit === "m2") return "m²";
+  if (unit === "m") return "m";
   return locale === "sr" ? "stavka" : "item";
 }
 
