@@ -2558,3 +2558,128 @@ button { cursor: pointer; }
   stroke-linecap: round;
   stroke-dasharray: 5 3;
 }
+
+
+.prototype-evidence-section {
+  background: #eee8df;
+  border-top: 1px solid var(--line);
+}
+.prototype-identity {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 9px;
+  margin-bottom: 20px;
+}
+.prototype-identity > div {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+.prototype-identity span {
+  display: block;
+  color: var(--muted);
+  font: 800 8px ui-monospace, monospace;
+  letter-spacing: .07em;
+}
+.prototype-identity strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.prototype-form-grid,
+.prototype-notes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.prototype-form-grid label,
+.prototype-notes-grid label {
+  display: grid;
+  gap: 6px;
+}
+.prototype-form-grid label > span,
+.prototype-notes-grid label > span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 750;
+}
+.prototype-form-grid input,
+.prototype-notes-grid textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 11px 12px;
+  font: inherit;
+}
+.prototype-notes-grid {
+  margin-top: 14px;
+}
+.prototype-notes-grid textarea {
+  resize: vertical;
+  min-height: 118px;
+  line-height: 1.5;
+}
+.prototype-checklist {
+  margin-top: 18px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.prototype-checklist header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  background: #f6f1ea;
+}
+.prototype-checklist header span {
+  font: 800 11px ui-monospace, monospace;
+}
+.prototype-checklist label {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+}
+.prototype-checklist label:last-child {
+  border-bottom: 0;
+}
+.prototype-checklist input {
+  margin-top: 2px;
+  accent-color: #5d7569;
+}
+.prototype-checklist label span {
+  line-height: 1.45;
+  font-size: 11px;
+}
+.prototype-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+.prototype-disclaimer {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+@media (max-width: 700px) {
+  .prototype-form-grid,
+  .prototype-notes-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media print {
+  .prototype-actions {
+    display: none !important;
+  }
+}
