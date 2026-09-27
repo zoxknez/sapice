@@ -144,6 +144,55 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
     }
 
     if (
+      compiled.ventilation.zones.length !==
+      model.layout.chambers * model.ventilation.zonesPerChamber
+    ) {
+      issues.push({
+        severity: "error",
+        code: "VENTILATION_ZONE_COUNT_MISMATCH",
+        message: "Compiled ventilation provision zones do not match chamber count."
+      });
+    }
+
+    const rearStudPositionsMm = compiled.linearParts
+      .filter((part) => part.wall === "rear" && typeof part.positionMm === "number")
+      .map((part) => part.positionMm as number);
+
+    for (const zone of compiled.ventilation.zones) {
+      const chamberIndex = zone.chamber - 1;
+      const chamberLeftMm = compiled.layout.chamberStartsXmm[chamberIndex];
+      const chamberRightMm = chamberLeftMm + compiled.layout.chamberWidthMm;
+      const zoneLeftMm = zone.centerXmm - zone.widthMm / 2;
+      const zoneRightMm = zone.centerXmm + zone.widthMm / 2;
+      const zoneTopMm = zone.bottomMm + zone.heightMm;
+
+      if (
+        zoneLeftMm < chamberLeftMm ||
+        zoneRightMm > chamberRightMm ||
+        zone.bottomMm < 0 ||
+        zoneTopMm > compiled.interfaces.wallRearHeightMm
+      ) {
+        issues.push({
+          severity: "error",
+          code: "VENTILATION_ZONE_OUT_OF_BOUNDS",
+          message: `Ventilation provision zone ${zone.id} falls outside its rear-wall chamber geometry.`
+        });
+      }
+
+      for (const studXmm of rearStudPositionsMm) {
+        const requiredClearanceMm =
+          zone.widthMm / 2 + compiled.framing.frameProfileMm[0] / 2;
+        if (Math.abs(studXmm - zone.centerXmm) < requiredClearanceMm) {
+          issues.push({
+            severity: "error",
+            code: "VENTILATION_ZONE_STUD_CONFLICT",
+            message: `Ventilation provision zone ${zone.id} conflicts with a rear-wall stud.`
+          });
+        }
+      }
+    }
+
+    if (
       compiled.layout.entranceCentersXmm.length !== model.layout.entrances ||
       compiled.layout.dividerPositionsXmm.length !== Math.max(0, model.layout.chambers - 1)
     ) {
