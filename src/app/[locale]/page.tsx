@@ -51,6 +51,7 @@ export default async function HomePage({params}: {params: Promise<{locale: AppLo
               <Link href="/models" locale={locale} className="button secondary">{t("secondary")}</Link>
             </div>
             <div className="trust-row">
+              <span><strong>{shelterModels.length}</strong>{locale === "sr" ? "gotovih modela" : "ready models"}</span>
               <span><strong>SR + EN</strong>bilingual</span>
               <span><strong>3D</strong>parametric</span>
               <span><strong>0 AI</strong>runtime</span>
