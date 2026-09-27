@@ -462,6 +462,28 @@ export function TechnicalSketch({
             );
           })}
 
+          {compiled.heating.zones.map((zone, index) => (
+            <g key={zone.id}>
+              <rect
+                x={planX + zone.xMm * planScale}
+                y={planY + zone.zMm * planScale}
+                width={zone.widthMm * planScale}
+                height={zone.depthMm * planScale}
+                rx="4"
+                className="drawing-heating-provision"
+              />
+              <text
+                x={planX + (zone.xMm + zone.widthMm / 2) * planScale}
+                y={planY + (zone.zMm + zone.depthMm / 2) * planScale}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="drawing-axis-label"
+              >
+                HZ{index + 1}
+              </text>
+            </g>
+          ))}
+
           {compiled.ventilation.zones.map((zone, index) => {
             const x1 = planX + (zone.centerXmm - zone.widthMm / 2) * planScale;
             const x2 = planX + (zone.centerXmm + zone.widthMm / 2) * planScale;
@@ -579,6 +601,12 @@ export function TechnicalSketch({
           <text x="821" y="4" className="drawing-legend">{isSr ? "vent. PROVISION zona" : "vent PROVISION zone"}</text>
           <rect x="955" y="-5" width="20" height="10" className="drawing-base-post" />
           <text x="983" y="4" className="drawing-legend">{isSr ? "oslonac baze" : "base support"}</text>
+          {compiled.heating.zones.length > 0 && (
+            <>
+              <rect x="1040" y="-5" width="20" height="10" className="drawing-heating-provision" />
+              <text x="1068" y="4" className="drawing-legend">{isSr ? "grejna PROVISION zona" : "heating PROVISION zone"}</text>
+            </>
+          )}
         </g>
       </svg>
 
