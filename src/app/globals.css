@@ -1661,3 +1661,66 @@ button { cursor: pointer; }
   font-size: 9px;
   letter-spacing: .08em;
 }
+
+
+.operation-section {
+  background: #2b332f;
+  color: #fff;
+}
+.operation-layout {
+  display: grid;
+  grid-template-columns: .85fr 1.15fr;
+  gap: 60px;
+  align-items: start;
+}
+.operation-layout h2 {
+  margin-top: 10px;
+  color: #fff;
+}
+.operation-layout > div:first-child > p {
+  color: #c9d0cc;
+  line-height: 1.7;
+  max-width: 520px;
+}
+.operation-list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: op;
+}
+.operation-list li {
+  position: relative;
+  padding: 18px 0 18px 44px;
+  border-bottom: 1px solid #ffffff17;
+  color: #e7ebe8;
+  line-height: 1.6;
+}
+.operation-list li::before {
+  counter-increment: op;
+  content: counter(op, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 20px;
+  color: #cba17d;
+  font: 800 10px ui-monospace, monospace;
+}
+.operation-sources {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+.operation-sources a {
+  padding: 7px 9px;
+  border: 1px solid #ffffff1f;
+  border-radius: 999px;
+  color: #f0dfd1;
+  font-size: 10px;
+  font-weight: 760;
+}
+
+@media (max-width: 800px) {
+  .operation-layout { grid-template-columns: 1fr; gap: 24px; }
+}
