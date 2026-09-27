@@ -1,5 +1,5 @@
 import type {ShelterModel} from "@/lib/domain";
-import {constructionInterfaceGeometry, constructionSummary, entranceGeometry, framingMethod, getModelAssemblies, heatingProvisionGeometry, layoutGeometry, provisionalIntermediatePositions, roofPanelGeometry, roofSlope, surfaceAreas, thermalSummary, ventilationProvisionGeometry} from "@/lib/engineering";
+import {constructionInterfaceGeometry, constructionSummary, entranceGeometry, framingMethod, getModelAssemblies, heatingProvisionGeometry, layoutGeometry, provisionalIntermediatePositions, roofPanelGeometry, roofSlope, surfaceAreas, thermalSummary, ventilationProvisionGeometry, wallJoineryGeometry} from "@/lib/engineering";
 import {cutGeometryAreaMm2, cutGeometryCutoutPerimeterMm, cutGeometryOuterPerimeterMm} from "@/lib/cut-geometry";
 import {materials} from "@/data/materials";
 import {deterministicFingerprint} from "@/lib/fingerprint";
@@ -56,7 +56,7 @@ export type LinearPart = {
 
 
 export const compilerMethod = {
-  version: "1.7.0"
+  version: "1.8.0"
 } as const;
 
 export type HardwareItem = {
@@ -130,10 +130,11 @@ export function compileShelterModel(model: ShelterModel) {
   const floorThicknessMm = construction.floorThicknessMm;
   const roofThicknessMm = construction.roofThicknessMm;
   const interfaces = constructionInterfaceGeometry(model);
-  const internalWidthMm = Math.max(0, model.dimensions.widthMm - 2 * wall);
-  const internalDepthMm = Math.max(0, model.dimensions.depthMm - 2 * wall);
-  const internalFrontHeightMm = interfaces.wallFrontHeightMm;
-  const internalRearHeightMm = interfaces.wallRearHeightMm;
+  const joinery = wallJoineryGeometry(model);
+  const internalWidthMm = joinery.internalWidthMm;
+  const internalDepthMm = joinery.internalDepthMm;
+  const internalFrontHeightMm = joinery.internalFrontHeightMm;
+  const internalRearHeightMm = joinery.internalRearHeightMm;
   const roof = roofSlope(model);
   const roofPanel = roofPanelGeometry(model);
   const areas = surfaceAreas(model);
@@ -208,13 +209,13 @@ export function compileShelterModel(model: ShelterModel) {
       nameEn: "Exterior side panels",
       material: "plywood-12",
       quantity: 2,
-      widthMm: model.dimensions.depthMm,
-      heightMm: Math.round(interfaces.wallFrontHeightMm),
+      widthMm: joinery.sideRunMm,
+      heightMm: Math.round(joinery.sideFrontHeightMm),
       thicknessMm: 12,
       shape: "trapezoid",
-      trapezoidRearHeightMm: Math.round(interfaces.wallRearHeightMm),
-      notesSr: `Prednja zidna ivica ${Math.round(interfaces.wallFrontHeightMm)} mm; zadnja zidna ivica ${Math.round(interfaces.wallRearHeightMm)} mm. Zid stoji na gotovom podu i završava ispod krovnog sklopa.`,
-      notesEn: `Front wall edge ${Math.round(interfaces.wallFrontHeightMm)} mm; rear wall edge ${Math.round(interfaces.wallRearHeightMm)} mm. The wall sits on the finished floor and terminates below the roof assembly.`
+      trapezoidRearHeightMm: Math.round(joinery.sideRearHeightMm),
+      notesSr: `Bočni zid staje između punog prednjeg i zadnjeg zida. Čista dužina ${Math.round(joinery.sideRunMm)} mm; prednja unutrašnja ivica ${Math.round(joinery.sideFrontHeightMm)} mm; zadnja unutrašnja ivica ${Math.round(joinery.sideRearHeightMm)} mm.`,
+      notesEn: `The side wall fits between the full-width front and rear walls. Clear length ${Math.round(joinery.sideRunMm)} mm; front inner edge ${Math.round(joinery.sideFrontHeightMm)} mm; rear inner edge ${Math.round(joinery.sideRearHeightMm)} mm.`
     },
     {
       id: "roof-outer",
@@ -505,11 +506,11 @@ export function compileShelterModel(model: ShelterModel) {
     })
   );
 
-  const clearStudHeightAtDepth = (positionMm: number) => {
+  const clearStudHeightAtDepth = (globalZmm: number) => {
     const ratio =
       model.dimensions.depthMm === 0
         ? 0
-        : positionMm / model.dimensions.depthMm;
+        : globalZmm / model.dimensions.depthMm;
     const wallHeightMm =
       interfaces.wallFrontHeightMm +
       (interfaces.wallRearHeightMm - interfaces.wallFrontHeightMm) * ratio;
@@ -536,12 +537,12 @@ export function compileShelterModel(model: ShelterModel) {
     })
   );
 
-  const sideIntermediatePositionsMm = provisionalIntermediatePositions(
-    model.dimensions.depthMm,
+  const sideIntermediatePositionsZmm = provisionalIntermediatePositions(
+    joinery.sideRunMm,
     maxStudSpacingMm
-  );
+  ).map((localPositionMm) => joinery.sideStartZmm + localPositionMm);
   const sideIntermediateStuds: LinearPart[] = ["left", "right"].flatMap((wallSide) =>
-    sideIntermediatePositionsMm.map((positionMm, index) => ({
+    sideIntermediatePositionsZmm.map((positionMm, index) => ({
       id: `${wallSide}-stud-${index + 1}`,
       nameSr: "Međustub bočnog zida",
       nameEn: "Side-wall intermediate stud",
@@ -551,8 +552,8 @@ export function compileShelterModel(model: ShelterModel) {
       provenance: "ASSUMPTION" as const,
       wall: wallSide as "left" | "right",
       positionMm,
-      notesSr: `Pozicija prati V1 maksimalni osni razmak ≈ ${maxStudSpacingMm} mm; dužina prati kosinu krova.`,
-      notesEn: `Position follows the V1 maximum stud spacing of ≈ ${maxStudSpacingMm} mm; length follows the roof slope.`
+      notesSr: `Globalna Z pozicija je unutar bočnog zida između prednjeg i zadnjeg assembly-ja; razmak prati V1 maksimum ≈ ${maxStudSpacingMm} mm.`,
+      notesEn: `Global Z position lies inside the side wall between the front and rear assemblies; spacing follows the V1 maximum of ≈ ${maxStudSpacingMm} mm.`
     }))
   );
 
@@ -687,8 +688,10 @@ export function compileShelterModel(model: ShelterModel) {
       nameEn: "Side-wall lower rails",
       profileMm: frameProfile,
       quantity: 2,
-      lengthMm: model.dimensions.depthMm,
-      provenance: "GEOMETRY"
+      lengthMm: joinery.sideRunMm,
+      provenance: "GEOMETRY",
+      notesSr: "Bočna donja letva staje između punog prednjeg i zadnjeg zida.",
+      notesEn: "Side lower rail fits between the full-width front and rear walls."
     },
     {
       id: "side-top-rail",
@@ -696,10 +699,10 @@ export function compileShelterModel(model: ShelterModel) {
       nameEn: "Sloped side-wall upper rails",
       profileMm: frameProfile,
       quantity: 2,
-      lengthMm: Math.round(roof.trueLengthMm),
+      lengthMm: Math.round(joinery.sideTopSlopeLengthMm),
       provenance: "GEOMETRY",
-      notesSr: "Dužina prati stvarnu kosinu od prednje do zadnje ravni zida, bez krovnih prepusta.",
-      notesEn: "Length follows the true wall-top slope from front to rear wall plane, excluding roof overhangs."
+      notesSr: "Dužina prati kosinu bočnog zida između unutrašnjih ravni punog prednjeg i zadnjeg zida.",
+      notesEn: "Length follows the side-wall slope between the inner planes of the full-width front and rear walls."
     },
     {
       id: "corner-front",
@@ -849,6 +852,18 @@ export function compileShelterModel(model: ShelterModel) {
       provenance: "ASSUMPTION",
       notesSr: "Po jedna stopica ili odgovarajući izolacioni podmetač ispod svakog V1 vertikalnog oslonca, da drvo ne stoji direktno na mokroj podlozi. Konkretan proizvod, sidrenje i nosivost zavise od lokacije i podloge.",
       notesEn: "One suitable isolation foot or pad below each V1 vertical support so timber does not bear directly on wet ground. Product selection, anchorage and capacity depend on the actual site and substrate."
+    },
+    {
+      id: "corner-weather-trim",
+      nameSr: "Spoljašnja ugaona weather-trim zaštita",
+      nameEn: "Exterior corner weather trim",
+      quantity:
+        (2 * (interfaces.wallFrontHeightMm + interfaces.wallRearHeightMm)) /
+        1000,
+      unit: "m",
+      provenance: "ASSUMPTION",
+      notesSr: "Planerska dužina za četiri vertikalne spoljašnje ugaone ivice. Profil, zaptivanje i preklop moraju biti kompatibilni sa izabranom spoljašnjom oblogom i završnom zaštitom.",
+      notesEn: "Planning length for the four vertical exterior corner edges. Profile, sealing and overlap must be compatible with the selected exterior sheathing and finish system."
     },
     {
       id: "panel-fasteners",
@@ -1002,6 +1017,7 @@ export function compileShelterModel(model: ShelterModel) {
     compilerVersion: compilerMethod.version,
     model,
     interfaces,
+    joinery,
     layout,
     entrance,
     ventilation,
@@ -1026,6 +1042,7 @@ export function compileShelterModel(model: ShelterModel) {
     planFingerprint,
     model,
     interfaces,
+    joinery,
     layout,
     entrance,
     ventilation,
