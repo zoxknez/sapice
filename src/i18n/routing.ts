@@ -10,7 +10,9 @@ export const routing = defineRouting({
     "/models/[slug]": {sr: "/modeli/[slug]", en: "/models/[slug]"},
     "/finder": {sr: "/pronadji-model", en: "/find-model"},
     "/materials": {sr: "/materijali", en: "/materials"},
-    "/guides": {sr: "/vodici", en: "/guides"}
+    "/guides": {sr: "/vodici", en: "/guides"},
+    "/methodology": {sr: "/metodologija", en: "/methodology"},
+    "/offline": "/offline"
   }
 });
 
