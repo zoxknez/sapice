@@ -1,6 +1,6 @@
 import type {AppLocale} from "@/i18n/routing";
 import type {CompiledShelterModel, CutPart} from "@/lib/compiler";
-import {packCutParts} from "@/lib/nesting";
+import {packCutParts, type PackedPart} from "@/lib/nesting";
 
 type StockProfile = {
   id: string;
@@ -46,6 +46,79 @@ const stockProfiles: StockProfile[] = [
   }
 ];
 
+function PackedPartShape({
+  part,
+  scale
+}: {
+  part: PackedPart;
+  scale: number;
+}) {
+  const x = part.x * scale;
+  const y = part.y * scale;
+  const sourceW = part.sourceWidthMm * scale;
+  const sourceH = part.sourceHeightMm * scale;
+  const transform = part.rotated
+    ? `translate(${x + sourceH} ${y}) rotate(90)`
+    : `translate(${x} ${y})`;
+
+  const shape =
+    part.shape === "trapezoid" &&
+    part.trapezoidRearHeightMm !== undefined ? (
+      <polygon
+        points={[
+          "0,0",
+          `${sourceW},${(part.sourceHeightMm - part.trapezoidRearHeightMm) * scale}`,
+          `${sourceW},${sourceH}`,
+          `0,${sourceH}`
+        ].join(" ")}
+        className="packed-part packed-part-actual"
+      />
+    ) : (
+      <rect
+        x="0"
+        y="0"
+        width={sourceW}
+        height={sourceH}
+        className="packed-part packed-part-actual"
+      />
+    );
+
+  return (
+    <g>
+      <rect
+        x={x}
+        y={y}
+        width={part.widthMm * scale}
+        height={part.heightMm * scale}
+        className="packed-envelope"
+      />
+      <g transform={transform}>
+        {shape}
+        {(part.cutouts ?? []).map((cutout, index) => (
+          <rect
+            key={index}
+            x={cutout.xMm * scale}
+            y={(part.sourceHeightMm - cutout.yMm - cutout.heightMm) * scale}
+            width={cutout.widthMm * scale}
+            height={cutout.heightMm * scale}
+            rx={cutout.radiusMm * scale}
+            className="packed-cutout"
+          />
+        ))}
+        <text
+          x={sourceW / 2}
+          y={sourceH / 2}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          className="packed-label"
+        >
+          {part.partId}
+        </text>
+      </g>
+    </g>
+  );
+}
+
 function StockLayout({
   profile,
   parts,
@@ -68,7 +141,9 @@ function StockLayout({
     <section className="stock-layout">
       <header className="stock-layout-head">
         <div>
-          <span className="kicker">{profile.widthMm} × {profile.heightMm} mm</span>
+          <span className="kicker">
+            {profile.widthMm} × {profile.heightMm} mm · kerf {profile.kerfMm} mm · margin {profile.marginMm} mm
+          </span>
           <h3>{locale === "sr" ? profile.titleSr : profile.titleEn}</h3>
         </div>
         <div className="sheet-summary">
@@ -82,7 +157,10 @@ function StockLayout({
           <article key={sheet.index} className="sheet-card">
             <header>
               <strong>{locale === "sr" ? "Tabla" : "Sheet"} {sheet.index + 1}</strong>
-              <span>{Math.round(sheet.utilization * 100)}% {locale === "sr" ? "iskorišćeno" : "utilized"}</span>
+              <span>
+                {Math.round(sheet.materialUtilization * 100)}% {locale === "sr" ? "materijal" : "material"} ·{" "}
+                {Math.round(sheet.packingEnvelopeUtilization * 100)}% envelope
+              </span>
             </header>
             <svg
               viewBox={`0 0 ${sheet.widthMm * scale} ${sheet.heightMm * scale}`}
@@ -99,23 +177,7 @@ function StockLayout({
                 className="sheet-outline"
               />
               {sheet.parts.map((part) => (
-                <g key={part.partId}>
-                  <rect
-                    x={part.x * scale}
-                    y={part.y * scale}
-                    width={part.widthMm * scale}
-                    height={part.heightMm * scale}
-                    className={part.shape === "trapezoid" ? "packed-part trapezoid-part" : "packed-part"}
-                  />
-                  <text
-                    x={(part.x + part.widthMm / 2) * scale}
-                    y={(part.y + part.heightMm / 2) * scale}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                  >
-                    {part.partId}
-                  </text>
-                </g>
+                <PackedPartShape key={part.partId} part={part} scale={scale} />
               ))}
             </svg>
           </article>
@@ -149,8 +211,8 @@ export function SheetLayout({
           </div>
           <p>
             {locale === "sr"
-              ? "Svaki materijal se pakuje posebno sa kerf-om i marginom. Trapezni delovi se trenutno pakuju po bounding-box-u, pa prikaz nije polygon-optimalni nesting. Stock formati su planerski default i treba ih proveriti kod lokalnog dobavljača."
-              : "Each material is packed separately with kerf and margins. Trapezoid parts currently pack by bounding box, so this is not polygon-optimal nesting. Stock formats are planning defaults and should be checked with the local supplier."}
+              ? "Stvarna geometrija dela se prikazuje punom linijom, a isprekidani pravougaonik je konzervativni packing envelope. V1 i dalje pakuje trapeze po bounding-box-u, pa nije polygon-optimalni nesting. Material % meri stvarnu površinu delova, envelope % prostor rezervisan algoritmom."
+              : "Actual part geometry is shown with a solid outline while the dashed rectangle is the conservative packing envelope. V1 still packs trapezoids by bounding box, so it is not polygon-optimal nesting. Material % measures actual part area; envelope % is the space reserved by the algorithm."}
           </p>
         </div>
 
