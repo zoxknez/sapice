@@ -79,6 +79,84 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
       });
     }
 
+    const expectedSideRunMm =
+      model.dimensions.depthMm -
+      2 * compiled.construction.wallThicknessMm;
+    const sideOuterPart = compiled.cutParts.find(
+      (part) => part.id === "side-outer"
+    );
+    const sideInnerPart = compiled.cutParts.find(
+      (part) => part.id === "side-inner"
+    );
+    const sideBottomRail = compiled.linearParts.find(
+      (part) => part.id === "side-bottom-rail"
+    );
+    const sideTopRail = compiled.linearParts.find(
+      (part) => part.id === "side-top-rail"
+    );
+
+    if (
+      compiled.joinery.convention !==
+        "FRONT_REAR_FULL_WIDTH_SIDES_BETWEEN" ||
+      Math.abs(compiled.joinery.sideRunMm - expectedSideRunMm) > 0.001 ||
+      Math.abs(compiled.joinery.internalDepthMm - expectedSideRunMm) > 0.001 ||
+      Math.abs(compiled.internal.depthMm - expectedSideRunMm) > 0.001
+    ) {
+      issues.push({
+        severity: "error",
+        code: "WALL_JOINERY_DEPTH_MISMATCH",
+        message: "Side-wall and internal depth geometry does not match the front/rear-full-width joinery convention."
+      });
+    }
+
+    if (
+      !sideOuterPart ||
+      !sideInnerPart ||
+      Math.abs(sideOuterPart.widthMm - compiled.joinery.sideRunMm) > 0.001 ||
+      Math.abs(sideInnerPart.widthMm - compiled.joinery.sideRunMm) > 0.001 ||
+      Math.abs(
+        (sideOuterPart.trapezoidRearHeightMm ?? Number.NaN) -
+          Math.round(compiled.joinery.sideRearHeightMm)
+      ) > 0.001 ||
+      Math.abs(
+        sideOuterPart.heightMm -
+          Math.round(compiled.joinery.sideFrontHeightMm)
+      ) > 0.001
+    ) {
+      issues.push({
+        severity: "error",
+        code: "SIDE_PANEL_JOINERY_MISMATCH",
+        message: "Compiled side-wall panels do not match the canonical wall-joinery geometry."
+      });
+    }
+
+    if (
+      !sideBottomRail ||
+      !sideTopRail ||
+      Math.abs(sideBottomRail.lengthMm - compiled.joinery.sideRunMm) > 0.001 ||
+      Math.abs(
+        sideTopRail.lengthMm -
+          Math.round(compiled.joinery.sideTopSlopeLengthMm)
+      ) > 0.001
+    ) {
+      issues.push({
+        severity: "error",
+        code: "SIDE_RAIL_JOINERY_MISMATCH",
+        message: "Side-wall framing rails do not match the canonical joinery run and roof slope."
+      });
+    }
+
+    if (
+      compiled.areas.cornerReturnM2 <= 0 ||
+      compiled.areas.sidePanelCoreM2 <= 0
+    ) {
+      issues.push({
+        severity: "error",
+        code: "INVALID_WALL_JOINERY_ENVELOPE",
+        message: "Wall joinery must preserve both side-panel core area and front/rear corner-return envelope area."
+      });
+    }
+
     if (
       compiled.internal.widthMm <= 0 ||
       compiled.internal.depthMm <= 0 ||
@@ -536,14 +614,27 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
 
     const checkStudSpacing = (
       wallName: "rear" | "left" | "right",
-      spanMm: number
+      startMm: number,
+      endMm: number
     ) => {
       const positions = compiled.linearParts
         .filter((part) => part.wall === wallName && typeof part.positionMm === "number")
         .map((part) => part.positionMm as number)
         .sort((a, b) => a - b);
 
-      const points = [0, ...positions, spanMm];
+      if (
+        positions.some(
+          (positionMm) => positionMm <= startMm || positionMm >= endMm
+        )
+      ) {
+        issues.push({
+          severity: "error",
+          code: "STUD_OUTSIDE_WALL_JOINERY",
+          message: `${wallName} wall contains an intermediate stud outside its compiled wall span.`
+        });
+      }
+
+      const points = [startMm, ...positions, endMm];
       for (let index = 1; index < points.length; index++) {
         const gap = points[index] - points[index - 1];
         if (gap > compiled.framing.maxStudSpacingMm + 1) {
@@ -556,9 +647,17 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
       }
     };
 
-    checkStudSpacing("rear", model.dimensions.widthMm);
-    checkStudSpacing("left", model.dimensions.depthMm);
-    checkStudSpacing("right", model.dimensions.depthMm);
+    checkStudSpacing("rear", 0, model.dimensions.widthMm);
+    checkStudSpacing(
+      "left",
+      compiled.joinery.sideStartZmm,
+      compiled.joinery.sideEndZmm
+    );
+    checkStudSpacing(
+      "right",
+      compiled.joinery.sideStartZmm,
+      compiled.joinery.sideEndZmm
+    );
 
     for (const part of compiled.linearParts) {
       if (
@@ -710,6 +809,28 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
         severity: "error",
         code: "ROOF_EDGE_PROTECTION_LENGTH_MISMATCH",
         message: "Roof edge/drip protection length does not match the compiled roof-panel perimeter."
+      });
+    }
+
+    const cornerTrimItem = compiled.hardwareItems.find(
+      (item) => item.id === "corner-weather-trim"
+    );
+    const expectedCornerTrimM =
+      (2 *
+        (
+          compiled.interfaces.wallFrontHeightMm +
+          compiled.interfaces.wallRearHeightMm
+        )) /
+      1000;
+
+    if (
+      !cornerTrimItem ||
+      Math.abs(cornerTrimItem.quantity - expectedCornerTrimM) > 0.001
+    ) {
+      issues.push({
+        severity: "error",
+        code: "CORNER_WEATHER_TRIM_LENGTH_MISMATCH",
+        message: "Exterior corner weather-trim quantity does not match the four vertical corner edges."
       });
     }
 
