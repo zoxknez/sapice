@@ -140,9 +140,16 @@ Physical validation must inspect excess humidity, visible condensation and exces
 
 ## Roof and water management
 
-Canonical geometry defines roof slope and overhangs.
+Canonical geometry defines roof slope and overhangs. The compiler identifies the **front as the high edge** and the **rear as the runoff edge**, so normal shedding is directed away from the entrance side.
 
-The model intentionally keeps the final waterproof covering product-specific. The selected covering/membrane remains authoritative for minimum permitted slope, overlap, edge treatment and installation method.
+It also derives:
+
+- roof slope in degrees
+- rise and run
+- rear drip-edge planning length
+- full roof-panel edge-protection planning length
+
+The final waterproof covering remains **PRODUCT_SPECIFIC**. The selected covering/membrane remains authoritative for minimum permitted slope, substrate, overlap, fastening, drip/edge treatment and installation method.
 
 A geometric roof slope is therefore not automatically a certification that every roofing product is suitable.
 
@@ -180,12 +187,17 @@ V1 also enforces a provisional maximum support spacing.
 
 Hardware quantities and roof hinge/latch positions are generated deterministically but remain assumptions until engineering review selects real hardware products and verifies their capacities.
 
-## Heating
+## Heating provision
 
 Heated variants do not define homemade heaters.
 
-They only reserve geometry for compatible purpose-built animal-heating equipment. The selected product's declarations and manufacturer instructions remain authoritative for:
+Compiler v1.5 derives one **PRODUCT_SPECIFIC provision zone per chamber**. Each zone is bounded by the chamber floor geometry and must leave a positive unheated choice area. The BOM creates one protected cable-entry provision per zone.
 
+These values do **not** specify heater power, voltage, thermostat set-points or a safe DIY electrical design.
+
+The selected purpose-built animal-heating product's declarations and manufacturer instructions remain authoritative for:
+
+- actual product footprint
 - permitted environment
 - cable routing
 - electrical protection
