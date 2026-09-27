@@ -6,7 +6,7 @@ import {Canvas} from "@react-three/fiber";
 import {ContactShadows, OrbitControls} from "@react-three/drei";
 import type {ShelterModel} from "@/lib/domain";
 import type {AppLocale} from "@/i18n/routing";
-import {constructionSummary, layoutGeometry, roofPanelGeometry, roofSlope} from "@/lib/engineering";
+import {layoutGeometry} from "@/lib/engineering";
 import {compileShelterModel, type CompiledShelterModel} from "@/lib/compiler";
 
 type ViewMode = "assembled" | "roof-off" | "exploded" | "frame";
@@ -349,7 +349,7 @@ function Shelter({model, mode}: {model: ShelterModel; mode: ViewMode}) {
   const roofWidth = roofPanel.panelWidthMm / 1000;
   const roofCenterZ = d / 2 + roofPanel.centerPlanOffsetMm / 1000;
   const roofCenterY = gc + avgH + roofT / 2 + roofPanel.centerHeightOffsetMm / 1000;
-  const layout = layoutGeometry(model);
+  const layout = compiled.layout;
   const dividerDepth = Math.max(0.05, d - 2 * wallT);
   const dividerFrontHeight = Math.max(0.05, hf - floorT - roofT);
   const dividerRearHeight = Math.max(0.05, hr - floorT - roofT);
