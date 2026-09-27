@@ -226,6 +226,59 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
       });
     }
 
+    if (
+      model.maintenance.roofAccess === "HINGED" &&
+      model.maintenance.hingeEdge === null
+    ) {
+      issues.push({
+        severity: "error",
+        code: "HINGE_EDGE_REQUIRED",
+        message: "Hinged roof access requires an explicit hinge edge."
+      });
+    }
+
+    if (
+      model.maintenance.roofAccess === "REMOVABLE" &&
+      model.maintenance.hingeEdge !== null
+    ) {
+      issues.push({
+        severity: "error",
+        code: "REMOVABLE_ROOF_HAS_HINGE_EDGE",
+        message: "Removable roof access must not declare a hinge edge."
+      });
+    }
+
+    const hingeItem = compiled.hardwareItems.find((item) => item.id === "roof-hinges");
+    const latchItem = compiled.hardwareItems.find((item) => item.id === "roof-latches");
+
+    if (
+      (hingeItem?.quantity ?? 0) !== compiled.hardware.hingePositionsAcrossRoofMm.length ||
+      (latchItem?.quantity ?? 0) !== compiled.hardware.latchPositionsAcrossRoofMm.length
+    ) {
+      issues.push({
+        severity: "error",
+        code: "HARDWARE_POSITION_COUNT_MISMATCH",
+        message: "Hardware item quantities do not match compiled hinge/latch positions."
+      });
+    }
+
+    for (const positionMm of [
+      ...compiled.hardware.hingePositionsAcrossRoofMm,
+      ...compiled.hardware.latchPositionsAcrossRoofMm
+    ]) {
+      if (
+        !Number.isFinite(positionMm) ||
+        positionMm <= 0 ||
+        positionMm >= compiled.roofPanel.panelWidthMm
+      ) {
+        issues.push({
+          severity: "error",
+          code: "HARDWARE_POSITION_OUT_OF_BOUNDS",
+          message: `Roof hardware center ${positionMm} mm is outside the roof panel.`
+        });
+      }
+    }
+
     for (const item of compiled.hardwareItems) {
       if (
         item.quantity <= 0 ||
