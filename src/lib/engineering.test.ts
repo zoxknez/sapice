@@ -416,6 +416,42 @@ describe("engineering model derivations", () => {
     }
   });
 
+  it("compiles one bounded heating provision zone per chamber only for heated models", () => {
+    for (const model of shelterModels) {
+      const compiled = compileShelterModel(model);
+
+      if (!model.heated) {
+        expect(compiled.heating.zones).toHaveLength(0);
+        expect(
+          compiled.hardwareItems.some((item) => item.id === "protected-cable-entry")
+        ).toBe(false);
+        continue;
+      }
+
+      expect(compiled.heating.zones).toHaveLength(model.layout.chambers);
+
+      const cableEntry = compiled.hardwareItems.find(
+        (item) => item.id === "protected-cable-entry"
+      );
+      expect(cableEntry?.quantity).toBe(compiled.heating.zones.length);
+
+      for (const zone of compiled.heating.zones) {
+        const chamberIndex = zone.chamber - 1;
+        const chamberLeftMm = compiled.layout.chamberStartsXmm[chamberIndex];
+        const chamberRightMm = chamberLeftMm + compiled.layout.chamberWidthMm;
+        const internalRearMm =
+          model.dimensions.depthMm - compiled.construction.wallThicknessMm;
+
+        expect(zone.xMm).toBeGreaterThanOrEqual(chamberLeftMm);
+        expect(zone.xMm + zone.widthMm).toBeLessThanOrEqual(chamberRightMm);
+        expect(zone.zMm).toBeGreaterThanOrEqual(compiled.construction.wallThicknessMm);
+        expect(zone.zMm + zone.depthMm).toBeLessThanOrEqual(internalRearMm);
+        expect(zone.areaM2).toBeGreaterThan(0);
+        expect(zone.areaM2).toBeLessThan(zone.chamberFloorAreaM2);
+      }
+    }
+  });
+
   it("keeps large heated and passive dog geometry identical", () => {
     const passive = getShelterModel("alpine-large-winter");
     const heated = getShelterModel("alpine-large-heated");
