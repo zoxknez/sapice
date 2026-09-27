@@ -62,7 +62,12 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
       compiled.internal.widthMm <= 0 ||
       compiled.internal.depthMm <= 0 ||
       compiled.internal.frontHeightMm <= 0 ||
-      compiled.internal.rearHeightMm <= 0
+      compiled.internal.rearHeightMm <= 0 ||
+      compiled.internal.chamberClearWidthMm <= 0 ||
+      compiled.internal.usableFloorAreaM2 <= 0 ||
+      compiled.internal.usableVolumeM3 <= 0 ||
+      !Number.isFinite(compiled.internal.floorAreaPerRecommendedAnimalM2) ||
+      !Number.isFinite(compiled.internal.floorAreaPerMaxAnimalM2)
     ) {
       issues.push({
         severity: "error",
