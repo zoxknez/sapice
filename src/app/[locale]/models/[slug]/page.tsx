@@ -100,10 +100,11 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
         <div className="shell">
           <a href="#geometry">{locale === "sr" ? "Mere" : "Dimensions"}</a>
           <a href="#thermal">{locale === "sr" ? "Termika" : "Thermal"}</a>
-          <a href="#inside">{locale === "sr" ? "Unutrašnjost" : "Interior"}</a>
-          <a href="#cut-list">{locale === "sr" ? "Krojna lista" : "Cut list"}</a>
+          <a href="#materials">{locale === "sr" ? "Materijali" : "Materials"}</a>
           <a href="#nesting">{locale === "sr" ? "Table" : "Sheets"}</a>
           <a href="#cost">{locale === "sr" ? "Trošak" : "Cost"}</a>
+          <a href="#inside">{locale === "sr" ? "Unutrašnjost" : "Interior"}</a>
+          <a href="#cut-list">{locale === "sr" ? "Krojna lista" : "Cut list"}</a>
           <a href="#framing">{locale === "sr" ? "Ram" : "Framing"}</a>
           <a href="#build-guide">{locale === "sr" ? "Izrada" : "Build"}</a>
           <a href="#sources">{locale === "sr" ? "Izvori" : "Sources"}</a>
@@ -157,7 +158,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
         </div>
       </section>
 
-      <section className="section">
+      <section className="section" id="materials">
         <div className="shell">
           <span className="kicker">BOM preview</span>
           <h2>{locale === "sr" ? "Osnovni materijali" : "Core materials"}</h2>
