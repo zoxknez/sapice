@@ -73,6 +73,13 @@ export default async function MethodologyPage({params}: {params: Promise<{locale
               : "The current engine estimates steady-state transmission through walls, floor and roof. Method v" + thermalMethod.version + " uses ISO 6946 orientation-specific surface resistances: Rsi 0.13 m²K/W for walls, 0.10 for upward heat flow through the roof and 0.17 for downward heat flow through the floor, with Rse 0.04 m²K/W. The model does not yet claim validated entrance infiltration, animal metabolic heat, wind effects, 2D framing thermal bridges or full hygrothermal behavior. The result is therefore not a temperature guarantee."}
           </p>
 
+          <h2>{isSr ? "Ventilacija" : "Ventilation"}</h2>
+          <p>
+            {isSr
+              ? "V1 ne tvrdi univerzalnu potrebnu površinu ventilacionog otvora. Compiler rezerviše high-rear PROVISION zone koje ne seku provisional framing, ali stvarni cutout i net free area zavise od konkretnog podesivog ventilacionog umetka. Terenska provera mora obuhvatiti kondenzaciju, vlagu i lokalnu promaju. Termički engine ne računa ventilacioni protok kroz te buduće otvore."
+              : "V1 does not claim a universal required ventilation-opening area. The compiler reserves high-rear PROVISION zones that avoid provisional framing, while the actual cutout and net free area depend on the selected adjustable vent insert. Field validation must include condensation, moisture and localized drafts. The thermal engine does not calculate airflow through those future openings."}
+          </p>
+
           <h2>{isSr ? "Grejanje" : "Heating"}</h2>
           <p>
             {isSr
