@@ -1942,3 +1942,37 @@ button { cursor: pointer; }
   .capability-grid article { min-height: 0; }
   .capability-grid article > span { margin-bottom: 24px; }
 }
+
+
+.skip-link {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 999;
+  transform: translateY(-160%);
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--ink);
+  color: #fff;
+  font-weight: 800;
+  transition: transform .15s ease;
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+:where(a, button, input, select, summary):focus-visible {
+  outline: 3px solid #9a6442;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
