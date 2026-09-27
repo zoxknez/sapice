@@ -1501,3 +1501,37 @@ button { cursor: pointer; }
 .material-source-links a::after {
   content: " ↗";
 }
+
+
+.thermal-grid small {
+  display: block;
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.thermal-grid .wide small { color: #bfb7ae; }
+.thermal-limitations {
+  margin-top: 18px;
+  padding: 18px 20px;
+  border: 1px solid #cdbfae;
+  border-radius: 16px;
+  background: #f4ede3;
+}
+.thermal-limitations > strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+.thermal-limitations ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 18px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
