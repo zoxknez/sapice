@@ -1,5 +1,6 @@
 import type {ShelterModel} from "@/lib/domain";
 import {materialLambda, materials, type Material} from "@/data/materials";
+import {roundedRectangleAreaMm2} from "@/lib/cut-geometry";
 import {
   assemblyThicknessMm,
   getAssembly,
@@ -75,6 +76,30 @@ export function layoutGeometry(model: ShelterModel) {
   };
 }
 
+export function entranceGeometry(model: ShelterModel) {
+  const widthMm = model.layout.entranceWidthMm;
+  const heightMm = model.layout.entranceHeightMm;
+  const radiusMm = Math.min(40, Math.round(widthMm * 0.22));
+  const singleOpeningAreaMm2 = roundedRectangleAreaMm2({
+    type: "roundedRectangle",
+    xMm: 0,
+    yMm: 0,
+    widthMm,
+    heightMm,
+    radiusMm
+  });
+
+  return {
+    widthMm,
+    heightMm,
+    radiusMm,
+    thresholdHeightMm: model.layout.thresholdHeightMm,
+    count: model.layout.entrances,
+    singleOpeningAreaMm2,
+    totalOpeningAreaMm2: singleOpeningAreaMm2 * model.layout.entrances
+  };
+}
+
 export function roofSlope(model: ShelterModel) {
   const rise = model.dimensions.frontHeightMm - model.dimensions.rearHeightMm;
   const run = model.dimensions.depthMm;
@@ -104,7 +129,8 @@ export function roofPanelGeometry(model: ShelterModel) {
 
 export function surfaceAreas(model: ShelterModel) {
   const {widthMm: w, depthMm: d, frontHeightMm: hf, rearHeightMm: hr} = model.dimensions;
-  const openingArea = model.layout.entrances * model.layout.entranceWidthMm * model.layout.entranceHeightMm;
+  const entrance = entranceGeometry(model);
+  const openingArea = entrance.totalOpeningAreaMm2;
   const wallAreaMm2 = w * hf + w * hr + 2 * d * ((hf + hr) / 2) - openingArea;
   const floorAreaMm2 = w * d;
   const roofAreaMm2 = w * roofSlope(model).trueLengthMm;
