@@ -126,7 +126,120 @@ export function compileShelterModel(model: ShelterModel) {
       heightMm: Math.ceil(roofPanel.panelLengthMm),
       thicknessMm: 12,
       shape: "rectangle"
-    }
+    },
+    {
+      id: "front-inner",
+      nameSr: "Unutrašnja prednja obloga",
+      nameEn: "Interior front lining",
+      material: "plywood-9",
+      quantity: 1,
+      widthMm: internalWidthMm,
+      heightMm: internalFrontHeightMm,
+      thicknessMm: 9,
+      shape: "rectangle",
+      cutouts: entranceCutouts.map((cutout) => ({
+        ...cutout,
+        xMm: Math.max(0, cutout.xMm - wall)
+      }))
+    },
+    {
+      id: "rear-inner",
+      nameSr: "Unutrašnja zadnja obloga",
+      nameEn: "Interior rear lining",
+      material: "plywood-9",
+      quantity: 1,
+      widthMm: internalWidthMm,
+      heightMm: internalRearHeightMm,
+      thicknessMm: 9,
+      shape: "rectangle"
+    },
+    {
+      id: "side-inner",
+      nameSr: "Unutrašnje bočne obloge",
+      nameEn: "Interior side linings",
+      material: "plywood-9",
+      quantity: 2,
+      widthMm: internalDepthMm,
+      heightMm: internalFrontHeightMm,
+      thicknessMm: 9,
+      shape: "trapezoid",
+      notes: `Front clear edge ${internalFrontHeightMm} mm; rear clear edge ${internalRearHeightMm} mm.`
+    },
+    {
+      id: "roof-inner",
+      nameSr: "Unutrašnja obloga krova",
+      nameEn: "Interior roof lining",
+      material: "plywood-9",
+      quantity: 1,
+      widthMm: internalWidthMm,
+      heightMm: Math.ceil(Math.hypot(
+        internalDepthMm,
+        Math.max(0, internalFrontHeightMm - internalRearHeightMm)
+      )),
+      thicknessMm: 9,
+      shape: "rectangle"
+    },
+    {
+      id: "wall-xps-front-rear",
+      nameSr: "XPS prednji/zadnji zid",
+      nameEn: "XPS front/rear wall",
+      material: "xps",
+      quantity: 2,
+      widthMm: internalWidthMm,
+      heightMm: Math.max(internalFrontHeightMm, internalRearHeightMm),
+      thicknessMm: assemblies.wall.layers.find((layer) => layer.role === "insulation")?.thicknessMm ?? 0,
+      shape: "rectangle",
+      notes: "Trim each panel to the exact front or rear cavity height during dry fitting."
+    },
+    {
+      id: "wall-xps-side",
+      nameSr: "XPS bočni zidovi",
+      nameEn: "XPS side walls",
+      material: "xps",
+      quantity: 2,
+      widthMm: internalDepthMm,
+      heightMm: internalFrontHeightMm,
+      thicknessMm: assemblies.wall.layers.find((layer) => layer.role === "insulation")?.thicknessMm ?? 0,
+      shape: "trapezoid",
+      notes: `Front clear edge ${internalFrontHeightMm} mm; rear clear edge ${internalRearHeightMm} mm.`
+    },
+    {
+      id: "floor-xps",
+      nameSr: "XPS poda",
+      nameEn: "Floor XPS",
+      material: "xps",
+      quantity: 1,
+      widthMm: internalWidthMm,
+      heightMm: internalDepthMm,
+      thicknessMm: assemblies.floor.layers.find((layer) => layer.role === "insulation")?.thicknessMm ?? 0,
+      shape: "rectangle"
+    },
+    {
+      id: "roof-xps",
+      nameSr: "XPS krova",
+      nameEn: "Roof XPS",
+      material: "xps",
+      quantity: 1,
+      widthMm: internalWidthMm,
+      heightMm: Math.ceil(Math.hypot(
+        internalDepthMm,
+        Math.max(0, internalFrontHeightMm - internalRearHeightMm)
+      )),
+      thicknessMm: assemblies.roof.layers.find((layer) => layer.role === "insulation")?.thicknessMm ?? 0,
+      shape: "rectangle"
+    },
+    ...(model.layout.chambers > 1 ? [{
+      id: "divider",
+      nameSr: "Unutrašnja pregrada",
+      nameEn: "Interior divider",
+      material: "plywood-12" as const,
+      quantity: model.layout.chambers - 1,
+      widthMm: internalDepthMm,
+      heightMm: internalRearHeightMm,
+      thicknessMm: 12,
+      shape: "rectangle" as const,
+      notes: "Dry-fit below the sloped roof; final top edge can be scribed to the roof lining."
+    }] : [])
   ];
 
   const buildSteps: BuildStep[] = [
@@ -153,11 +266,18 @@ export function compileShelterModel(model: ShelterModel) {
     },
     {
       id: "insulation",
-      titleSr: "Zatvorite zidnu izolaciju",
-      titleEn: "Enclose wall insulation",
-      detailSr: "Izolacija ne sme ostati dostupna mačkama ili psima.",
-      detailEn: "Insulation must not remain accessible to cats or dogs."
+      titleSr: "Ugradite izolaciju i unutrašnje obloge",
+      titleEn: "Install insulation and interior linings",
+      detailSr: "Suvo uklopite XPS, zatvorite ga unutrašnjim oblogama i proverite da nijedna ivica izolacije nije dostupna životinji.",
+      detailEn: "Dry-fit the XPS, enclose it with the interior linings and confirm that no insulation edge is accessible to the animal."
     },
+    ...(model.layout.chambers > 1 ? [{
+      id: "dividers",
+      titleSr: "Ugradite unutrašnje pregrade",
+      titleEn: "Install interior dividers",
+      detailSr: "Postavite pregrade po osi između odgovarajućih ulaza, proverite stabilnost i zatvorite sve oštre ivice.",
+      detailEn: "Position dividers on the axes between the corresponding entrances, verify stability and seal every sharp edge."
+    }] : []),
     {
       id: "roof",
       titleSr: "Montirajte krov i hidroizolaciju",
