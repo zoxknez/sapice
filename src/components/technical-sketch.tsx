@@ -1,66 +1,348 @@
-import type {ShelterModel} from "@/lib/domain";
-import {roofSlope} from "@/lib/engineering";
+import type {AppLocale} from "@/i18n/routing";
+import type {CompiledShelterModel} from "@/lib/compiler";
 
-export function TechnicalSketch({model, locale}: {model: ShelterModel; locale: "sr" | "en"}) {
-  const w = model.dimensions.widthMm;
-  const d = model.dimensions.depthMm;
-  const hf = model.dimensions.frontHeightMm;
-  const hr = model.dimensions.rearHeightMm;
-  const scale = 360 / Math.max(w, d);
-  const frontW = w * scale;
-  const frontH = hf * scale;
-  const sideD = d * scale;
-  const sideHF = hf * scale;
-  const sideHR = hr * scale;
-  const ew = model.layout.entranceWidthMm * scale;
-  const eh = model.layout.entranceHeightMm * scale;
-  const roof = roofSlope(model);
+function HDimension({
+  x1,
+  x2,
+  y,
+  label
+}: {
+  x1: number;
+  x2: number;
+  y: number;
+  label: string;
+}) {
+  return (
+    <g className="drawing-dimension">
+      <line x1={x1} y1={y} x2={x2} y2={y} />
+      <line x1={x1} y1={y - 6} x2={x1} y2={y + 6} />
+      <line x1={x2} y1={y - 6} x2={x2} y2={y + 6} />
+      <text x={(x1 + x2) / 2} y={y - 7} textAnchor="middle">{label}</text>
+    </g>
+  );
+}
+
+function VDimension({
+  x,
+  y1,
+  y2,
+  label
+}: {
+  x: number;
+  y1: number;
+  y2: number;
+  label: string;
+}) {
+  const cy = (y1 + y2) / 2;
+  return (
+    <g className="drawing-dimension">
+      <line x1={x} y1={y1} x2={x} y2={y2} />
+      <line x1={x - 6} y1={y1} x2={x + 6} y2={y1} />
+      <line x1={x - 6} y1={y2} x2={x + 6} y2={y2} />
+      <text
+        x={x - 8}
+        y={cy}
+        textAnchor="middle"
+        transform={`rotate(-90 ${x - 8} ${cy})`}
+      >
+        {label}
+      </text>
+    </g>
+  );
+}
+
+function ViewTitle({
+  x,
+  y,
+  code,
+  title
+}: {
+  x: number;
+  y: number;
+  code: string;
+  title: string;
+}) {
+  return (
+    <g>
+      <text x={x} y={y} className="drawing-view-code">{code}</text>
+      <text x={x + 34} y={y} className="drawing-view-title">{title}</text>
+    </g>
+  );
+}
+
+export function TechnicalSketch({
+  compiled,
+  locale
+}: {
+  compiled: CompiledShelterModel;
+  locale: AppLocale;
+}) {
+  const model = compiled.model;
+  const isSr = locale === "sr";
+  const {widthMm: w, depthMm: d, frontHeightMm: hf, rearHeightMm: hr, groundClearanceMm: gc} = model.dimensions;
+  const wall = compiled.construction.wallThicknessMm;
+
+  const frontScale = Math.min(400 / w, 220 / (hf + gc));
+  const frontX = 68;
+  const frontTop = 82;
+  const fw = w * frontScale;
+  const fh = hf * frontScale;
+  const fgc = gc * frontScale;
+  const frontBottom = frontTop + fh;
+  const frontGround = frontBottom + fgc;
+
+  const sideTotalDepth = d + model.roof.frontOverhangMm + model.roof.rearOverhangMm;
+  const sideScale = Math.min(400 / sideTotalDepth, 220 / (hf + gc + 80));
+  const sideX = 650;
+  const sideTop = 82;
+  const bodyX = sideX + model.roof.frontOverhangMm * sideScale;
+  const sd = d * sideScale;
+  const shf = hf * sideScale;
+  const shr = hr * sideScale;
+  const sgc = gc * sideScale;
+  const sideBodyBottom = sideTop + shf;
+  const sideGround = sideBodyBottom + sgc;
+  const slopeRise = (hf - hr) * sideScale;
+  const roofFrontX = sideX;
+  const roofRearX = sideX + sideTotalDepth * sideScale;
+  const roofFrontY = sideTop - model.roof.frontOverhangMm * Math.tan(compiled.roof.angleRad) * sideScale;
+  const roofRearY = sideTop + slopeRise + model.roof.rearOverhangMm * Math.tan(compiled.roof.angleRad) * sideScale;
+
+  const planScale = Math.min(400 / w, 220 / d);
+  const planX = 68;
+  const planY = 495;
+  const pw = w * planScale;
+  const pd = d * planScale;
+
+  const roofScale = Math.min(
+    400 / compiled.roofPanel.panelWidthMm,
+    220 / compiled.roofPanel.panelLengthMm
+  );
+  const roofX = 650;
+  const roofY = 495;
+  const rpw = compiled.roofPanel.panelWidthMm * roofScale;
+  const rpl = compiled.roofPanel.panelLengthMm * roofScale;
+
+  const entranceW = model.layout.entranceWidthMm * frontScale;
+  const entranceH = model.layout.entranceHeightMm * frontScale;
+  const threshold = model.layout.thresholdHeightMm * frontScale;
+
+  const sideStuds = compiled.linearParts.filter(
+    (part) => part.wall === "left" && typeof part.positionMm === "number"
+  );
 
   return (
-    <figure className="technical-sketch">
-      <svg viewBox="0 0 860 430" aria-labelledby="technical-title">
-        <title id="technical-title">
-          {locale === "sr" ? "Tehnički pogled spreda i sa strane" : "Technical front and side elevations"}
-        </title>
+    <figure className="technical-sketch technical-sheet">
+      <div className="technical-sheet-head">
+        <div>
+          <span className="kicker">Compiled drawing sheet</span>
+          <strong>{model.translations[locale].name}</strong>
+        </div>
+        <div>
+          <span>MODEL</span>
+          <strong>{model.id}</strong>
+        </div>
+        <div>
+          <span>VERSION</span>
+          <strong>v{model.version}</strong>
+        </div>
+        <div>
+          <span>STATUS</span>
+          <strong>{model.validationState.replaceAll("_", " ")}</strong>
+        </div>
+      </div>
 
-        <g transform="translate(38 48)" fill="none" stroke="currentColor">
-          <text x="0" y="-16" fill="currentColor" stroke="none" fontSize="12">
-            {locale === "sr" ? "Pogled spreda" : "Front elevation"}
-          </text>
-          <rect x="0" y="0" width={frontW} height={frontH} strokeWidth="2.2" />
-          {Array.from({length: model.layout.entrances}).map((_, index) => {
-            const x = frontW * ((index + 1) / (model.layout.entrances + 1)) - ew / 2;
-            const y = frontH - (model.layout.thresholdHeightMm + model.layout.entranceHeightMm) * scale;
-            return <rect key={index} x={x} y={y} width={ew} height={eh} rx="12" strokeWidth="2" />;
+      <svg viewBox="0 0 1160 830" aria-labelledby="technical-title technical-desc">
+        <title id="technical-title">
+          {isSr ? "Kompajlirani tehnički crtež kućice" : "Compiled technical shelter drawing"}
+        </title>
+        <desc id="technical-desc">
+          {isSr
+            ? "Pogled spreda, bočni pogled, osnova i krovni panel sa kotama izvedenim iz kanonskog modela."
+            : "Front elevation, side elevation, plan and roof panel with dimensions derived from the canonical model."}
+        </desc>
+
+        <rect x="24" y="24" width="1112" height="770" rx="12" className="drawing-border" />
+
+        <ViewTitle x={54} y={58} code="A" title={isSr ? "POGLED SPREDA + RAM" : "FRONT ELEVATION + FRAME"} />
+        <g className="drawing-shape">
+          <rect x={frontX} y={frontTop} width={fw} height={fh} />
+          <line x1={frontX} y1={frontGround} x2={frontX + fw} y2={frontGround} className="drawing-ground" />
+
+          {[0.22, 0.78].map((ratio) => (
+            <rect
+              key={ratio}
+              x={frontX + fw * ratio - Math.max(3, 45 * frontScale / 2)}
+              y={frontBottom}
+              width={Math.max(6, 45 * frontScale)}
+              height={fgc}
+              className="drawing-runner"
+            />
+          ))}
+
+          <line x1={frontX + 3} y1={frontTop + 3} x2={frontX + 3} y2={frontBottom - 3} className="drawing-frame" />
+          <line x1={frontX + fw - 3} y1={frontTop + 3} x2={frontX + fw - 3} y2={frontBottom - 3} className="drawing-frame" />
+          <line x1={frontX + 3} y1={frontTop + 4} x2={frontX + fw - 3} y2={frontTop + 4} className="drawing-frame" />
+          <line x1={frontX + 3} y1={frontBottom - 4} x2={frontX + fw - 3} y2={frontBottom - 4} className="drawing-frame" />
+
+          {compiled.layout.entranceCentersXmm.map((centerMm, index) => {
+            const cx = frontX + centerMm * frontScale;
+            const x = cx - entranceW / 2;
+            const y = frontBottom - threshold - entranceH;
+            return (
+              <g key={index}>
+                <rect x={x} y={y} width={entranceW} height={entranceH} rx={Math.min(12, entranceW * 0.22)} className="drawing-opening" />
+                <line x1={x - 3} y1={frontBottom - 4} x2={x - 3} y2={y - 3} className="drawing-frame drawing-frame-assumption" />
+                <line x1={x + entranceW + 3} y1={frontBottom - 4} x2={x + entranceW + 3} y2={y - 3} className="drawing-frame drawing-frame-assumption" />
+                <line x1={x - 3} y1={y - 3} x2={x + entranceW + 3} y2={y - 3} className="drawing-frame drawing-frame-assumption" />
+                <text x={cx} y={y + entranceH / 2} textAnchor="middle" className="drawing-label">
+                  E{index + 1}
+                </text>
+              </g>
+            );
           })}
-          <line x1="0" y1={frontH + 30} x2={frontW} y2={frontH + 30} />
-          <line x1="0" y1={frontH + 22} x2="0" y2={frontH + 38} />
-          <line x1={frontW} y1={frontH + 22} x2={frontW} y2={frontH + 38} />
-          <text x={frontW / 2} y={frontH + 52} textAnchor="middle" fill="currentColor" stroke="none" fontSize="11">
-            {w} mm
+
+          {compiled.layout.dividerPositionsXmm.map((positionMm, index) => {
+            const x = frontX + positionMm * frontScale;
+            return (
+              <g key={index}>
+                <line x1={x} y1={frontTop} x2={x} y2={frontBottom} className="drawing-divider-axis" />
+                <text x={x + 4} y={frontTop + 14} className="drawing-axis-label">D{index + 1}</text>
+              </g>
+            );
+          })}
+        </g>
+        <HDimension x1={frontX} x2={frontX + fw} y={frontGround + 30} label={`${w} mm`} />
+        <VDimension x={frontX - 26} y1={frontTop} y2={frontBottom} label={`${hf} mm`} />
+        <VDimension x={frontX + fw + 24} y1={frontBottom} y2={frontGround} label={`${gc} mm`} />
+        {compiled.layout.entranceCentersXmm.length > 0 && (
+          <HDimension
+            x1={frontX + compiled.layout.entranceCentersXmm[0] * frontScale - entranceW / 2}
+            x2={frontX + compiled.layout.entranceCentersXmm[0] * frontScale + entranceW / 2}
+            y={frontBottom - threshold + 19}
+            label={`${model.layout.entranceWidthMm} mm`}
+          />
+        )}
+
+        <ViewTitle x={636} y={58} code="B" title={isSr ? "BOČNI POGLED + KOSINA" : "SIDE ELEVATION + SLOPE"} />
+        <g className="drawing-shape">
+          <path
+            d={`M ${bodyX} ${sideTop} L ${bodyX + sd} ${sideTop + slopeRise} L ${bodyX + sd} ${sideBodyBottom} L ${bodyX} ${sideBodyBottom} Z`}
+          />
+          <line x1={roofFrontX} y1={roofFrontY} x2={roofRearX} y2={roofRearY} className="drawing-roof" />
+          <line x1={bodyX} y1={sideGround} x2={bodyX + sd} y2={sideGround} className="drawing-ground" />
+
+          {[0.22, 0.78].map((ratio) => (
+            <rect
+              key={ratio}
+              x={bodyX + sd * ratio - Math.max(3, 45 * sideScale / 2)}
+              y={sideBodyBottom}
+              width={Math.max(6, 45 * sideScale)}
+              height={sgc}
+              className="drawing-runner"
+            />
+          ))}
+
+          {sideStuds.map((part) => {
+            const x = bodyX + (part.positionMm ?? 0) * sideScale;
+            const topY = sideTop + ((hf - (part.lengthMm + compiled.construction.floorThicknessMm + compiled.construction.roofThicknessMm)) * sideScale);
+            return (
+              <line
+                key={part.id}
+                x1={x}
+                y1={sideBodyBottom - 3}
+                x2={x}
+                y2={Math.max(sideTop + 3, topY)}
+                className="drawing-frame drawing-frame-assumption"
+              />
+            );
+          })}
+        </g>
+        <HDimension x1={bodyX} x2={bodyX + sd} y={sideGround + 30} label={`${d} mm`} />
+        <VDimension x={bodyX - 24} y1={sideTop} y2={sideBodyBottom} label={`${hf} mm`} />
+        <VDimension x={bodyX + sd + 24} y1={sideTop + slopeRise} y2={sideBodyBottom} label={`${hr} mm`} />
+        <text x={bodyX + sd / 2} y={sideGround + 54} textAnchor="middle" className="drawing-note">
+          {isSr ? "nagib" : "slope"} {(compiled.roof.angleRad * 180 / Math.PI).toFixed(1)}°
+        </text>
+
+        <ViewTitle x={54} y={470} code="C" title={isSr ? "OSNOVA + KOMORE" : "PLAN + CHAMBERS"} />
+        <g className="drawing-shape">
+          <rect x={planX} y={planY} width={pw} height={pd} />
+          <rect
+            x={planX + wall * planScale}
+            y={planY + wall * planScale}
+            width={Math.max(0, compiled.internal.widthMm * planScale)}
+            height={Math.max(0, compiled.internal.depthMm * planScale)}
+            className="drawing-inner"
+          />
+
+          {compiled.layout.dividerPositionsXmm.map((positionMm, index) => {
+            const x = planX + positionMm * planScale;
+            return (
+              <g key={index}>
+                <line x1={x} y1={planY + wall * planScale} x2={x} y2={planY + pd - wall * planScale} className="drawing-divider" />
+                <text x={x + 5} y={planY + pd / 2} className="drawing-label">D{index + 1}</text>
+              </g>
+            );
+          })}
+
+          {compiled.layout.entranceCentersXmm.map((centerMm, index) => {
+            const cx = planX + centerMm * planScale;
+            const half = model.layout.entranceWidthMm * planScale / 2;
+            return (
+              <g key={index}>
+                <line x1={cx - half} y1={planY - 5} x2={cx + half} y2={planY - 5} className="drawing-opening-line" />
+                <text x={cx} y={planY - 11} textAnchor="middle" className="drawing-label">E{index + 1}</text>
+              </g>
+            );
+          })}
+        </g>
+        <HDimension x1={planX} x2={planX + pw} y={planY + pd + 28} label={`${w} mm`} />
+        <VDimension x={planX - 24} y1={planY} y2={planY + pd} label={`${d} mm`} />
+        <text x={planX + pw / 2} y={planY + pd + 52} textAnchor="middle" className="drawing-note">
+          {isSr ? "unutrašnje" : "internal"} {compiled.internal.widthMm} × {compiled.internal.depthMm} mm · {model.layout.chambers} {isSr ? "kom." : "ch."}
+        </text>
+
+        <ViewTitle x={636} y={470} code="D" title={isSr ? "KROVNI PANEL + SERVIS" : "ROOF PANEL + SERVICE"} />
+        <g className="drawing-shape">
+          <rect x={roofX} y={roofY} width={rpw} height={rpl} />
+          {compiled.hardware.hingeEdge === "REAR" && (
+            <line x1={roofX} y1={roofY + rpl} x2={roofX + rpw} y2={roofY + rpl} className="drawing-hinge" />
+          )}
+          {compiled.hardware.latchEdge === "FRONT" && (
+            <line x1={roofX} y1={roofY} x2={roofX + rpw} y2={roofY} className="drawing-latch" />
+          )}
+          <text x={roofX + rpw / 2} y={roofY + 18} textAnchor="middle" className="drawing-label">
+            {isSr ? "ZATVARAČI · PREDNJA IVICA" : "LATCHES · FRONT EDGE"}
+          </text>
+          <text x={roofX + rpw / 2} y={roofY + rpl - 9} textAnchor="middle" className="drawing-label">
+            {isSr ? "ŠARKE · ZADNJA IVICA" : "HINGES · REAR EDGE"}
           </text>
         </g>
+        <HDimension x1={roofX} x2={roofX + rpw} y={roofY + rpl + 28} label={`${Math.ceil(compiled.roofPanel.panelWidthMm)} mm`} />
+        <VDimension x={roofX - 24} y1={roofY} y2={roofY + rpl} label={`${Math.ceil(compiled.roofPanel.panelLengthMm)} mm`} />
+        <text x={roofX + rpw / 2} y={roofY + rpl + 53} textAnchor="middle" className="drawing-note">
+          {isSr
+            ? `prepust bočno ${model.roof.sideOverhangMm} mm · napred ${model.roof.frontOverhangMm} mm · nazad ${model.roof.rearOverhangMm} mm`
+            : `overhang side ${model.roof.sideOverhangMm} mm · front ${model.roof.frontOverhangMm} mm · rear ${model.roof.rearOverhangMm} mm`}
+        </text>
 
-        <g transform="translate(500 48)" fill="none" stroke="currentColor">
-          <text x="0" y="-16" fill="currentColor" stroke="none" fontSize="12">
-            {locale === "sr" ? "Bočni pogled" : "Side elevation"}
-          </text>
-          <path d={`M 0 0 L ${sideD} ${sideHF - sideHR} L ${sideD} ${sideHF} L 0 ${sideHF} Z`} strokeWidth="2.2" />
-          <line x1="0" y1={sideHF + 30} x2={sideD} y2={sideHF + 30} />
-          <line x1="0" y1={sideHF + 22} x2="0" y2={sideHF + 38} />
-          <line x1={sideD} y1={sideHF + 22} x2={sideD} y2={sideHF + 38} />
-          <text x={sideD / 2} y={sideHF + 52} textAnchor="middle" fill="currentColor" stroke="none" fontSize="11">
-            {d} mm
-          </text>
-          <text x={sideD / 2} y={sideHF + 72} textAnchor="middle" fill="currentColor" stroke="none" fontSize="10">
-            {locale === "sr" ? "nagib krova" : "roof slope"} {(roof.angleRad * 180 / Math.PI).toFixed(1)}°
-          </text>
+        <g transform="translate(54 770)">
+          <line x1="0" y1="0" x2="28" y2="0" className="drawing-frame" />
+          <text x="36" y="4" className="drawing-legend">{isSr ? "geometrijski ram / osa" : "geometry frame / axis"}</text>
+          <line x1="220" y1="0" x2="248" y2="0" className="drawing-frame drawing-frame-assumption" />
+          <text x="256" y="4" className="drawing-legend">{isSr ? "PROVISIONAL framing" : "PROVISIONAL framing"}</text>
+          <line x1="475" y1="0" x2="503" y2="0" className="drawing-divider" />
+          <text x="511" y="4" className="drawing-legend">{isSr ? "pregrada" : "divider"}</text>
+          <line x1="650" y1="0" x2="678" y2="0" className="drawing-hinge" />
+          <text x="686" y="4" className="drawing-legend">{isSr ? "šarka" : "hinge"}</text>
         </g>
       </svg>
+
       <figcaption>
-        {locale === "sr"
-          ? "Oba pogleda su izvedena iz kanonskih dimenzija modela."
-          : "Both views are derived from the model's canonical dimensions."}
+        {isSr
+          ? "Sheet je izveden iz compiler-a. Pune kote i komore su geometrija; framing/hardware elementi označeni kao PROVISIONAL ostaju projektantska pretpostavka do engineering review-a."
+          : "This sheet is compiler-derived. Solid dimensions and chambers are geometry; framing/hardware elements marked PROVISIONAL remain design assumptions until engineering review."}
       </figcaption>
     </figure>
   );
