@@ -6,8 +6,13 @@ export type PackedPart = {
   y: number;
   widthMm: number;
   heightMm: number;
+  sourceWidthMm: number;
+  sourceHeightMm: number;
   rotated: boolean;
   shape: CutPart["shape"];
+  trapezoidRearHeightMm?: number;
+  cutouts?: CutPart["cutouts"];
+  partAreaMm2: number;
 };
 
 export type PackedSheet = {
@@ -16,6 +21,8 @@ export type PackedSheet = {
   heightMm: number;
   parts: PackedPart[];
   utilization: number;
+  materialUtilization: number;
+  packingEnvelopeUtilization: number;
 };
 
 type FreeRect = {x: number; y: number; width: number; height: number};
@@ -64,9 +71,65 @@ function splitFreeRect(free: FreeRect, usedWidth: number, usedHeight: number) {
   return [right, bottom].filter((rect) => rect.width > 0 && rect.height > 0);
 }
 
+function roundedRectangleAreaMm2(cutout: NonNullable<CutPart["cutouts"]>[number]) {
+  const radius = Math.min(
+    cutout.radiusMm,
+    cutout.widthMm / 2,
+    cutout.heightMm / 2
+  );
+  return (
+    cutout.widthMm * cutout.heightMm -
+    (4 - Math.PI) * radius * radius
+  );
+}
+
+export function cutPartAreaMm2(part: Pick<
+  CutPart,
+  "widthMm" | "heightMm" | "shape" | "trapezoidRearHeightMm" | "cutouts"
+>) {
+  const grossArea =
+    part.shape === "trapezoid" && part.trapezoidRearHeightMm !== undefined
+      ? part.widthMm * ((part.heightMm + part.trapezoidRearHeightMm) / 2)
+      : part.widthMm * part.heightMm;
+
+  const cutoutArea = (part.cutouts ?? []).reduce(
+    (sum, cutout) => sum + roundedRectangleAreaMm2(cutout),
+    0
+  );
+
+  return Math.max(0, grossArea - cutoutArea);
+}
+
+function packPayload(
+  item: CutPart & {instanceId: string},
+  x: number,
+  y: number,
+  rotated: boolean
+): PackedPart {
+  return {
+    partId: item.instanceId,
+    x,
+    y,
+    widthMm: rotated ? item.heightMm : item.widthMm,
+    heightMm: rotated ? item.widthMm : item.heightMm,
+    sourceWidthMm: item.widthMm,
+    sourceHeightMm: item.heightMm,
+    rotated,
+    shape: item.shape,
+    trapezoidRearHeightMm: item.trapezoidRearHeightMm,
+    cutouts: item.cutouts,
+    partAreaMm2: cutPartAreaMm2(item)
+  };
+}
+
 export function packCutParts(
   cutParts: CutPart[],
-  options: {sheetWidthMm?: number; sheetHeightMm?: number; kerfMm?: number; marginMm?: number} = {}
+  options: {
+    sheetWidthMm?: number;
+    sheetHeightMm?: number;
+    kerfMm?: number;
+    marginMm?: number;
+  } = {}
 ): PackedSheet[] {
   const sheetWidthMm = options.sheetWidthMm ?? 2500;
   const sheetHeightMm = options.sheetHeightMm ?? 1250;
@@ -90,23 +153,21 @@ export function packCutParts(
     let placed = false;
 
     for (const sheet of sheets) {
-      const placement = choosePlacement(sheet.free, requestedWidth, requestedHeight, true);
+      const placement = choosePlacement(
+        sheet.free,
+        requestedWidth,
+        requestedHeight,
+        true
+      );
       if (!placement) continue;
 
       const free = sheet.free.splice(placement.freeIndex, 1)[0];
-      const actualWidth = placement.rotated ? item.heightMm : item.widthMm;
-      const actualHeight = placement.rotated ? item.widthMm : item.heightMm;
-
-      sheet.parts.push({
-        partId: item.instanceId,
-        x: free.x,
-        y: free.y,
-        widthMm: actualWidth,
-        heightMm: actualHeight,
-        rotated: placement.rotated,
-        shape: item.shape
-      });
-      sheet.free.push(...splitFreeRect(free, placement.width, placement.height));
+      sheet.parts.push(
+        packPayload(item, free.x, free.y, placement.rotated)
+      );
+      sheet.free.push(
+        ...splitFreeRect(free, placement.width, placement.height)
+      );
       placed = true;
       break;
     }
@@ -127,32 +188,45 @@ export function packCutParts(
         );
       }
 
-      const free = {x: marginMm, y: marginMm, width: usableWidth, height: usableHeight};
-      const actualWidth = placement.rotated ? item.heightMm : item.widthMm;
-      const actualHeight = placement.rotated ? item.widthMm : item.heightMm;
+      const free = {
+        x: marginMm,
+        y: marginMm,
+        width: usableWidth,
+        height: usableHeight
+      };
       sheets.push({
-        parts: [{
-          partId: item.instanceId,
-          x: marginMm,
-          y: marginMm,
-          widthMm: actualWidth,
-          heightMm: actualHeight,
-          rotated: placement.rotated,
-          shape: item.shape
-        }],
+        parts: [
+          packPayload(
+            item,
+            marginMm,
+            marginMm,
+            placement.rotated
+          )
+        ],
         free: splitFreeRect(free, placement.width, placement.height)
       });
     }
   }
 
   return sheets.map((sheet, index) => {
-    const usedArea = sheet.parts.reduce((sum, part) => sum + part.widthMm * part.heightMm, 0);
+    const materialAreaMm2 = sheet.parts.reduce(
+      (sum, part) => sum + part.partAreaMm2,
+      0
+    );
+    const envelopeAreaMm2 = sheet.parts.reduce(
+      (sum, part) => sum + part.widthMm * part.heightMm,
+      0
+    );
+    const stockAreaMm2 = sheetWidthMm * sheetHeightMm;
+
     return {
       index,
       widthMm: sheetWidthMm,
       heightMm: sheetHeightMm,
       parts: sheet.parts,
-      utilization: usedArea / (sheetWidthMm * sheetHeightMm)
+      utilization: materialAreaMm2 / stockAreaMm2,
+      materialUtilization: materialAreaMm2 / stockAreaMm2,
+      packingEnvelopeUtilization: envelopeAreaMm2 / stockAreaMm2
     };
   });
 }
