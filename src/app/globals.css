@@ -2460,3 +2460,10 @@ button { cursor: pointer; }
   stroke-width: 1.1;
   stroke-dasharray: 3 3;
 }
+
+
+.drawing-frame-member-assumption {
+  fill: #d7b28f;
+  stroke: #a87045;
+  stroke-width: 1;
+}
