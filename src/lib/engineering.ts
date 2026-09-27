@@ -34,12 +34,30 @@ export function roofSlope(model: ShelterModel) {
   };
 }
 
+export function roofPanelGeometry(model: ShelterModel) {
+  const slope = roofSlope(model);
+  const cos = Math.cos(slope.angleRad);
+  const extraPlanDepthMm = model.roof.frontOverhangMm + model.roof.rearOverhangMm;
+  const panelLengthMm = slope.trueLengthMm + extraPlanDepthMm / cos;
+  const panelWidthMm = model.dimensions.widthMm + 2 * model.roof.sideOverhangMm;
+  const centerPlanOffsetMm = (model.roof.rearOverhangMm - model.roof.frontOverhangMm) / 2;
+  const centerHeightOffsetMm = -Math.tan(slope.angleRad) * centerPlanOffsetMm;
+
+  return {
+    panelWidthMm,
+    panelLengthMm,
+    centerPlanOffsetMm,
+    centerHeightOffsetMm
+  };
+}
+
 export function surfaceAreas(model: ShelterModel) {
   const {widthMm: w, depthMm: d, frontHeightMm: hf, rearHeightMm: hr} = model.dimensions;
   const openingArea = model.layout.entrances * model.layout.entranceWidthMm * model.layout.entranceHeightMm;
   const wallAreaMm2 = w * hf + w * hr + 2 * d * ((hf + hr) / 2) - openingArea;
   const floorAreaMm2 = w * d;
-  const roofAreaMm2 = w * roofSlope(model).trueLengthMm;
+  const roofPanel = roofPanelGeometry(model);
+  const roofAreaMm2 = roofPanel.panelWidthMm * roofPanel.panelLengthMm;
 
   return {
     wallM2: mm2ToM2(wallAreaMm2),
