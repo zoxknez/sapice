@@ -11,7 +11,7 @@ Canonical shelter definitions live in Git and are validated before publication.
 ```text
 ShelterModel
   -> construction assemblies
-  -> compiler v1.7
+  -> compiler v1.8
      -> construction-interface geometry
      -> entrance geometry
      -> chamber/divider geometry
@@ -74,6 +74,7 @@ A compiled plan also exposes the complete set of external sources used by its mo
 The compiler centralizes geometry that previously could drift between views:
 
 - floor / wall / roof construction-interface datum
+- front/rear-full-width wall joinery with side assemblies fitted between
 - rounded entrance geometry
 - chamber clear widths and physical divider thickness
 - sloped divider and side-panel geometry
@@ -90,7 +91,7 @@ The compiler centralizes geometry that previously could drift between views:
 
 ## Thermal boundary
 
-Thermal method v1.1 is a steady-state envelope-transmission model.
+Thermal method v1.2 is a steady-state envelope-transmission model.
 
 It uses:
 
