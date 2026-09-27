@@ -383,6 +383,31 @@ export function TechnicalSketch({
             );
           })}
 
+          {compiled.ventilation.zones.map((zone, index) => {
+            const x1 = planX + (zone.centerXmm - zone.widthMm / 2) * planScale;
+            const x2 = planX + (zone.centerXmm + zone.widthMm / 2) * planScale;
+            const y = planY + pd - wall * planScale / 2;
+            return (
+              <g key={zone.id}>
+                <line
+                  x1={x1}
+                  y1={y}
+                  x2={x2}
+                  y2={y}
+                  className="drawing-vent-provision"
+                />
+                <text
+                  x={(x1 + x2) / 2}
+                  y={y - 7}
+                  textAnchor="middle"
+                  className="drawing-axis-label"
+                >
+                  V{index + 1}
+                </text>
+              </g>
+            );
+          })}
+
           {compiled.layout.entranceCentersXmm.map((centerMm, index) => {
             const cx = planX + centerMm * planScale;
             const half = model.layout.entranceWidthMm * planScale / 2;
@@ -471,6 +496,8 @@ export function TechnicalSketch({
           <text x="511" y="4" className="drawing-legend">{isSr ? "pregrada" : "divider"}</text>
           <line x1="650" y1="0" x2="678" y2="0" className="drawing-hinge" />
           <text x="686" y="4" className="drawing-legend">{isSr ? "šarka" : "hinge"}</text>
+          <line x1="785" y1="0" x2="813" y2="0" className="drawing-vent-provision" />
+          <text x="821" y="4" className="drawing-legend">{isSr ? "vent. PROVISION zona" : "vent PROVISION zone"}</text>
         </g>
       </svg>
 
