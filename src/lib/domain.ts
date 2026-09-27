@@ -39,10 +39,9 @@ export const shelterModelSchema = z.object({
     entranceHeightMm: z.number().int().positive()
   }),
   construction: z.object({
-    wallInsulationMm: z.number().int().nonnegative(),
-    floorInsulationMm: z.number().int().nonnegative(),
-    roofInsulationMm: z.number().int().nonnegative(),
-    wallThicknessMm: z.number().int().positive()
+    wallAssemblyId: z.string(),
+    floorAssemblyId: z.string(),
+    roofAssemblyId: z.string()
   }),
   heated: z.boolean(),
   climateProfile: z.enum([
