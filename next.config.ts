@@ -1,3 +1,4 @@
+import type {NextConfig} from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
@@ -10,7 +11,7 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
-  "connect-src 'self'",
+  `connect-src 'self'${isDevelopment ? " ws: wss:" : ""}`,
   "worker-src 'self' blob:",
   "child-src 'self' blob:",
   "manifest-src 'self'",
@@ -34,7 +35,7 @@ const securityHeaders = [
   {key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains"}
 ];
 
-const nextConfig = {
+const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   async headers() {
