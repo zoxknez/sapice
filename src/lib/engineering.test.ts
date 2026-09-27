@@ -210,6 +210,14 @@ describe("engineering model derivations", () => {
     }
   });
 
+  it("keeps every entrance sill above the V1 bottom framing rail", () => {
+    for (const model of shelterModels) {
+      const compiled = compileShelterModel(model);
+      expect(compiled.internal.entranceSillAboveFinishedFloorMm)
+        .toBeGreaterThanOrEqual(compiled.framing.frameProfileMm[0]);
+    }
+  });
+
   it("keeps front entrance-support gaps within the compiled maximum", () => {
     for (const model of shelterModels) {
       const compiled = compileShelterModel(model);
