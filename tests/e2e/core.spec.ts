@@ -1,0 +1,52 @@
+import {expect, test} from "@playwright/test";
+
+test("SR homepage exposes the real engineering workflow", async ({page}) => {
+  await page.goto("/sr");
+
+  await expect(
+    page.getByRole("heading", {level: 1, name: /Toplije i bezbednije kućice/i})
+  ).toBeVisible();
+
+  await expect(page.getByText("Krojna lista + nesting")).toBeVisible();
+  await expect(page.getByText("Troškovnik bez izmišljenih cena")).toBeVisible();
+  await expect(page.getByText("Build mode u radionici")).toBeVisible();
+});
+
+test("model page exposes compiled workshop sections", async ({page}) => {
+  await page.goto("/sr/modeli/nordic-quad-winter");
+
+  await expect(page.getByRole("heading", {level: 1, name: "Nordic Quad Winter"})).toBeVisible();
+  await expect(page.getByRole("heading", {name: "Transparentna termička procena"})).toBeVisible();
+  await expect(page.getByRole("heading", {name: "Raspored na tablama"})).toBeVisible();
+  await expect(page.getByRole("heading", {name: "Troškovnik"})).toBeVisible();
+  await expect(page.getByRole("heading", {name: "Raspored letvi i nosača"})).toBeVisible();
+  await expect(page.getByRole("heading", {name: "Pričvršćivači i servisni krov"})).toBeVisible();
+});
+
+test("dynamic locale switch preserves the model slug", async ({page}) => {
+  await page.goto("/sr/modeli/nordic-quad-winter");
+  await page.getByRole("button", {name: "Switch to English"}).click();
+
+  await expect(page).toHaveURL(/\/en\/models\/nordic-quad-winter$/);
+  await expect(page.getByRole("heading", {level: 1, name: "Nordic Quad Winter"})).toBeVisible();
+  await expect(page.getByRole("heading", {name: "Transparent thermal estimate"})).toBeVisible();
+});
+
+test("large dog request never surfaces small or medium dog models", async ({page}) => {
+  await page.goto("/sr/pronadji-model");
+
+  await page.getByLabel("Životinja").selectOption("dog");
+  await page.getByLabel("Veličina psa").selectOption("large");
+
+  await expect(page.getByText("Alpine Large Winter", {exact: true})).toBeVisible();
+  await expect(page.getByText("Alpine Small Winter", {exact: true})).toHaveCount(0);
+  await expect(page.getByText("Alpine Medium Winter", {exact: true})).toHaveCount(0);
+});
+
+test("English model route is directly addressable", async ({page}) => {
+  await page.goto("/en/models/alpine-medium-winter");
+
+  await expect(page.getByRole("heading", {level: 1, name: "Alpine Medium Winter"})).toBeVisible();
+  await expect(page.getByText("Print / Save PDF")).toBeVisible();
+  await expect(page.getByText("Share plan")).toBeVisible();
+});
