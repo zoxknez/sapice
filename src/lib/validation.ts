@@ -560,6 +560,21 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
       });
     }
 
+    const baseIsolationItem = compiled.hardwareItems.find(
+      (item) => item.id === "base-isolation-pads"
+    );
+    const compiledBasePostCount = compiled.linearParts.filter(
+      (part) => part.id.startsWith("base-post-")
+    ).length;
+
+    if ((baseIsolationItem?.quantity ?? 0) !== compiledBasePostCount) {
+      issues.push({
+        severity: "error",
+        code: "BASE_ISOLATION_PAD_COUNT_MISMATCH",
+        message: "Base isolation pad quantity does not match the compiled support-post grid."
+      });
+    }
+
     const hingeItem = compiled.hardwareItems.find((item) => item.id === "roof-hinges");
     const latchItem = compiled.hardwareItems.find((item) => item.id === "roof-latches");
 
