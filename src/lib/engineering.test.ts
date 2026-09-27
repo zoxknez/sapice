@@ -104,15 +104,16 @@ describe("engineering model derivations", () => {
 
       compiled.layout.entranceCentersXmm.forEach((centerMm, index) => {
         const expected =
-          compiled.layout.clearLeftMm +
-          compiled.layout.chamberWidthMm * (index + 0.5);
+          compiled.layout.chamberStartsXmm[index] +
+          compiled.layout.chamberWidthMm / 2;
         expect(centerMm).toBeCloseTo(expected, 6);
       });
 
       compiled.layout.dividerPositionsXmm.forEach((dividerMm, index) => {
         const expected =
-          compiled.layout.clearLeftMm +
-          compiled.layout.chamberWidthMm * (index + 1);
+          compiled.layout.chamberStartsXmm[index] +
+          compiled.layout.chamberWidthMm +
+          compiled.layout.dividerThicknessMm / 2;
         expect(dividerMm).toBeCloseTo(expected, 6);
       });
     }
