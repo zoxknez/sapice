@@ -4,7 +4,8 @@
     "models": "Models",
     "finder": "Find a model",
     "materials": "Materials",
-    "guides": "Guides"
+    "guides": "Guides",
+    "methodology": "Methodology"
   },
   "Home": {
     "eyebrow": "Open winter shelter engineering plans",
@@ -13,7 +14,7 @@
     "primary": "Find a model",
     "secondary": "Browse models",
     "catalogTitle": "Reference models",
-    "catalogLead": "We start with a small set of carefully defined constructions. Every future model uses the same verifiable engineering system."
+    "catalogLead": "Reference cat and dog models, from compact shelters to multi-chamber and heated variants, all built on the same verifiable engineering system."
   },
   "Models": {
     "title": "Shelter models",
