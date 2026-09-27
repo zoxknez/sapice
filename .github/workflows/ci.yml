@@ -40,3 +40,9 @@ jobs:
 
       - name: Production build
         run: pnpm build
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: E2E smoke tests
+        run: pnpm test:e2e
