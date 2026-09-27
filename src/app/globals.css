@@ -2683,3 +2683,10 @@ button { cursor: pointer; }
     display: none !important;
   }
 }
+
+
+.drawing-base-post {
+  fill: #8a765f;
+  stroke: #5c4d3f;
+  stroke-width: 1;
+}
