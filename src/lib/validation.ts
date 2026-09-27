@@ -115,10 +115,8 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
 
     if (model.layout.entrances === model.layout.chambers) {
       compiled.layout.entranceCentersXmm.forEach((centerMm, index) => {
-        const chamberLeftMm =
-          compiled.layout.clearLeftMm + index * compiled.layout.chamberWidthMm;
-        const chamberRightMm =
-          compiled.layout.clearLeftMm + (index + 1) * compiled.layout.chamberWidthMm;
+        const chamberLeftMm = compiled.layout.chamberStartsXmm[index];
+        const chamberRightMm = chamberLeftMm + compiled.layout.chamberWidthMm;
         const openingLeftMm = centerMm - model.layout.entranceWidthMm / 2;
         const openingRightMm = centerMm + model.layout.entranceWidthMm / 2;
 
