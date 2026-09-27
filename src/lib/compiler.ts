@@ -61,10 +61,12 @@ function splitInsulationPanel({
   thicknessMm: number;
   notes?: string;
 }): CutPart[] {
-  const stockWidthMm = 1250;
-  const stockHeightMm = 600;
-  const columns = Math.max(1, Math.ceil(widthMm / stockWidthMm));
-  const rows = Math.max(1, Math.ceil(heightMm / stockHeightMm));
+  // Matches the current XPS planning profile: 1250 × 600 mm,
+  // 5 mm perimeter margin and 2 mm kerf.
+  const maxPieceWidthMm = 1250 - 2 * 5 - 2;
+  const maxPieceHeightMm = 600 - 2 * 5 - 2;
+  const columns = Math.max(1, Math.ceil(widthMm / maxPieceWidthMm));
+  const rows = Math.max(1, Math.ceil(heightMm / maxPieceHeightMm));
   const segmentWidth = Math.ceil(widthMm / columns);
   const segmentHeight = Math.ceil(heightMm / rows);
   const parts: CutPart[] = [];
