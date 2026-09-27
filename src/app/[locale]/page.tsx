@@ -4,6 +4,7 @@ import {Link} from "@/i18n/navigation";
 import {shelterModels} from "@/data/models";
 import {ModelCard} from "@/components/model-card";
 import {StructuredData} from "@/components/structured-data";
+import {modelComparisonSummaryMap} from "@/lib/catalog-summary";
 
 export default async function HomePage({params}: {params: Promise<{locale: AppLocale}>}) {
   const {locale} = await params;
@@ -13,6 +14,7 @@ export default async function HomePage({params}: {params: Promise<{locale: AppLo
   const featured = featuredSlugs
     .map((slug) => shelterModels.find((model) => model.slug === slug))
     .filter((model): model is (typeof shelterModels)[number] => Boolean(model));
+  const featuredSummaries = modelComparisonSummaryMap(featured);
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const structuredData = {
@@ -160,7 +162,14 @@ export default async function HomePage({params}: {params: Promise<{locale: AppLo
             <p>{t("catalogLead")}</p>
           </div>
           <div className="model-grid">
-            {featured.map((model) => <ModelCard key={model.id} model={model} locale={locale} />)}
+            {featured.map((model) => (
+              <ModelCard
+                key={model.id}
+                model={model}
+                locale={locale}
+                summary={featuredSummaries[model.id]}
+              />
+            ))}
           </div>
         </div>
       </section>
