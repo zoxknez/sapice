@@ -4,6 +4,7 @@ import {setRequestLocale} from "next-intl/server";
 import {notFound} from "next/navigation";
 import {routing, type AppLocale} from "@/i18n/routing";
 import {SiteHeader} from "@/components/site-header";
+import {PwaRegistration} from "@/components/pwa-registration";
 import "../globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -65,6 +66,7 @@ export default async function LocaleLayout({
     <html lang={locale === "sr" ? "sr-Latn" : "en"}>
       <body>
         <NextIntlClientProvider>
+          <PwaRegistration />
           <SiteHeader locale={locale as AppLocale} />
           <main>{children}</main>
           <footer className="site-footer">
