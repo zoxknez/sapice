@@ -31,6 +31,19 @@ export type BuildStep = {
 };
 
 
+export type LinearPart = {
+  id: string;
+  nameSr: string;
+  nameEn: string;
+  profileMm: [number, number];
+  quantity: number;
+  lengthMm: number;
+  provenance: "ASSUMPTION" | "GEOMETRY";
+  notesSr?: string;
+  notesEn?: string;
+};
+
+
 function splitInsulationPanel({
   id,
   nameSr,
@@ -296,6 +309,118 @@ export function compileShelterModel(model: ShelterModel) {
     }] : [])
   ];
 
+  const wallInsulationMm =
+    assemblies.wall.layers.find((layer) => layer.role === "insulation")?.thicknessMm ?? 0;
+  const frameProfile: [number, number] = [30, wallInsulationMm];
+  const baseProfile: [number, number] = [45, 45];
+
+  const linearParts: LinearPart[] = [
+    {
+      id: "base-runner",
+      nameSr: "Uzdužni nosači baze",
+      nameEn: "Base runners",
+      profileMm: baseProfile,
+      quantity: 2,
+      lengthMm: model.dimensions.depthMm,
+      provenance: "ASSUMPTION",
+      notesSr: "Početni V1 profil. Potvrditi izbor drveta i zaštitu od vlage pre ENGINEERING_REVIEWED statusa.",
+      notesEn: "Initial V1 profile. Confirm timber selection and moisture protection before ENGINEERING_REVIEWED status."
+    },
+    {
+      id: "floor-frame-long",
+      nameSr: "Uzdužne letve rama poda",
+      nameEn: "Floor frame long rails",
+      profileMm: frameProfile,
+      quantity: 2,
+      lengthMm: model.dimensions.depthMm,
+      provenance: "GEOMETRY"
+    },
+    {
+      id: "floor-frame-short",
+      nameSr: "Poprečne letve rama poda",
+      nameEn: "Floor frame cross rails",
+      profileMm: frameProfile,
+      quantity: 2,
+      lengthMm: Math.max(1, model.dimensions.widthMm - 2 * frameProfile[0]),
+      provenance: "GEOMETRY"
+    },
+    {
+      id: "front-rear-bottom-rail",
+      nameSr: "Donje letve prednjeg/zadnjeg zida",
+      nameEn: "Front/rear lower rails",
+      profileMm: frameProfile,
+      quantity: 2,
+      lengthMm: model.dimensions.widthMm,
+      provenance: "GEOMETRY"
+    },
+    {
+      id: "front-rear-top-rail",
+      nameSr: "Gornje letve prednjeg/zadnjeg zida",
+      nameEn: "Front/rear upper rails",
+      profileMm: frameProfile,
+      quantity: 2,
+      lengthMm: model.dimensions.widthMm,
+      provenance: "GEOMETRY"
+    },
+    {
+      id: "corner-front",
+      nameSr: "Prednje ugaone letve",
+      nameEn: "Front corner studs",
+      profileMm: frameProfile,
+      quantity: 2,
+      lengthMm: Math.max(1, model.dimensions.frontHeightMm - floorThicknessMm - roofThicknessMm),
+      provenance: "GEOMETRY"
+    },
+    {
+      id: "corner-rear",
+      nameSr: "Zadnje ugaone letve",
+      nameEn: "Rear corner studs",
+      profileMm: frameProfile,
+      quantity: 2,
+      lengthMm: Math.max(1, model.dimensions.rearHeightMm - floorThicknessMm - roofThicknessMm),
+      provenance: "GEOMETRY"
+    },
+    {
+      id: "entrance-vertical",
+      nameSr: "Vertikalna ojačanja ulaza",
+      nameEn: "Entrance vertical supports",
+      profileMm: frameProfile,
+      quantity: model.layout.entrances * 2,
+      lengthMm: model.layout.entranceHeightMm + model.layout.thresholdHeightMm,
+      provenance: "GEOMETRY"
+    },
+    {
+      id: "entrance-header",
+      nameSr: "Gornje ojačanje ulaza",
+      nameEn: "Entrance headers",
+      profileMm: frameProfile,
+      quantity: model.layout.entrances,
+      lengthMm: model.layout.entranceWidthMm + 2 * frameProfile[0],
+      provenance: "GEOMETRY"
+    },
+    ...(model.layout.chambers > 1 ? [{
+      id: "divider-cleat",
+      nameSr: "Letve za unutrašnje pregrade",
+      nameEn: "Divider cleats",
+      profileMm: frameProfile,
+      quantity: (model.layout.chambers - 1) * 2,
+      lengthMm: internalRearHeightMm,
+      provenance: "GEOMETRY" as const,
+      notesSr: "Po dve vertikalne letve po pregradi; finalno uklapanje prati kosinu krova.",
+      notesEn: "Two vertical cleats per divider; final fitting follows the roof slope."
+    }] : [])
+  ];
+
+  const framing = {
+    status: "PROVISIONAL" as const,
+    frameProfileMm: frameProfile,
+    baseProfileMm: baseProfile,
+    totalLinearM: linearParts.reduce(
+      (sum, part) => sum + (part.quantity * part.lengthMm) / 1000,
+      0
+    )
+  };
+
   const buildSteps: BuildStep[] = [
     {
       id: "base",
@@ -371,6 +496,8 @@ export function compileShelterModel(model: ShelterModel) {
     areas,
     thermal,
     cutParts,
+    linearParts,
+    framing,
     buildSteps
   };
 }
