@@ -1,5 +1,5 @@
 import type {ShelterModel} from "@/lib/domain";
-import {compileShelterModel} from "@/lib/compiler";
+import {compileShelterModel, type CompiledShelterModel} from "@/lib/compiler";
 import {packCutParts} from "@/lib/nesting";
 import {assemblyInsulationMm} from "@/data/assemblies";
 
@@ -13,8 +13,8 @@ export type CostLine = {
   noteEn: string;
 };
 
-export function costLinesForModel(model: ShelterModel): CostLine[] {
-  const compiled = compileShelterModel(model);
+export function costLinesForCompiled(compiled: CompiledShelterModel): CostLine[] {
+  const model = compiled.model;
 
   const sheets12 = packCutParts(
     compiled.cutParts.filter((part) => part.material === "plywood-12"),
@@ -128,4 +128,9 @@ export function costLinesForModel(model: ShelterModel): CostLine[] {
   }
 
   return lines;
+}
+
+
+export function costLinesForModel(model: ShelterModel): CostLine[] {
+  return costLinesForCompiled(compileShelterModel(model));
 }
