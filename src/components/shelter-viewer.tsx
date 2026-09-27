@@ -252,10 +252,20 @@ function Shelter({model, mode}: {model: ShelterModel; mode: ViewMode}) {
 
 export function ShelterViewer({model, locale}: {model: ShelterModel; locale: AppLocale}) {
   const [mode, setMode] = useState<ViewMode>("assembled");
+  const widthM = model.dimensions.widthMm / 1000;
+  const depthM = model.dimensions.depthMm / 1000;
+  const heightM = (model.dimensions.frontHeightMm + model.dimensions.groundClearanceMm) / 1000;
+  const maxSpan = Math.max(widthM, depthM, heightM);
+  const cameraPosition: [number, number, number] = [
+    maxSpan * 1.35,
+    Math.max(1.2, heightM * 1.18),
+    maxSpan * 1.55
+  ];
+  const orbitTarget: [number, number, number] = [0, heightM * 0.43, 0];
 
   return (
     <div className="viewer" aria-label={`3D preview: ${model.translations.en.name}`}>
-      <Canvas camera={{position: [2.25, 1.6, 2.55], fov: 38}} dpr={[1, 1.5]} shadows>
+      <Canvas camera={{position: cameraPosition, fov: 38}} dpr={[1, 1.5]} shadows>
         <color attach="background" args={["#eee9e0"]} />
         <ambientLight intensity={1.45} />
         <directionalLight position={[3, 5, 2]} intensity={2.2} castShadow />
@@ -266,7 +276,7 @@ export function ShelterViewer({model, locale}: {model: ShelterModel; locale: App
           enablePan={false}
           minDistance={1.25}
           maxDistance={5}
-          target={[0, 0.48, 0]}
+          target={orbitTarget}
         />
       </Canvas>
 
