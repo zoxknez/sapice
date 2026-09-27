@@ -1863,3 +1863,12 @@ button { cursor: pointer; }
   font-weight: 500;
   line-height: 1.45;
 }
+
+
+.field-help {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
