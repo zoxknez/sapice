@@ -70,7 +70,9 @@ export function ModelBuildBook({model, locale}: {model: ShelterModel; locale: Ap
                     {part.shape === "trapezoid"
                       ? (locale === "sr" ? "trapezni profil" : "trapezoid profile")
                       : part.material}
-                    {part.notes ? ` · ${part.notes}` : ""}
+                    {(locale === "sr" ? part.notesSr : part.notesEn)
+                      ? ` · ${locale === "sr" ? part.notesSr : part.notesEn}`
+                      : ""}
                   </small>
                 </span>
                 <span role="cell">
