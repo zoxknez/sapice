@@ -2701,3 +2701,62 @@ button { cursor: pointer; }
   fill: #3f6f79;
   stroke: none;
 }
+
+
+.heating-provision-section {
+  background: #f5eee9;
+  border-block: 1px solid var(--line);
+}
+.heating-zone-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+.heating-zone-grid article {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.heating-zone-grid article > strong {
+  display: block;
+  margin: 6px 0 14px;
+  font-size: 22px;
+}
+.heating-zone-grid dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+.heating-zone-grid dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+.heating-zone-grid dt {
+  color: var(--muted);
+  font-size: 10px;
+}
+.heating-zone-grid dd {
+  margin: 0;
+  text-align: right;
+  font: 750 10px ui-monospace, monospace;
+}
+.heating-safety-note {
+  margin-top: 14px;
+  padding: 16px 18px;
+  border-left: 3px solid #a55e45;
+  background: #f5e5de;
+}
+.heating-safety-note p {
+  margin: 6px 0 10px;
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 11px;
+}
+.heating-safety-note a {
+  font-size: 10px;
+  font-weight: 800;
+}
