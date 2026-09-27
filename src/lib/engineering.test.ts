@@ -95,6 +95,48 @@ describe("engineering model derivations", () => {
     }
   });
 
+  it("centers entrances inside chambers for multi-chamber models", () => {
+    for (const model of shelterModels.filter(
+      (item) => item.layout.entrances === item.layout.chambers && item.layout.chambers > 1
+    )) {
+      const compiled = compileShelterModel(model);
+      expect(compiled.layout.entranceCentersXmm).toHaveLength(model.layout.chambers);
+
+      compiled.layout.entranceCentersXmm.forEach((centerMm, index) => {
+        const expected = model.dimensions.widthMm * ((index + 0.5) / model.layout.chambers);
+        expect(centerMm).toBeCloseTo(expected, 6);
+      });
+
+      compiled.layout.dividerPositionsXmm.forEach((dividerMm, index) => {
+        const expected = model.dimensions.widthMm * ((index + 1) / model.layout.chambers);
+        expect(dividerMm).toBeCloseTo(expected, 6);
+      });
+    }
+  });
+
+  it("keeps provisional rear and side stud gaps within the compiled maximum", () => {
+    for (const model of shelterModels) {
+      const compiled = compileShelterModel(model);
+
+      for (const [wall, spanMm] of [
+        ["rear", model.dimensions.widthMm],
+        ["left", model.dimensions.depthMm],
+        ["right", model.dimensions.depthMm]
+      ] as const) {
+        const positions = compiled.linearParts
+          .filter((part) => part.wall === wall && typeof part.positionMm === "number")
+          .map((part) => part.positionMm as number)
+          .sort((a, b) => a - b);
+
+        const points = [0, ...positions, spanMm];
+        for (let index = 1; index < points.length; index++) {
+          expect(points[index] - points[index - 1])
+            .toBeLessThanOrEqual(compiled.framing.maxStudSpacingMm + 1);
+        }
+      }
+    }
+  });
+
   it("keeps large heated and passive dog geometry identical", () => {
     const passive = getShelterModel("alpine-large-winter");
     const heated = getShelterModel("alpine-large-heated");
