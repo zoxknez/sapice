@@ -2,16 +2,14 @@ import type {ShelterModel} from "@/lib/domain";
 import type {AppLocale} from "@/i18n/routing";
 import {Link} from "@/i18n/navigation";
 import {assemblyInsulationMm, getAssembly} from "@/data/assemblies";
+import {ModelThumbnail} from "@/components/model-thumbnail";
 
 export function ModelCard({model, locale}: {model: ShelterModel; locale: AppLocale}) {
   const copy = model.translations[locale];
   return (
     <article className="model-card">
-      <div className="model-visual" aria-hidden="true">
-        <div className="mini-shelter">
-          <span className="mini-roof" />
-          <span className="mini-door" />
-        </div>
+      <div className="model-visual">
+        <ModelThumbnail model={model} locale={locale} />
         <span className="status-chip">{model.validationState.replaceAll("_", " ")}</span>
       </div>
       <div className="model-card-body">
