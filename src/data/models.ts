@@ -1,4 +1,5 @@
 import {shelterModelSchema, type ShelterModel} from "@/lib/domain";
+import {assertShelterModelValid} from "@/lib/validation";
 
 const catSources = [
   "aspcapro-community-cat-winter",
@@ -217,7 +218,11 @@ const models: ShelterModel[] = [
   }
 ];
 
-export const shelterModels = models.map((model) => shelterModelSchema.parse(model));
+export const shelterModels = models.map((model) => {
+  const parsed = shelterModelSchema.parse(model);
+  assertShelterModelValid(parsed);
+  return parsed;
+});
 
 export function getShelterModel(slug: string) {
   return shelterModels.find((model) => model.slug === slug);
