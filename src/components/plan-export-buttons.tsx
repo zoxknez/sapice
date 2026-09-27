@@ -77,6 +77,20 @@ export function PlanExportButtons({
       ]);
     }
 
+    rows.push(
+      [],
+      ["WALL JOINERY"],
+      ["Convention", compiled.joinery.convention],
+      ["Wall thickness mm", compiled.joinery.wallThicknessMm],
+      ["Side start Z mm", compiled.joinery.sideStartZmm.toFixed(1)],
+      ["Side end Z mm", compiled.joinery.sideEndZmm.toFixed(1)],
+      ["Side panel run mm", compiled.joinery.sideRunMm.toFixed(1)],
+      ["Side front height mm", compiled.joinery.sideFrontHeightMm.toFixed(1)],
+      ["Side rear height mm", compiled.joinery.sideRearHeightMm.toFixed(1)],
+      ["Side top slope length mm", compiled.joinery.sideTopSlopeLengthMm.toFixed(1)],
+      ["Corner return envelope m2", compiled.areas.cornerReturnM2.toFixed(4)]
+    );
+
     if (compiled.heating.zones.length > 0) {
       rows.push(
         [],
