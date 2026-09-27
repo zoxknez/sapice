@@ -20,6 +20,16 @@ export const sources: Record<string, SourceRecord> = {
     topics: ["community-cats", "winter", "entrances", "bedding", "raised-floor"],
     notes: "Supports small insulated shelters, cat-sized entrances, elevation from wet ground, straw bedding and predator-aware entrance decisions."
   },
+  "gov-uk-dog-kennel-ventilation": {
+    id: "gov-uk-dog-kennel-ventilation",
+    publisher: "UK Government",
+    title: "Dog kennel boarding licensing: statutory guidance for local authorities",
+    url: "https://www.gov.uk/government/publications/animal-activities-licensing-guidance-for-local-authorities/dog-kennel-boarding-licensing-statutory-guidance-for-local-authorities",
+    accessedAt: "2026-09-27",
+    tier: 1,
+    topics: ["dogs", "ventilation", "humidity", "drafts", "heating-safety"],
+    notes: "Requires adequate ventilation without excessive localised draughts and to avoid excess humidity. Šapice uses this only as a qualitative ventilation principle; it is commercial-kennel guidance, not a dimensional standard for these small auxiliary shelters."
+  },
   "humane-world-pets-cold": {
     id: "humane-world-pets-cold",
     publisher: "Humane World for Animals",
