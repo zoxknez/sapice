@@ -27,19 +27,54 @@ const parts: CutPart[] = [
   }
 ];
 
+function overlaps(
+  a: {x: number; y: number; widthMm: number; heightMm: number},
+  b: {x: number; y: number; widthMm: number; heightMm: number}
+) {
+  return !(
+    a.x + a.widthMm <= b.x ||
+    b.x + b.widthMm <= a.x ||
+    a.y + a.heightMm <= b.y ||
+    b.y + b.heightMm <= a.y
+  );
+}
+
 describe("sheet nesting", () => {
-  it("keeps every packed part inside the sheet", () => {
-    const sheets = packCutParts(parts, {sheetWidthMm: 2500, sheetHeightMm: 1250});
+  it("keeps every packed part inside sheet margins", () => {
+    const marginMm = 10;
+    const sheets = packCutParts(parts, {
+      sheetWidthMm: 2500,
+      sheetHeightMm: 1250,
+      marginMm
+    });
     const totalParts = sheets.flatMap((sheet) => sheet.parts);
     expect(totalParts).toHaveLength(3);
 
     for (const sheet of sheets) {
       for (const part of sheet.parts) {
-        expect(part.x).toBeGreaterThanOrEqual(0);
-        expect(part.y).toBeGreaterThanOrEqual(0);
-        expect(part.x + part.widthMm).toBeLessThanOrEqual(sheet.widthMm);
-        expect(part.y + part.heightMm).toBeLessThanOrEqual(sheet.heightMm);
+        expect(part.x).toBeGreaterThanOrEqual(marginMm);
+        expect(part.y).toBeGreaterThanOrEqual(marginMm);
+        expect(part.x + part.widthMm).toBeLessThanOrEqual(sheet.widthMm - marginMm);
+        expect(part.y + part.heightMm).toBeLessThanOrEqual(sheet.heightMm - marginMm);
       }
+    }
+  });
+
+  it("never overlaps packed bounding boxes", () => {
+    const sheets = packCutParts(parts);
+    for (const sheet of sheets) {
+      for (let i = 0; i < sheet.parts.length; i++) {
+        for (let j = i + 1; j < sheet.parts.length; j++) {
+          expect(overlaps(sheet.parts[i], sheet.parts[j])).toBe(false);
+        }
+      }
+    }
+  });
+
+  it("keeps utilization between zero and one", () => {
+    for (const sheet of packCutParts(parts)) {
+      expect(sheet.utilization).toBeGreaterThan(0);
+      expect(sheet.utilization).toBeLessThanOrEqual(1);
     }
   });
 
