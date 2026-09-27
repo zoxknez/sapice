@@ -1358,3 +1358,105 @@ button { cursor: pointer; }
 @media (max-width: 700px) {
   .framing-summary { grid-template-columns: 1fr; }
 }
+
+
+.catalog-model { position: relative; min-width: 0; }
+.compare-toggle {
+  width: calc(100% - 24px);
+  min-height: 38px;
+  margin: -1px 12px 14px;
+  border: 1px solid var(--line);
+  border-top: 0;
+  border-radius: 0 0 13px 13px;
+  background: #eee7dc;
+  color: var(--accent-dark);
+  font-size: 11px;
+  font-weight: 800;
+}
+.compare-toggle span {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+  border-radius: 999px;
+  background: #d8c9bb;
+}
+.compare-toggle.active {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
+.compare-toggle.active span { background: #ffffff20; }
+
+.compare-panel {
+  margin: 0 0 28px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 16px 50px #4b382818;
+}
+.compare-panel > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: end;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid var(--line);
+}
+.compare-panel h2 {
+  margin: 8px 0 0;
+  font-size: 30px;
+  letter-spacing: -.04em;
+}
+.compare-panel > header button {
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+.compare-scroll { overflow-x: auto; }
+.compare-panel table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+.compare-panel th,
+.compare-panel td {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  font-size: 12px;
+}
+.compare-panel thead th {
+  background: #eee7dc;
+  color: var(--ink);
+  font-size: 12px;
+}
+.compare-panel tbody th {
+  width: 180px;
+  color: var(--muted);
+  font-weight: 720;
+}
+.compare-panel tbody tr:last-child th,
+.compare-panel tbody tr:last-child td { border-bottom: 0; }
+.compare-hint {
+  position: sticky;
+  bottom: 14px;
+  z-index: 30;
+  width: fit-content;
+  margin: 18px auto 0;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  box-shadow: 0 12px 30px #0003;
+  font-size: 11px;
+  font-weight: 760;
+}
