@@ -452,6 +452,18 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
     });
   }
 
+  if (
+    compiled &&
+    compiled.internal.entranceSillAboveFinishedFloorMm <
+      compiled.framing.frameProfileMm[0]
+  ) {
+    issues.push({
+      severity: "error",
+      code: "ENTRANCE_INTERSECTS_BOTTOM_RAIL",
+      message: `Entrance sill ${compiled.internal.entranceSillAboveFinishedFloorMm} mm is below the V1 bottom framing rail depth ${compiled.framing.frameProfileMm[0]} mm.`
+    });
+  }
+
   if (model.layout.entranceWidthMm >= model.dimensions.widthMm) {
     issues.push({
       severity: "error",
