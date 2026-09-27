@@ -1,5 +1,5 @@
 import type {ShelterModel} from "@/lib/domain";
-import {constructionInterfaceGeometry, constructionSummary, entranceGeometry, framingMethod, getModelAssemblies, layoutGeometry, roofPanelGeometry, roofSlope, surfaceAreas, thermalSummary, ventilationProvisionGeometry} from "@/lib/engineering";
+import {constructionInterfaceGeometry, constructionSummary, entranceGeometry, framingMethod, getModelAssemblies, layoutGeometry, provisionalIntermediatePositions, roofPanelGeometry, roofSlope, surfaceAreas, thermalSummary, ventilationProvisionGeometry} from "@/lib/engineering";
 import {cutGeometryAreaMm2, cutGeometryCutoutPerimeterMm, cutGeometryOuterPerimeterMm} from "@/lib/cut-geometry";
 import {materials} from "@/data/materials";
 
@@ -510,55 +510,44 @@ export function compileShelterModel(model: ShelterModel) {
     return Math.max(1, Math.round(wallHeightMm));
   };
 
-  const rearIntermediateCount = Math.max(
-    0,
-    Math.ceil(model.dimensions.widthMm / maxStudSpacingMm) - 1
+  const rearIntermediatePositionsMm = provisionalIntermediatePositions(
+    model.dimensions.widthMm,
+    maxStudSpacingMm
   );
-  const rearIntermediateStuds: LinearPart[] = Array.from(
-    {length: rearIntermediateCount},
-    (_, index) => {
-      const positionMm = Math.round(
-        model.dimensions.widthMm * ((index + 1) / (rearIntermediateCount + 1))
-      );
-      return {
-        id: `rear-stud-${index + 1}`,
-        nameSr: "Međustub zadnjeg zida",
-        nameEn: "Rear-wall intermediate stud",
-        profileMm: frameProfile,
-        quantity: 1,
-        lengthMm: internalRearHeightMm,
-        provenance: "ASSUMPTION" as const,
-        wall: "rear" as const,
-        positionMm,
-        notesSr: `Pozicija je izvedena iz V1 maksimalnog osnog razmaka ≈ ${maxStudSpacingMm} mm.`,
-        notesEn: `Position is derived from the V1 maximum stud spacing of ≈ ${maxStudSpacingMm} mm.`
-      };
-    }
+  const rearIntermediateStuds: LinearPart[] = rearIntermediatePositionsMm.map(
+    (positionMm, index) => ({
+      id: `rear-stud-${index + 1}`,
+      nameSr: "Međustub zadnjeg zida",
+      nameEn: "Rear-wall intermediate stud",
+      profileMm: frameProfile,
+      quantity: 1,
+      lengthMm: internalRearHeightMm,
+      provenance: "ASSUMPTION" as const,
+      wall: "rear" as const,
+      positionMm,
+      notesSr: `Pozicija je izvedena iz V1 maksimalnog osnog razmaka ≈ ${maxStudSpacingMm} mm.`,
+      notesEn: `Position is derived from the V1 maximum stud spacing of ≈ ${maxStudSpacingMm} mm.`
+    })
   );
 
-  const sideIntermediateCount = Math.max(
-    0,
-    Math.ceil(model.dimensions.depthMm / maxStudSpacingMm) - 1
+  const sideIntermediatePositionsMm = provisionalIntermediatePositions(
+    model.dimensions.depthMm,
+    maxStudSpacingMm
   );
   const sideIntermediateStuds: LinearPart[] = ["left", "right"].flatMap((wallSide) =>
-    Array.from({length: sideIntermediateCount}, (_, index) => {
-      const positionMm = Math.round(
-        model.dimensions.depthMm * ((index + 1) / (sideIntermediateCount + 1))
-      );
-      return {
-        id: `${wallSide}-stud-${index + 1}`,
-        nameSr: "Međustub bočnog zida",
-        nameEn: "Side-wall intermediate stud",
-        profileMm: frameProfile,
-        quantity: 1,
-        lengthMm: clearStudHeightAtDepth(positionMm),
-        provenance: "ASSUMPTION" as const,
-        wall: wallSide as "left" | "right",
-        positionMm,
-        notesSr: `Pozicija prati V1 maksimalni osni razmak ≈ ${maxStudSpacingMm} mm; dužina prati kosinu krova.`,
-        notesEn: `Position follows the V1 maximum stud spacing of ≈ ${maxStudSpacingMm} mm; length follows the roof slope.`
-      };
-    })
+    sideIntermediatePositionsMm.map((positionMm, index) => ({
+      id: `${wallSide}-stud-${index + 1}`,
+      nameSr: "Međustub bočnog zida",
+      nameEn: "Side-wall intermediate stud",
+      profileMm: frameProfile,
+      quantity: 1,
+      lengthMm: clearStudHeightAtDepth(positionMm),
+      provenance: "ASSUMPTION" as const,
+      wall: wallSide as "left" | "right",
+      positionMm,
+      notesSr: `Pozicija prati V1 maksimalni osni razmak ≈ ${maxStudSpacingMm} mm; dužina prati kosinu krova.`,
+      notesEn: `Position follows the V1 maximum stud spacing of ≈ ${maxStudSpacingMm} mm; length follows the roof slope.`
+    }))
   );
 
   const entranceSillAboveFinishedFloorMm =
