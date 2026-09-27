@@ -4,6 +4,7 @@ import {getAssembly} from "@/data/assemblies";
 import {
   assemblyUValue,
   materialSummary,
+  thermalMethod,
   roofPanelGeometry,
   roofSlope,
   surfaceAreas,
@@ -46,6 +47,33 @@ describe("engineering model derivations", () => {
       expect(thermal.roofU).toBeGreaterThan(0);
       expect(Number.isFinite(thermal.envelopeTransmissionW)).toBe(true);
       expect(thermal.envelopeTransmissionW).toBeGreaterThan(0);
+    }
+  });
+
+  it("uses ISO 6946 orientation-specific surface resistances", () => {
+    expect(thermalMethod.version).toBe("1.1.0");
+    expect(thermalMethod.interiorSurfaceResistanceM2KW.horizontal).toBe(0.13);
+    expect(thermalMethod.interiorSurfaceResistanceM2KW.upward).toBe(0.10);
+    expect(thermalMethod.interiorSurfaceResistanceM2KW.downward).toBe(0.17);
+    expect(thermalMethod.exteriorSurfaceResistanceM2KW).toBe(0.04);
+
+    const wall = getAssembly("wall-xps-50");
+    const horizontalU = assemblyUValue(wall, "horizontal");
+    const upwardU = assemblyUValue(wall, "upward");
+    const downwardU = assemblyUValue(wall, "downward");
+
+    expect(upwardU).toBeGreaterThan(horizontalU);
+    expect(horizontalU).toBeGreaterThan(downwardU);
+  });
+
+  it("reports the assembly heat-flow assumptions in every thermal summary", () => {
+    for (const model of shelterModels) {
+      const thermal = thermalSummary(model);
+      expect(thermal.surfaceResistances.wallRsi).toBe(0.13);
+      expect(thermal.surfaceResistances.roofRsi).toBe(0.10);
+      expect(thermal.surfaceResistances.floorRsi).toBe(0.17);
+      expect(thermal.surfaceResistances.rse).toBe(0.04);
+      expect(thermal.surfaceResistanceSourceId).toBe("iso-6946-2017");
     }
   });
 
