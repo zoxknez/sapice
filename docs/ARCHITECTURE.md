@@ -11,7 +11,7 @@ Canonical shelter definitions live in Git and are validated before publication.
 ```text
 ShelterModel
   -> construction assemblies
-  -> compiler v1.5
+  -> compiler v1.6
      -> construction-interface geometry
      -> entrance geometry
      -> chamber/divider geometry
@@ -83,7 +83,7 @@ The compiler centralizes geometry that previously could drift between views:
 - roof rafters
 - ventilation provision zones
 - heating provision zones
-- hinge / latch positions
+- front-hinge / rear-latch service-roof positions coordinated with runoff
 - roof runoff direction and edge lengths
 
 3D, technical drawings, exports and validation consume these derived values.
