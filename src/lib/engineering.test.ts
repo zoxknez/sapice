@@ -140,6 +140,26 @@ describe("engineering model derivations", () => {
     }
   });
 
+  it("keeps service-roof hardware on structural wall lines inside roof overhangs", () => {
+    for (const model of shelterModels) {
+      const compiled = compileShelterModel(model);
+
+      expect(compiled.hardware.hingeAxisFromPanelFrontMm)
+        .toBeCloseTo(compiled.roofPanel.frontWallLineFromPanelFrontMm, 8);
+      expect(compiled.hardware.latchAxisFromPanelFrontMm)
+        .toBeCloseTo(compiled.roofPanel.rearWallLineFromPanelFrontMm, 8);
+      expect(compiled.hardware.hingeAxisFromPanelFrontMm).toBeGreaterThan(0);
+      expect(compiled.hardware.latchAxisFromPanelFrontMm)
+        .toBeLessThan(compiled.roofPanel.panelLengthMm);
+      expect(compiled.hardware.hingeAxisFromPanelFrontMm)
+        .toBeLessThan(compiled.hardware.latchAxisFromPanelFrontMm);
+      expect(
+        compiled.roofPanel.panelLengthMm -
+          compiled.hardware.latchAxisFromPanelFrontMm
+      ).toBeCloseTo(compiled.roofPanel.rearOverhangAlongSlopeMm, 8);
+    }
+  });
+
   it("keeps service-roof hinges off the rear runoff edge", () => {
     for (const model of shelterModels) {
       const compiled = compileShelterModel(model);
