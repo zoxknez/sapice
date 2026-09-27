@@ -16,6 +16,7 @@ import {SharePlanButton} from "@/components/share-plan-button";
 import {PlanExportButtons} from "@/components/plan-export-buttons";
 import {OperatingGuidance} from "@/components/operating-guidance";
 import {StructuredData} from "@/components/structured-data";
+import {ThermalScenario} from "@/components/thermal-scenario";
 import {compileShelterModel} from "@/lib/compiler";
 
 export function generateStaticParams() {
@@ -224,6 +225,12 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
               <small>{thermal.envelopeTransmissionRangeW[0].toFixed(0)}–{thermal.envelopeTransmissionRangeW[1].toFixed(0)} W</small>
             </div>
           </div>
+          <ThermalScenario
+            locale={locale}
+            baseDeltaTK={thermal.deltaTK}
+            nominalW={thermal.envelopeTransmissionW}
+            rangeW={thermal.envelopeTransmissionRangeW}
+          />
           <div className="thermal-limitations">
             <strong>{locale === "sr" ? "Trenutne limitacije modela" : "Current model limitations"}</strong>
             <ul>
