@@ -59,6 +59,26 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
   }
 
   if (compiled) {
+    const frontEnvelopeRebuildMm =
+      compiled.construction.floorThicknessMm +
+      compiled.interfaces.wallFrontHeightMm +
+      compiled.interfaces.roofVerticalThicknessMm;
+    const rearEnvelopeRebuildMm =
+      compiled.construction.floorThicknessMm +
+      compiled.interfaces.wallRearHeightMm +
+      compiled.interfaces.roofVerticalThicknessMm;
+
+    if (
+      Math.abs(frontEnvelopeRebuildMm - model.dimensions.frontHeightMm) > 0.001 ||
+      Math.abs(rearEnvelopeRebuildMm - model.dimensions.rearHeightMm) > 0.001
+    ) {
+      issues.push({
+        severity: "error",
+        code: "ENVELOPE_INTERFACE_MISMATCH",
+        message: "Floor + wall + roof interface geometry does not rebuild the declared overall height."
+      });
+    }
+
     if (
       compiled.internal.widthMm <= 0 ||
       compiled.internal.depthMm <= 0 ||
@@ -335,6 +355,45 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
           message: `Invalid hardware quantity: ${item.id}`
         });
       }
+    }
+
+    const frontOuter = compiled.cutParts.find((part) => part.id === "front-outer");
+    const rearOuter = compiled.cutParts.find((part) => part.id === "rear-outer");
+    const sideOuter = compiled.cutParts.find((part) => part.id === "side-outer");
+    const floorXps = compiled.cutParts.filter((part) => part.id.startsWith("xps-floor-"));
+    const roofXps = compiled.cutParts.filter((part) => part.id.startsWith("xps-roof-"));
+
+    if (
+      frontOuter?.heightMm !== Math.round(compiled.interfaces.wallFrontHeightMm) ||
+      rearOuter?.heightMm !== Math.round(compiled.interfaces.wallRearHeightMm) ||
+      sideOuter?.heightMm !== Math.round(compiled.interfaces.wallFrontHeightMm) ||
+      sideOuter?.trapezoidRearHeightMm !== Math.round(compiled.interfaces.wallRearHeightMm)
+    ) {
+      issues.push({
+        severity: "error",
+        code: "WALL_CUT_INTERFACE_MISMATCH",
+        message: "Exterior wall cut parts do not match the compiled wall interface heights."
+      });
+    }
+
+    const floorXpsAreaMm2 = floorXps.reduce(
+      (sum, part) => sum + part.widthMm * part.heightMm * part.quantity,
+      0
+    );
+    const roofXpsAreaMm2 = roofXps.reduce(
+      (sum, part) => sum + part.widthMm * part.heightMm * part.quantity,
+      0
+    );
+
+    if (
+      floorXpsAreaMm2 < model.dimensions.widthMm * model.dimensions.depthMm ||
+      roofXpsAreaMm2 < model.dimensions.widthMm * compiled.roof.trueLengthMm
+    ) {
+      issues.push({
+        severity: "error",
+        code: "INSULATION_COVERAGE_GAP",
+        message: "Floor or roof insulation cut parts do not cover the protected thermal footprint."
+      });
     }
 
     const stockChecks = [
