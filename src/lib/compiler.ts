@@ -45,6 +45,8 @@ export type LinearPart = {
   provenance: "ASSUMPTION" | "GEOMETRY";
   wall?: "front" | "rear" | "left" | "right" | "floor" | "roof" | "base" | "divider";
   positionMm?: number;
+  positionXmm?: number;
+  positionZmm?: number;
   startHeightMm?: number;
   elevationMm?: number;
   notesSr?: string;
@@ -385,6 +387,7 @@ export function compileShelterModel(model: ShelterModel) {
   const maxFloorJoistSpacingMm = 500;
   const maxRoofRafterSpacingMm = 500;
   const maxBaseRunnerSpacingMm = 700;
+  const maxBasePostSpacingMm = 700;
 
   const baseRunnerCount = Math.max(
     2,
@@ -409,6 +412,37 @@ export function compileShelterModel(model: ShelterModel) {
       notesSr: `Pozicija je izvedena iz V1 maksimalnog razmaka oslonaca ≈ ${maxBaseRunnerSpacingMm} mm.`,
       notesEn: `Position is derived from the V1 maximum base-support spacing of ≈ ${maxBaseRunnerSpacingMm} mm.`
     })
+  );
+
+  const basePostRowCount = Math.max(
+    2,
+    Math.ceil(model.dimensions.depthMm / maxBasePostSpacingMm)
+  );
+  const baseSupportPositionsZmm = Array.from(
+    {length: basePostRowCount},
+    (_, index) =>
+      model.dimensions.depthMm * ((index + 1) / (basePostRowCount + 1))
+  );
+  const baseSupportPostHeightMm = Math.max(
+    1,
+    model.dimensions.groundClearanceMm - baseProfile[1]
+  );
+  const baseSupportPostParts: LinearPart[] = baseRunnerPositionsXmm.flatMap(
+    (positionXmm, runnerIndex) =>
+      baseSupportPositionsZmm.map((positionZmm, rowIndex) => ({
+        id: `base-post-${runnerIndex + 1}-${rowIndex + 1}`,
+        nameSr: `Vertikalni oslonac baze ${runnerIndex + 1}.${rowIndex + 1}`,
+        nameEn: `Base support post ${runnerIndex + 1}.${rowIndex + 1}`,
+        profileMm: baseProfile,
+        quantity: 1,
+        lengthMm: baseSupportPostHeightMm,
+        provenance: "ASSUMPTION" as const,
+        wall: "base" as const,
+        positionXmm,
+        positionZmm,
+        notesSr: "V1 support grid podiže runner do donje strane poda. Materijal u kontaktu sa tlom, stopica i sidrenje ostaju za engineering/site review.",
+        notesEn: "The V1 support grid raises the runner to the floor underside. Ground-contact material, footing and anchorage remain subject to engineering/site review."
+      }))
   );
 
   const floorJoistCount = Math.max(
@@ -612,6 +646,7 @@ export function compileShelterModel(model: ShelterModel) {
 
   const linearParts: LinearPart[] = [
     ...baseRunnerParts,
+    ...baseSupportPostParts,
     {
       id: "floor-frame-long",
       nameSr: "Uzdužne letve rama poda",
@@ -729,7 +764,10 @@ export function compileShelterModel(model: ShelterModel) {
     maxFloorJoistSpacingMm,
     maxRoofRafterSpacingMm,
     maxBaseRunnerSpacingMm,
+    maxBasePostSpacingMm,
     baseRunnerPositionsXmm,
+    baseSupportPositionsZmm,
+    baseSupportPostHeightMm,
     floorJoistPositionsZmm,
     roofRafterPositionsXmm,
     frontSupportPositionsXmm: entranceSupportPositionsXmm,
