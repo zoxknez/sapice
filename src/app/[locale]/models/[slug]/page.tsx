@@ -3,7 +3,8 @@ import {notFound} from "next/navigation";
 import {setRequestLocale} from "next-intl/server";
 import type {AppLocale} from "@/i18n/routing";
 import {shelterModels, getShelterModel} from "@/data/models";
-import {materialSummary, thermalSummary, roofSlope} from "@/lib/engineering";
+import {constructionSummary, getModelAssemblies, materialSummary, thermalSummary, roofSlope} from "@/lib/engineering";
+import {assemblyInsulationMm} from "@/data/assemblies";
 import {ShelterViewer} from "@/components/shelter-viewer";
 import {TechnicalSketch} from "@/components/technical-sketch";
 import {ModelBuildBook} from "@/components/model-build-book";
@@ -58,6 +59,8 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
   const materials = materialSummary(model);
   const roof = roofSlope(model);
   const compiled = compileShelterModel(model);
+  const construction = constructionSummary(model);
+  const assemblies = getModelAssemblies(model);
 
   return (
     <>
@@ -72,7 +75,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
               <div><span>{locale === "sr" ? "Kapacitet" : "Capacity"}</span><strong>{model.capacity.recommended}</strong></div>
               <div><span>{locale === "sr" ? "Širina" : "Width"}</span><strong>{model.dimensions.widthMm} mm</strong></div>
               <div><span>{locale === "sr" ? "Dubina" : "Depth"}</span><strong>{model.dimensions.depthMm} mm</strong></div>
-              <div><span>{locale === "sr" ? "Izolacija" : "Insulation"}</span><strong>{model.construction.wallInsulationMm} mm</strong></div>
+              <div><span>{locale === "sr" ? "Izolacija" : "Insulation"}</span><strong>{assemblyInsulationMm(assemblies.wall)} mm</strong></div>
             </div>
             <div className="model-meta-line">
               <span>v{model.version}</span>
@@ -118,6 +121,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
               <div><dt>{locale === "sr" ? "Podignut pod" : "Ground clearance"}</dt><dd>{model.dimensions.groundClearanceMm} mm</dd></div>
               <div><dt>{locale === "sr" ? "Ulaz" : "Entrance"}</dt><dd>{model.layout.entranceWidthMm} × {model.layout.entranceHeightMm} mm × {model.layout.entrances}</dd></div>
               <div><dt>{locale === "sr" ? "Komore" : "Chambers"}</dt><dd>{model.layout.chambers}</dd></div>
+              <div><dt>{locale === "sr" ? "Debljina zida" : "Wall thickness"}</dt><dd>{construction.wallThicknessMm} mm</dd></div>
               <div><dt>{locale === "sr" ? "Nagib krova" : "Roof angle"}</dt><dd>{(roof.angleRad * 180 / Math.PI).toFixed(1)}°</dd></div>
             </dl>
           </div>
