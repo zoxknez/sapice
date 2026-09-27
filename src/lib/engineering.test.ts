@@ -3,6 +3,7 @@ import {getShelterModel, shelterModels} from "@/data/models";
 import {getAssembly} from "@/data/assemblies";
 import {
   assemblyUValue,
+  entranceGeometry,
   materialSummary,
   thermalMethod,
   roofPanelGeometry,
@@ -21,6 +22,23 @@ describe("engineering model derivations", () => {
       expect(areas.wallM2).toBeGreaterThan(0);
       expect(areas.floorM2).toBeGreaterThan(0);
       expect(areas.roofM2).toBeGreaterThan(0);
+    }
+  });
+
+  it("uses rounded entrance area consistently in wall surface calculations", () => {
+    for (const model of shelterModels) {
+      const entrance = entranceGeometry(model);
+      const rectangularAreaMm2 =
+        model.layout.entranceWidthMm *
+        model.layout.entranceHeightMm *
+        model.layout.entrances;
+
+      expect(entrance.totalOpeningAreaMm2).toBeLessThan(rectangularAreaMm2);
+      expect(entrance.radiusMm).toBeGreaterThan(0);
+      expect(surfaceAreas(model).openingM2).toBeCloseTo(
+        entrance.totalOpeningAreaMm2 / 1_000_000,
+        8
+      );
     }
   });
 
