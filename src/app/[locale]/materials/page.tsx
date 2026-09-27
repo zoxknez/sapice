@@ -1,6 +1,26 @@
+import type {Metadata} from "next";
 import {setRequestLocale} from "next-intl/server";
 import type {AppLocale} from "@/i18n/routing";
 import {materials} from "@/data/materials";
+import {localizedMetadata} from "@/lib/seo";
+
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{locale: AppLocale}>;
+}): Promise<Metadata> {
+  const {locale} = await params;
+  return localizedMetadata({
+    locale,
+    titleSr: "Materijali",
+    titleEn: "Materials",
+    descriptionSr: "Biblioteka materijala i projektantskih termičkih vrednosti korišćenih u Šapice modelima.",
+    descriptionEn: "Material library and design thermal values used by Šapice shelter models.",
+    srPath: "/sr/materijali",
+    enPath: "/en/materials"
+  });
+}
 
 export default async function MaterialsPage({params}: {params: Promise<{locale: AppLocale}>}) {
   const {locale} = await params;
