@@ -100,6 +100,82 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
       }
     }
 
+    if (
+      compiled.layout.entranceCentersXmm.length !== model.layout.entrances ||
+      compiled.layout.dividerPositionsXmm.length !== Math.max(0, model.layout.chambers - 1)
+    ) {
+      issues.push({
+        severity: "error",
+        code: "INVALID_LAYOUT_CARDINALITY",
+        message: "Compiled entrance/divider counts do not match the canonical layout."
+      });
+    }
+
+    const frameClearanceMm = compiled.framing.frameProfileMm[0];
+
+    if (model.layout.entrances === model.layout.chambers) {
+      compiled.layout.entranceCentersXmm.forEach((centerMm, index) => {
+        const chamberLeftMm = index * compiled.layout.chamberWidthMm;
+        const chamberRightMm = (index + 1) * compiled.layout.chamberWidthMm;
+        const openingLeftMm = centerMm - model.layout.entranceWidthMm / 2;
+        const openingRightMm = centerMm + model.layout.entranceWidthMm / 2;
+
+        if (
+          openingLeftMm < chamberLeftMm + frameClearanceMm ||
+          openingRightMm > chamberRightMm - frameClearanceMm
+        ) {
+          issues.push({
+            severity: "error",
+            code: "ENTRANCE_DOES_NOT_FIT_CHAMBER",
+            message: `Entrance ${index + 1} does not fit its chamber with the V1 frame clearance.`
+          });
+        }
+      });
+    }
+
+    for (const dividerMm of compiled.layout.dividerPositionsXmm) {
+      for (const cutout of compiled.cutParts.find((part) => part.id === "front-outer")?.cutouts ?? []) {
+        const openingLeftMm = cutout.xMm;
+        const openingRightMm = cutout.xMm + cutout.widthMm;
+        if (
+          dividerMm > openingLeftMm - frameClearanceMm &&
+          dividerMm < openingRightMm + frameClearanceMm
+        ) {
+          issues.push({
+            severity: "error",
+            code: "DIVIDER_CONFLICTS_WITH_ENTRANCE",
+            message: `Divider at ${dividerMm} mm conflicts with an entrance opening or its framing clearance.`
+          });
+        }
+      }
+    }
+
+    const checkStudSpacing = (
+      wallName: "rear" | "left" | "right",
+      spanMm: number
+    ) => {
+      const positions = compiled.linearParts
+        .filter((part) => part.wall === wallName && typeof part.positionMm === "number")
+        .map((part) => part.positionMm as number)
+        .sort((a, b) => a - b);
+
+      const points = [0, ...positions, spanMm];
+      for (let index = 1; index < points.length; index++) {
+        const gap = points[index] - points[index - 1];
+        if (gap > compiled.framing.maxStudSpacingMm + 1) {
+          issues.push({
+            severity: "error",
+            code: "STUD_SPACING_EXCEEDED",
+            message: `${wallName} wall stud gap ${gap} mm exceeds V1 maximum ${compiled.framing.maxStudSpacingMm} mm.`
+          });
+        }
+      }
+    };
+
+    checkStudSpacing("rear", model.dimensions.widthMm);
+    checkStudSpacing("left", model.dimensions.depthMm);
+    checkStudSpacing("right", model.dimensions.depthMm);
+
     for (const part of compiled.linearParts) {
       if (
         part.quantity <= 0 ||
