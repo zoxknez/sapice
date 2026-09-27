@@ -3,6 +3,7 @@ import {sources} from "@/data/sources";
 import {getAssembly} from "@/data/assemblies";
 import {compileShelterModel} from "@/lib/compiler";
 import {packCutParts} from "@/lib/nesting";
+import {compiledSourceIds} from "@/lib/provenance";
 
 export type ModelValidationIssue = {
   severity: "error" | "warning";
@@ -220,6 +221,16 @@ export function validateShelterModel(model: ShelterModel): ModelValidationIssue[
         code: "INVALID_FRAMING_TOTAL",
         message: "Compiled framing linear total is invalid."
       });
+    }
+
+    for (const sourceId of compiledSourceIds(compiled)) {
+      if (!sources[sourceId]) {
+        issues.push({
+          severity: "error",
+          code: "MISSING_COMPILED_SOURCE",
+          message: `Compiled plan references unknown source ID: ${sourceId}`
+        });
+      }
     }
 
     if (!sources[compiled.hardware.fastenerReferenceSourceId]) {
