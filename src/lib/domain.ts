@@ -13,6 +13,7 @@ export const shelterModelSchema = z.object({
   slug: z.string(),
   version: z.string(),
   validationState: validationStateSchema,
+  sourceIds: z.array(z.string()).min(1),
   animal: z.enum(["cat", "dog"]),
   intendedUse: z.enum([
     "COMMUNITY_CAT_SHELTER",
