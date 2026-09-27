@@ -44,6 +44,18 @@ export type LinearPart = {
 };
 
 
+export type HardwareItem = {
+  id: string;
+  nameSr: string;
+  nameEn: string;
+  quantity: number;
+  unit: "piece" | "m";
+  provenance: "ASSUMPTION" | "GEOMETRY";
+  notesSr: string;
+  notesEn: string;
+};
+
+
 function splitInsulationPanel({
   id,
   nameSr,
@@ -423,6 +435,99 @@ export function compileShelterModel(model: ShelterModel) {
     )
   };
 
+  const panelParts = cutParts.filter((part) => part.material !== "xps");
+  const fastenerEdgeSpacingMm = 150;
+  const fastenerFieldSpacingMm = 300;
+  const estimatedPanelFasteners = panelParts.reduce((sum, part) => {
+    const perimeterMm = 2 * (part.widthMm + part.heightMm);
+    const edgeCount = Math.ceil(perimeterMm / fastenerEdgeSpacingMm);
+    const fieldCount = Math.ceil(
+      (part.widthMm * part.heightMm) /
+      (fastenerFieldSpacingMm * fastenerFieldSpacingMm)
+    );
+    const cutoutCount = (part.cutouts ?? []).reduce(
+      (cutoutSum, cutout) =>
+        cutoutSum +
+        Math.ceil(
+          (2 * (cutout.widthMm + cutout.heightMm)) /
+          fastenerEdgeSpacingMm
+        ),
+      0
+    );
+    return sum + part.quantity * (edgeCount + fieldCount + cutoutCount);
+  }, 0);
+
+  const hingeCount =
+    model.maintenance.roofAccess === "HINGED"
+      ? model.dimensions.widthMm <= 800
+        ? 2
+        : model.dimensions.widthMm <= 1500
+          ? 3
+          : 4
+      : 0;
+
+  const hardwareItems: HardwareItem[] = [
+    {
+      id: "panel-fasteners",
+      nameSr: "Spoljašnji pričvršćivači za drvene ploče",
+      nameEn: "Exterior wood-panel fasteners",
+      quantity: estimatedPanelFasteners,
+      unit: "piece",
+      provenance: "ASSUMPTION",
+      notesSr: "V1 procena koristi približno 150 mm razmaka na ivicama i 300 mm u polju kao referentni početni obrazac. Konačan prečnik, dužina i raspored ostaju za engineering review.",
+      notesEn: "V1 estimate uses approximately 150 mm edge spacing and 300 mm field spacing as a reference starting pattern. Final diameter, length and schedule remain subject to engineering review."
+    },
+    ...(hingeCount > 0 ? [{
+      id: "roof-hinges",
+      nameSr: "Spoljne šarke krova",
+      nameEn: "Exterior roof hinges",
+      quantity: hingeCount,
+      unit: "piece" as const,
+      provenance: "ASSUMPTION" as const,
+      notesSr: "Broj se izvodi iz širine krova; finalni tip šarke i nosivost proveriti pre ENGINEERING_REVIEWED statusa.",
+      notesEn: "Count is derived from roof width; verify final hinge type and load capacity before ENGINEERING_REVIEWED status."
+    }] : []),
+    {
+      id: "roof-latches",
+      nameSr: "Zatvarači krova",
+      nameEn: "Roof latches",
+      quantity: model.maintenance.roofAccess === "HINGED" ? 2 : 0,
+      unit: "piece",
+      provenance: "ASSUMPTION",
+      notesSr: "Predviđeni za bezbedno zatvaranje servisnog krova protiv vetra.",
+      notesEn: "Intended to secure the service roof against wind uplift."
+    },
+    {
+      id: "roof-weather-seal",
+      nameSr: "Zaptivna traka servisnog krova",
+      nameEn: "Service-roof weather seal",
+      quantity: (2 * (model.dimensions.widthMm + model.dimensions.depthMm)) / 1000,
+      unit: "m",
+      provenance: "GEOMETRY",
+      notesSr: "Dužina je izvedena iz perimetra kućice; finalni profil zaptivke bira se prema detalju spoja.",
+      notesEn: "Length is derived from shelter perimeter; final seal profile depends on the joint detail."
+    },
+    ...(model.heated ? [{
+      id: "protected-cable-entry",
+      nameSr: "Zaštićen uvod kabla",
+      nameEn: "Protected cable entry",
+      quantity: 1,
+      unit: "piece" as const,
+      provenance: "ASSUMPTION" as const,
+      notesSr: "Samo za namenski pet-heating proizvod i prema njegovom uputstvu; aplikacija ne definiše DIY mrežno ožičenje.",
+      notesEn: "Only for a purpose-built pet-heating product and its instructions; the app does not specify DIY mains wiring."
+    }] : [])
+  ].filter((item) => item.quantity > 0);
+
+  const hardware = {
+    status: "PROVISIONAL" as const,
+    fastenerReferenceSourceId: "apa-panel-fastening-n335",
+    edgeSpacingMm: fastenerEdgeSpacingMm,
+    fieldSpacingMm: fastenerFieldSpacingMm,
+    edgeOffsetMm: 10,
+    panelJointGapMm: 3
+  };
+
   const buildSteps: BuildStep[] = [
     {
       id: "base",
@@ -500,6 +605,8 @@ export function compileShelterModel(model: ShelterModel) {
     cutParts,
     linearParts,
     framing,
+    hardwareItems,
+    hardware,
     buildSteps
   };
 }
