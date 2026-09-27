@@ -164,6 +164,10 @@ export function TechnicalSketch({
           <span>STATUS</span>
           <strong>{model.validationState.replaceAll("_", " ")}</strong>
         </div>
+        <div>
+          <span>PLAN ID</span>
+          <strong>{compiled.planFingerprint}</strong>
+        </div>
       </div>
 
       <svg viewBox="0 0 1160 830" aria-labelledby="technical-title technical-desc">
