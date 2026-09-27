@@ -5,7 +5,7 @@ import * as THREE from "three";
 import {Canvas} from "@react-three/fiber";
 import {ContactShadows, OrbitControls} from "@react-three/drei";
 import type {ShelterModel} from "@/lib/domain";
-import {constructionSummary, roofSlope} from "@/lib/engineering";
+import {constructionSummary, roofPanelGeometry, roofSlope} from "@/lib/engineering";
 
 type ViewMode = "assembled" | "roof-off" | "exploded";
 
@@ -160,7 +160,11 @@ function Shelter({model, mode}: {model: ShelterModel; mode: ViewMode}) {
   const roofT = Math.min(construction.roofThicknessMm / 1000, 0.085);
   const avgH = (hf + hr) / 2;
   const roof = roofSlope(model);
-  const roofLength = roof.trueLengthMm / 1000;
+  const roofPanel = roofPanelGeometry(model);
+  const roofLength = roofPanel.panelLengthMm / 1000;
+  const roofWidth = roofPanel.panelWidthMm / 1000;
+  const roofCenterZ = d / 2 + roofPanel.centerPlanOffsetMm / 1000;
+  const roofCenterY = gc + avgH + roofT / 2 + roofPanel.centerHeightOffsetMm / 1000;
 
   const exploded = mode === "exploded";
   const wallOffset = exploded ? 0.28 : 0;
@@ -232,12 +236,12 @@ function Shelter({model, mode}: {model: ShelterModel; mode: ViewMode}) {
 
       {mode !== "roof-off" && (
         <mesh
-          position={[w / 2, gc + avgH + roofT / 2 + roofOffset, d / 2]}
+          position={[w / 2, roofCenterY + roofOffset, roofCenterZ]}
           rotation={[roof.angleRad, 0, 0]}
           castShadow
           receiveShadow
         >
-          <boxGeometry args={[w + 0.14, roofT, roofLength + 0.18]} />
+          <boxGeometry args={[roofWidth, roofT, roofLength]} />
           <meshStandardMaterial color="#5d554c" roughness={0.92} />
         </mesh>
       )}
