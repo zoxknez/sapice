@@ -1,5 +1,6 @@
 import type {ShelterModel} from "@/lib/domain";
 import {constructionSummary, getModelAssemblies, layoutGeometry, roofPanelGeometry, roofSlope, surfaceAreas, thermalSummary} from "@/lib/engineering";
+import {cutGeometryAreaMm2, cutGeometryCutoutPerimeterMm, cutGeometryOuterPerimeterMm} from "@/lib/cut-geometry";
 
 export type CutPart = {
   id: string;
@@ -531,21 +532,17 @@ export function compileShelterModel(model: ShelterModel) {
   const fastenerEdgeSpacingMm = 150;
   const fastenerFieldSpacingMm = 300;
   const estimatedPanelFasteners = panelParts.reduce((sum, part) => {
-    const perimeterMm = 2 * (part.widthMm + part.heightMm);
-    const edgeCount = Math.ceil(perimeterMm / fastenerEdgeSpacingMm);
+    const edgeCount = Math.ceil(
+      cutGeometryOuterPerimeterMm(part) / fastenerEdgeSpacingMm
+    );
     const fieldCount = Math.ceil(
-      (part.widthMm * part.heightMm) /
+      cutGeometryAreaMm2(part) /
       (fastenerFieldSpacingMm * fastenerFieldSpacingMm)
     );
-    const cutoutCount = (part.cutouts ?? []).reduce(
-      (cutoutSum, cutout) =>
-        cutoutSum +
-        Math.ceil(
-          (2 * (cutout.widthMm + cutout.heightMm)) /
-          fastenerEdgeSpacingMm
-        ),
-      0
+    const cutoutCount = Math.ceil(
+      cutGeometryCutoutPerimeterMm(part) / fastenerEdgeSpacingMm
     );
+
     return sum + part.quantity * (edgeCount + fieldCount + cutoutCount);
   }, 0);
 
