@@ -2690,3 +2690,14 @@ button { cursor: pointer; }
   stroke: #5c4d3f;
   stroke-width: 1;
 }
+
+
+.drawing-runoff line {
+  stroke: #3f6f79;
+  stroke-width: 2;
+  stroke-dasharray: 5 3;
+}
+.drawing-runoff polygon {
+  fill: #3f6f79;
+  stroke: none;
+}
