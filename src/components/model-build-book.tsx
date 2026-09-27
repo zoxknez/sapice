@@ -117,8 +117,39 @@ export function ModelBuildBook({
               <strong>{compiled.framing.baseProfileMm[0]} × {compiled.framing.baseProfileMm[1]} mm</strong>
             </div>
             <div>
-              <span>{locale === "sr" ? "Max osni razmak V1" : "V1 max stud spacing"}</span>
+              <span>{locale === "sr" ? "Uzdužni runner-i" : "Base runners"}</span>
+              <strong>{compiled.framing.baseRunnerPositionsXmm.length}</strong>
+            </div>
+            <div>
+              <span>{locale === "sr" ? "Oslonaca baze" : "Base support posts"}</span>
+              <strong>
+                {compiled.framing.baseRunnerPositionsXmm.length *
+                  compiled.framing.baseSupportPositionsZmm.length}
+              </strong>
+            </div>
+            <div>
+              <span>{locale === "sr" ? "Visina oslonca" : "Support post height"}</span>
+              <strong>{compiled.framing.baseSupportPostHeightMm} mm</strong>
+            </div>
+            <div>
+              <span>{locale === "sr" ? "Max zidni razmak" : "Max wall stud spacing"}</span>
               <strong>≈ {compiled.framing.maxStudSpacingMm} mm</strong>
+            </div>
+            <div>
+              <span>{locale === "sr" ? "Max podna međuprečka" : "Max floor joist spacing"}</span>
+              <strong>≈ {compiled.framing.maxFloorJoistSpacingMm} mm</strong>
+            </div>
+            <div>
+              <span>{locale === "sr" ? "Max krovni nosač" : "Max roof rafter spacing"}</span>
+              <strong>≈ {compiled.framing.maxRoofRafterSpacingMm} mm</strong>
+            </div>
+            <div>
+              <span>{locale === "sr" ? "Max razmak runner-a" : "Max runner spacing"}</span>
+              <strong>≈ {compiled.framing.maxBaseRunnerSpacingMm} mm</strong>
+            </div>
+            <div>
+              <span>{locale === "sr" ? "Max red oslonaca" : "Max support-row spacing"}</span>
+              <strong>≈ {compiled.framing.maxBasePostSpacingMm} mm</strong>
             </div>
             <div>
               <span>{locale === "sr" ? "Ukupna linearna dužina" : "Total linear length"}</span>
@@ -138,7 +169,13 @@ export function ModelBuildBook({
                 <code role="cell">{part.id}</code>
                 <span role="cell">
                   <strong>{locale === "sr" ? part.nameSr : part.nameEn}</strong>
-                  <small>{part.provenance}</small>
+                  <small>
+                    {part.provenance}
+                    {typeof part.positionMm === "number" ? ` · @ ${part.positionMm.toFixed(0)} mm` : ""}
+                    {typeof part.positionXmm === "number" && typeof part.positionZmm === "number"
+                      ? ` · X ${part.positionXmm.toFixed(0)} / Z ${part.positionZmm.toFixed(0)} mm`
+                      : ""}
+                  </small>
                 </span>
                 <span role="cell">{part.profileMm[0]} × {part.profileMm[1]} mm · {part.lengthMm} mm</span>
                 <strong role="cell">{part.quantity}</strong>
