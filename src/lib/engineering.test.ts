@@ -3,6 +3,7 @@ import {getShelterModel, shelterModels} from "@/data/models";
 import {getAssembly} from "@/data/assemblies";
 import {
   assemblyUValue,
+  constructionInterfaceGeometry,
   entranceGeometry,
   materialSummary,
   thermalMethod,
@@ -22,6 +23,38 @@ describe("engineering model derivations", () => {
       expect(areas.wallM2).toBeGreaterThan(0);
       expect(areas.floorM2).toBeGreaterThan(0);
       expect(areas.roofM2).toBeGreaterThan(0);
+    }
+  });
+
+  it("rebuilds declared overall height from floor wall and roof interfaces", () => {
+    for (const model of shelterModels) {
+      const interfaces = constructionInterfaceGeometry(model);
+      const compiled = compileShelterModel(model);
+
+      expect(
+        compiled.construction.floorThicknessMm +
+          interfaces.wallFrontHeightMm +
+          interfaces.roofVerticalThicknessMm
+      ).toBeCloseTo(model.dimensions.frontHeightMm, 8);
+
+      expect(
+        compiled.construction.floorThicknessMm +
+          interfaces.wallRearHeightMm +
+          interfaces.roofVerticalThicknessMm
+      ).toBeCloseTo(model.dimensions.rearHeightMm, 8);
+
+      expect(interfaces.wallFrontHeightMm).toBeGreaterThan(0);
+      expect(interfaces.wallRearHeightMm).toBeGreaterThan(0);
+    }
+  });
+
+  it("keeps the roof top inside the declared height instead of adding roof thickness above it", () => {
+    for (const model of shelterModels) {
+      const interfaces = constructionInterfaceGeometry(model);
+      expect(interfaces.overallFrontHeightMm).toBe(model.dimensions.frontHeightMm);
+      expect(interfaces.overallRearHeightMm).toBe(model.dimensions.rearHeightMm);
+      expect(interfaces.wallFrontTopElevationMm).toBeLessThan(model.dimensions.frontHeightMm);
+      expect(interfaces.wallRearTopElevationMm).toBeLessThan(model.dimensions.rearHeightMm);
     }
   });
 
