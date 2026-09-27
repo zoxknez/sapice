@@ -1,26 +1,35 @@
-const CACHE_VERSION = "sapice-v1";
+const CACHE_VERSION = "sapice-v2";
 const STATIC_CACHE = `${CACHE_VERSION}:static`;
 const PAGE_CACHE = `${CACHE_VERSION}:pages`;
-const STATIC_SEED = ["/sr", "/en", "/icon.svg"];
+const STATIC_SEED = [
+  "/sr",
+  "/en",
+  "/sr/offline",
+  "/en/offline",
+  "/manifest.webmanifest",
+  "/icon.svg"
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(STATIC_CACHE).then((cache) => cache.addAll(STATIC_SEED))
+    caches.open(STATIC_CACHE)
+      .then((cache) => cache.addAll(STATIC_SEED))
+      .then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => !key.startsWith(CACHE_VERSION))
-          .map((key) => caches.delete(key))
+    caches.keys()
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter((key) => !key.startsWith(CACHE_VERSION))
+            .map((key) => caches.delete(key))
+        )
       )
-    )
+      .then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
 self.addEventListener("fetch", (event) => {
@@ -44,7 +53,7 @@ self.addEventListener("fetch", (event) => {
         .catch(async () => {
           const cached = await caches.match(request);
           if (cached) return cached;
-          const fallback = url.pathname.startsWith("/en") ? "/en" : "/sr";
+          const fallback = url.pathname.startsWith("/en") ? "/en/offline" : "/sr/offline";
           return caches.match(fallback);
         })
     );
