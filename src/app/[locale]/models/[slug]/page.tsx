@@ -5,6 +5,7 @@ import type {AppLocale} from "@/i18n/routing";
 import {shelterModels, getShelterModel} from "@/data/models";
 import {constructionSummary, getModelAssemblies, materialSummary, thermalSummary, roofSlope} from "@/lib/engineering";
 import {assemblyInsulationMm} from "@/data/assemblies";
+import {sources} from "@/data/sources";
 import {ShelterViewer} from "@/components/shelter-viewer";
 import {TechnicalSketch} from "@/components/technical-sketch";
 import {ModelBuildBook} from "@/components/model-build-book";
@@ -13,6 +14,7 @@ import {CostCalculator} from "@/components/cost-calculator";
 import {PrintPlanButton} from "@/components/print-plan-button";
 import {SharePlanButton} from "@/components/share-plan-button";
 import {OperatingGuidance} from "@/components/operating-guidance";
+import {StructuredData} from "@/components/structured-data";
 import {compileShelterModel} from "@/lib/compiler";
 
 export function generateStaticParams() {
@@ -70,9 +72,34 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
   const compiled = compileShelterModel(model);
   const construction = constructionSummary(model);
   const assemblies = getModelAssemblies(model);
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const modelUrl = `${siteUrl}/${locale}/${locale === "sr" ? "modeli" : "models"}/${model.slug}`;
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: copy.name,
+    description: copy.description,
+    url: modelUrl,
+    inLanguage: locale === "sr" ? "sr-Latn" : "en",
+    supply: materials.map((item) => ({
+      "@type": "HowToSupply",
+      name: locale === "sr" ? item.nameSr : item.nameEn,
+      requiredQuantity: `${item.purchaseM2.toFixed(2)} m²`
+    })),
+    step: compiled.buildSteps.map((step, index) => ({
+      "@type": "HowToStep",
+      position: index + 1,
+      name: locale === "sr" ? step.titleSr : step.titleEn,
+      text: locale === "sr" ? step.detailSr : step.detailEn
+    })),
+    isBasedOn: model.sourceIds
+      .map((sourceId) => sources[sourceId]?.url)
+      .filter(Boolean)
+  };
 
   return (
     <>
+      <StructuredData data={structuredData} />
       <section className="model-detail-hero">
         <div className="shell detail-grid">
           <ShelterViewer model={model} locale={locale} />
