@@ -109,6 +109,18 @@ export function ModelCatalog({models, locale}: {models: ShelterModel[]; locale: 
                   ))}
                 </tr>
                 <tr>
+                  <th>{isSr ? "Čista širina komore" : "Clear chamber width"}</th>
+                  {selected.map((model) => (
+                    <td key={model.id}>{compileShelterModel(model).internal.chamberClearWidthMm.toFixed(0)} mm</td>
+                  ))}
+                </tr>
+                <tr>
+                  <th>{isSr ? "Površina po preporučenoj životinji" : "Area per recommended animal"}</th>
+                  {selected.map((model) => (
+                    <td key={model.id}>{compileShelterModel(model).internal.floorAreaPerRecommendedAnimalM2.toFixed(2)} m²</td>
+                  ))}
+                </tr>
+                <tr>
                   <th>{isSr ? "Izolacija zida" : "Wall insulation"}</th>
                   {selected.map((model) => {
                     const compiled = compileShelterModel(model);
