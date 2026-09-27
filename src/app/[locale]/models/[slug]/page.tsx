@@ -187,6 +187,10 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
                 </div>
               )}
               <div><dt>{locale === "sr" ? "Debljina zida" : "Wall thickness"}</dt><dd>{construction.wallThicknessMm} mm</dd></div>
+              <div><dt>{locale === "sr" ? "Debljina poda" : "Floor assembly"}</dt><dd>{construction.floorThicknessMm} mm</dd></div>
+              <div><dt>{locale === "sr" ? "Debljina krova" : "Roof assembly"}</dt><dd>{construction.roofThicknessMm} mm</dd></div>
+              <div><dt>{locale === "sr" ? "Vertikalna projekcija krova" : "Roof vertical projection"}</dt><dd>{compiled.interfaces.roofVerticalThicknessMm.toFixed(1)} mm</dd></div>
+              <div><dt>{locale === "sr" ? "Čista zidna visina napred/pozadi" : "Clear wall height front/rear"}</dt><dd>{compiled.interfaces.wallFrontHeightMm.toFixed(0)} / {compiled.interfaces.wallRearHeightMm.toFixed(0)} mm</dd></div>
               <div><dt>{locale === "sr" ? "Nagib krova" : "Roof angle"}</dt><dd>{(roof.angleRad * 180 / Math.PI).toFixed(1)}°</dd></div>
             </dl>
           </div>
