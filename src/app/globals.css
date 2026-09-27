@@ -1644,3 +1644,20 @@ button { cursor: pointer; }
     text-decoration: none !important;
   }
 }
+
+
+.model-thumbnail {
+  width: min(290px, 94%);
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 18px 22px #49362926);
+}
+.model-thumbnail text {
+  fill: #6f432b;
+  font: 700 10px ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.model-thumbnail .thumb-meta {
+  fill: #76695d;
+  font-size: 9px;
+  letter-spacing: .08em;
+}
