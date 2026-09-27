@@ -4,60 +4,35 @@ import {useMemo, useState} from "react";
 import type {ShelterModel} from "@/lib/domain";
 import type {AppLocale} from "@/i18n/routing";
 import {ModelCard} from "./model-card";
-
-type ClimateNeed = "moderate" | "cold" | "severe";
-type HeatingNeed = "any" | "passive" | "heated";
-
-const climateRank: Record<ShelterModel["climateProfile"], number> = {
-  SHELTERED_MILD: 0,
-  WINTER_MODERATE: 1,
-  WINTER_COLD: 2,
-  WINTER_SEVERE: 3
-};
-
-const needRank: Record<ClimateNeed, number> = {
-  moderate: 1,
-  cold: 2,
-  severe: 3
-};
+import {
+  matchShelterModels,
+  type ClimateNeed,
+  type HeatingNeed,
+  type DogSizeNeed
+} from "@/lib/finder";
 
 export function Finder({models, locale}: {models: ShelterModel[]; locale: AppLocale}) {
   const isSr = locale === "sr";
   const [animal, setAnimal] = useState<"cat" | "dog">("cat");
   const [count, setCount] = useState(2);
-  const [dogSize, setDogSize] = useState<"small" | "medium" | "large">("medium");
+  const [dogSize, setDogSize] = useState<DogSizeNeed>("medium");
   const [heating, setHeating] = useState<HeatingNeed>("any");
   const [climate, setClimate] = useState<ClimateNeed>("cold");
   const [maxWidth, setMaxWidth] = useState(1400);
   const [maxDepth, setMaxDepth] = useState(1400);
 
-  const matches = useMemo(() => models
-    .filter((model) => {
-      const heatingOk =
-        heating === "any" ||
-        (heating === "heated" && model.heated) ||
-        (heating === "passive" && !model.heated);
-
-      return (
-        model.animal === animal &&
-        (animal === "cat" ? model.animalSizeClass === "standard" : model.animalSizeClass === dogSize) &&
-        model.capacity.max >= (animal === "dog" ? 1 : count) &&
-        heatingOk &&
-        climateRank[model.climateProfile] >= needRank[climate] &&
-        model.dimensions.widthMm <= maxWidth &&
-        model.dimensions.depthMm <= maxDepth
-      );
-    })
-    .sort((a, b) => {
-      const requestedCount = animal === "dog" ? 1 : count;
-      const capacityWasteA = a.capacity.max - requestedCount;
-      const capacityWasteB = b.capacity.max - requestedCount;
-      if (capacityWasteA !== capacityWasteB) return capacityWasteA - capacityWasteB;
-
-      const areaA = a.dimensions.widthMm * a.dimensions.depthMm;
-      const areaB = b.dimensions.widthMm * b.dimensions.depthMm;
-      return areaA - areaB;
-    }), [models, animal, count, heating, climate, maxWidth, maxDepth]);
+  const matches = useMemo(
+    () => matchShelterModels(models, {
+      animal,
+      count,
+      dogSize,
+      heating,
+      climate,
+      maxWidthMm: maxWidth,
+      maxDepthMm: maxDepth
+    }),
+    [models, animal, count, dogSize, heating, climate, maxWidth, maxDepth]
+  );
 
   function reasons(model: ShelterModel) {
     const items = [
@@ -108,7 +83,7 @@ export function Finder({models, locale}: {models: ShelterModel[]; locale: AppLoc
         ) : (
           <label>
             <span>{isSr ? "Veličina psa" : "Dog size"}</span>
-            <select value={dogSize} onChange={(event) => setDogSize(event.target.value as "small" | "medium" | "large")}>
+            <select value={dogSize} onChange={(event) => setDogSize(event.target.value as DogSizeNeed)}>
               <option value="small">{isSr ? "Mali" : "Small"}</option>
               <option value="medium">{isSr ? "Srednji" : "Medium"}</option>
               <option value="large">{isSr ? "Veliki" : "Large"}</option>
