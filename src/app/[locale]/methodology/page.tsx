@@ -2,6 +2,7 @@ import type {Metadata} from "next";
 import {setRequestLocale} from "next-intl/server";
 import type {AppLocale} from "@/i18n/routing";
 import {sources} from "@/data/sources";
+import {thermalMethod} from "@/lib/engineering";
 
 export async function generateMetadata({
   params
@@ -68,8 +69,8 @@ export default async function MethodologyPage({params}: {params: Promise<{locale
           <h2>{isSr ? "Termički proračun" : "Thermal calculation"}</h2>
           <p>
             {isSr
-              ? "Trenutni engine računa približan steady-state prolaz toplote kroz zidove, pod i krov. Model još ne tvrdi pouzdanu infiltraciju kroz ulaz, metaboličku toplotu životinje, vetar ili punu higrotermalnu dinamiku. Zato prikaz nije temperaturna garancija."
-              : "The current engine estimates steady-state transmission through walls, floor and roof. It does not yet claim a validated entrance-infiltration model, animal metabolic heat, wind effects or full hygrothermal behavior. The result is therefore not a temperature guarantee."}
+              ? "Trenutni engine računa približan steady-state prolaz toplote kroz zidove, pod i krov. Metod v" + thermalMethod.version + " koristi ISO 6946 orijentacione površinske otpore: Rsi 0,13 m²K/W za zidove, 0,10 za krov pri toku toplote naviše i 0,17 za pod pri toku naniže, uz Rse 0,04 m²K/W. Model još ne tvrdi pouzdanu infiltraciju kroz ulaz, metaboličku toplotu životinje, vetar, 2D termičke mostove rama ili punu higrotermalnu dinamiku. Zato prikaz nije temperaturna garancija."
+              : "The current engine estimates steady-state transmission through walls, floor and roof. Method v" + thermalMethod.version + " uses ISO 6946 orientation-specific surface resistances: Rsi 0.13 m²K/W for walls, 0.10 for upward heat flow through the roof and 0.17 for downward heat flow through the floor, with Rse 0.04 m²K/W. The model does not yet claim validated entrance infiltration, animal metabolic heat, wind effects, 2D framing thermal bridges or full hygrothermal behavior. The result is therefore not a temperature guarantee."}
           </p>
 
           <h2>{isSr ? "Grejanje" : "Heating"}</h2>
