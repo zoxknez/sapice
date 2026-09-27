@@ -173,6 +173,10 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
               <div><dt>{locale === "sr" ? "Visina pozadi" : "Rear height"}</dt><dd>{model.dimensions.rearHeightMm} mm</dd></div>
               <div><dt>{locale === "sr" ? "Podignut pod" : "Ground clearance"}</dt><dd>{model.dimensions.groundClearanceMm} mm</dd></div>
               <div><dt>{locale === "sr" ? "Ulaz" : "Entrance"}</dt><dd>{model.layout.entranceWidthMm} × {model.layout.entranceHeightMm} mm × {model.layout.entrances}</dd></div>
+              <div>
+                <dt>{locale === "sr" ? "Prag iznad gotovog poda" : "Sill above finished floor"}</dt>
+                <dd>{compiled.internal.entranceSillAboveFinishedFloorMm} mm</dd>
+              </div>
               <div><dt>{locale === "sr" ? "Komore" : "Chambers"}</dt><dd>{model.layout.chambers}</dd></div>
               {model.animal === "dog" && (
                 <div>
