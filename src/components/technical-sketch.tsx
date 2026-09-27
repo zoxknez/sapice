@@ -347,7 +347,7 @@ export function TechnicalSketch({
               <line
                 key={part.id}
                 x1={x}
-                y1={sideBodyBottom - 3}
+                y1={sideFloorTopY - 3}
                 x2={x}
                 y2={Math.max(sideTop + 3, topY)}
                 className="drawing-frame drawing-frame-assumption"
