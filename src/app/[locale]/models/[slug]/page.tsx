@@ -273,7 +273,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
       <SheetLayout compiled={compiled} locale={locale} />
       <CostCalculator model={model} locale={locale} />
       <OperatingGuidance model={model} locale={locale} />
-      <ModelBuildBook model={model} locale={locale} />
+      <ModelBuildBook compiled={compiled} locale={locale} />
     </>
   );
 }
