@@ -6,6 +6,7 @@ import {ModelCard} from "@/components/model-card";
 import {ModelThumbnail} from "@/components/model-thumbnail";
 import {StructuredData} from "@/components/structured-data";
 import {modelComparisonSummaryMap} from "@/lib/catalog-summary";
+import {siteUrl} from "@/lib/seo";
 
 export default async function HomePage({params}: {params: Promise<{locale: AppLocale}>}) {
   const {locale: routeLocale} = await params;
@@ -18,7 +19,6 @@ export default async function HomePage({params}: {params: Promise<{locale: AppLo
     .filter((model): model is (typeof shelterModels)[number] => Boolean(model));
   const featuredSummaries = modelComparisonSummaryMap(featured);
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebApplication",

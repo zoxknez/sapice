@@ -1,8 +1,9 @@
 import type {MetadataRoute} from "next";
+import {siteUrl} from "@/lib/seo";
 import {shelterModels} from "@/data/models";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const base = siteUrl;
   const now = new Date();
   const staticSr = ["", "/modeli", "/pronadji-model", "/materijali", "/vodici", "/metodologija"];
   const staticEn = ["", "/models", "/find-model", "/materials", "/guides", "/methodology"];

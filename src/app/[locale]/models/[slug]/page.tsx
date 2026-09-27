@@ -23,6 +23,7 @@ import {HeatingProvision} from "@/components/heating-provision";
 import {compileShelterModel} from "@/lib/compiler";
 import {compiledSourceIds} from "@/lib/provenance";
 import {costLinesForCompiled} from "@/lib/costing";
+import {openGraphLocale, siteUrl} from "@/lib/seo";
 
 export function generateStaticParams() {
   return shelterModels.map((model) => ({slug: model.slug}));
@@ -53,15 +54,16 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: copy.name,
+      title: `${copy.name} · Šapice`,
       description: copy.description
     },
     openGraph: {
       type: "article",
-      title: copy.name,
+      siteName: "Šapice",
+      url: locale === "sr" ? srPath : enPath,
+      title: `${copy.name} · Šapice`,
       description: copy.description,
-      locale: locale === "sr" ? "sr_RS" : "en_US",
-      alternateLocale: locale === "sr" ? ["en_US"] : ["sr_RS"]
+      ...openGraphLocale(locale)
     }
   };
 }
@@ -81,7 +83,6 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
   const construction = compiled.construction;
   const assemblies = compiled.assemblies;
   const costLines = costLinesForCompiled(compiled);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const modelUrl = `${siteUrl}/${locale}/${locale === "sr" ? "modeli" : "models"}/${model.slug}`;
   const structuredData = {
     "@context": "https://schema.org",

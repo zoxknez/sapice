@@ -5,9 +5,8 @@ import {notFound} from "next/navigation";
 import {routing, type AppLocale} from "@/i18n/routing";
 import {SiteHeader} from "@/components/site-header";
 import {PwaRegistration} from "@/components/pwa-registration";
+import {openGraphLocale, siteUrl, socialImage} from "@/lib/seo";
 import "../globals.css";
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -22,18 +21,26 @@ export async function generateMetadata({
 }: {
   params: Promise<{locale: string}>;
 }): Promise<Metadata> {
-  const {locale} = await params;
+  const {locale: routeLocale} = await params;
+  const locale: AppLocale = routeLocale === "en" ? "en" : "sr";
   const isSr = locale === "sr";
+  const title = isSr ? "Šapice · Planiranje kućica za pse i mačke" : "Šapice · Winter shelter plans for cats and dogs";
+  const description = isSr
+    ? "SR/EN tehnički planovi zimskih kućica i skloništa za pse i mačke: 3D, mere, materijali, krojna lista i transparentni proračuni."
+    : "Bilingual engineering plans for winter cat and dog shelters with 3D, dimensions, materials, cut lists and transparent calculations.";
+  const socialDescription = isSr
+    ? "Modeli, materijali, 3D prikaz i vodiči za izradu zimskih kućica za pse i mačke."
+    : "Models, materials, 3D previews and build guides for winter cat and dog shelters.";
+  const image = socialImage(locale);
 
   return {
     metadataBase: new URL(siteUrl),
+    applicationName: "Šapice",
     title: {
-      default: isSr ? "Šapice · Tehnički planovi kućica za pse i mačke" : "Šapice · Pet Shelter Engineering",
+      default: title,
       template: "%s · Šapice"
     },
-    description: isSr
-      ? "SR/EN tehnički planovi zimskih kućica i skloništa za pse i mačke: 3D, mere, materijali, krojna lista i transparentni proračuni."
-      : "Bilingual engineering plans for winter cat and dog shelters with 3D, dimensions, materials, cut lists and transparent calculations.",
+    description,
     alternates: {
       canonical: `/${locale}`,
       languages: {
@@ -44,20 +51,18 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: isSr ? "Šapice · Tehnički planovi kućica za pse i mačke" : "Šapice · Pet Shelter Engineering",
-      description: isSr
-        ? "Praktični, unapred projektovani modeli zimskih skloništa za pse i mačke."
-        : "Practical pre-designed winter shelter models for cats and dogs."
+      title,
+      description: socialDescription,
+      images: [image]
     },
     openGraph: {
       type: "website",
       siteName: "Šapice",
-      locale: isSr ? "sr_RS" : "en_US",
-      alternateLocale: isSr ? ["en_US"] : ["sr_RS"],
-      title: isSr ? "Šapice · Tehnički planovi kućica za pse i mačke" : "Šapice · Pet Shelter Engineering",
-      description: isSr
-        ? "Praktični, unapred projektovani modeli zimskih skloništa za pse i mačke."
-        : "Practical pre-designed winter shelter models for cats and dogs."
+      url: `/${locale}`,
+      title,
+      description: socialDescription,
+      images: [image],
+      ...openGraphLocale(locale)
     }
   };
 }

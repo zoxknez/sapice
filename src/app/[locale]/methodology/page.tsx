@@ -3,6 +3,7 @@ import {setRequestLocale} from "next-intl/server";
 import type {AppLocale} from "@/i18n/routing";
 import {sources} from "@/data/sources";
 import {thermalMethod} from "@/lib/engineering";
+import {localizedMetadata} from "@/lib/seo";
 
 export async function generateMetadata({
   params
@@ -10,20 +11,15 @@ export async function generateMetadata({
   params: Promise<{locale: AppLocale}>;
 }): Promise<Metadata> {
   const {locale} = await params;
-  return {
-    title: locale === "sr" ? "Metodologija" : "Methodology",
-    description: locale === "sr"
-      ? "Kako Šapice razdvaja izvore, geometriju, proračune, pretpostavke i fizičku validaciju."
-      : "How Šapice separates sources, geometry, calculations, assumptions and physical validation.",
-    alternates: {
-      canonical: locale === "sr" ? "/sr/metodologija" : "/en/methodology",
-      languages: {
-        "sr-Latn": "/sr/metodologija",
-        en: "/en/methodology",
-        "x-default": "/sr/metodologija"
-      }
-    }
-  };
+  return localizedMetadata({
+    locale,
+    titleSr: "Metodologija",
+    titleEn: "Methodology",
+    descriptionSr: "Kako Šapice razdvaja izvore, geometriju, proračune, pretpostavke i fizičku validaciju.",
+    descriptionEn: "How Šapice separates sources, geometry, calculations, assumptions and physical validation.",
+    srPath: "/sr/metodologija",
+    enPath: "/en/methodology"
+  });
 }
 
 export default async function MethodologyPage({params}: {params: Promise<{locale: AppLocale}>}) {
