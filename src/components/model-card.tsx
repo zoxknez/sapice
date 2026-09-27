@@ -1,6 +1,7 @@
 import type {ShelterModel} from "@/lib/domain";
 import type {AppLocale} from "@/i18n/routing";
 import {Link} from "@/i18n/navigation";
+import {assemblyInsulationMm, getAssembly} from "@/data/assemblies";
 
 export function ModelCard({model, locale}: {model: ShelterModel; locale: AppLocale}) {
   const copy = model.translations[locale];
@@ -23,7 +24,7 @@ export function ModelCard({model, locale}: {model: ShelterModel; locale: AppLoca
         <p>{copy.description}</p>
         <dl className="spec-strip">
           <div><dt>{locale === "sr" ? "Širina" : "Width"}</dt><dd>{model.dimensions.widthMm} mm</dd></div>
-          <div><dt>{locale === "sr" ? "Izolacija" : "Insulation"}</dt><dd>{model.construction.wallInsulationMm} mm</dd></div>
+          <div><dt>{locale === "sr" ? "Izolacija" : "Insulation"}</dt><dd>{assemblyInsulationMm(getAssembly(model.construction.wallAssemblyId))} mm</dd></div>
           <div><dt>{locale === "sr" ? "Komore" : "Chambers"}</dt><dd>{model.layout.chambers}</dd></div>
         </dl>
         <Link href={{pathname: "/models/[slug]", params: {slug: model.slug}}} locale={locale} className="text-link">
