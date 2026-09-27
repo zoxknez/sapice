@@ -555,6 +555,19 @@ export function compileShelterModel(model: ShelterModel) {
           : 4
       : 0;
 
+  const hingePositionsAcrossRoofMm = Array.from(
+    {length: hingeCount},
+    (_, index) =>
+      roofPanel.panelWidthMm * ((index + 1) / (hingeCount + 1))
+  );
+
+  const latchCount = model.maintenance.roofAccess === "HINGED" ? 2 : 0;
+  const latchPositionsAcrossRoofMm = Array.from(
+    {length: latchCount},
+    (_, index) =>
+      roofPanel.panelWidthMm * ((index + 1) / (latchCount + 1))
+  );
+
   const hardwareItems: HardwareItem[] = ([
     {
       id: "panel-fasteners",
@@ -580,7 +593,7 @@ export function compileShelterModel(model: ShelterModel) {
       id: "roof-latches",
       nameSr: "Zatvarači krova",
       nameEn: "Roof latches",
-      quantity: model.maintenance.roofAccess === "HINGED" ? 2 : 0,
+      quantity: latchCount,
       unit: "piece",
       provenance: "ASSUMPTION",
       notesSr: "Predviđeni za bezbedno zatvaranje servisnog krova protiv vetra.",
@@ -616,6 +629,8 @@ export function compileShelterModel(model: ShelterModel) {
     edgeOffsetMm: 10,
     panelJointGapMm: 3,
     hingeEdge: model.maintenance.hingeEdge,
+    hingePositionsAcrossRoofMm,
+    latchPositionsAcrossRoofMm,
     latchEdge:
       model.maintenance.hingeEdge === "REAR"
         ? "FRONT"
