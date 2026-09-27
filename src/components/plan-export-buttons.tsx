@@ -51,7 +51,7 @@ export function PlanExportButtons({
         part.heightMm,
         part.thicknessMm,
         part.quantity,
-        part.notes ?? ""
+        isSr ? (part.notesSr ?? "") : (part.notesEn ?? "")
       ]);
     }
 
