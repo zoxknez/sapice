@@ -2,6 +2,14 @@
 
 import type {AppLocale} from "@/i18n/routing";
 import type {CompiledShelterModel} from "@/lib/compiler";
+import {
+  cutPartMaterialLabel,
+  cutPartNote,
+  hardwareItemName,
+  hardwareItemNote,
+  linearPartNote,
+  provenanceLabel
+} from "@/lib/model-presentation";
 
 function csvCell(value: string | number) {
   const text = String(value);
@@ -31,71 +39,83 @@ export function PlanExportButtons({
   const model = compiled.model;
 
   function exportCsv() {
+    const label = (sr: string, en: string) => isSr ? sr : en;
+    const wallLabels: Record<string, string> = {
+      front: "prednji zid",
+      rear: "zadnji zid",
+      left: "levi zid",
+      right: "desni zid",
+      floor: "pod",
+      roof: "krov",
+      base: "baza",
+      divider: "pregrada"
+    };
     const rows: Array<Array<string | number>> = [
       ["Šapice", model.translations[locale].name, `v${model.version}`],
-      ["Model ID", model.id],
-      ["Model version", model.version],
-      ["Compiler version", compiled.compilerVersion],
-      ["Plan fingerprint", compiled.planFingerprint],
-      ["Validation", model.validationState],
+      [label("ID modela", "Model ID"), model.id],
+      [label("Verzija modela", "Model version"), model.version],
+      [label("Verzija kompajlera", "Compiler version"), compiled.compilerVersion],
+      [label("Otisak plana", "Plan fingerprint"), compiled.planFingerprint],
+      [label("Status validacije", "Validation"), model.validationState],
       [],
-      ["CUT PARTS"],
-      ["ID", "Name", "Material", "Shape", "Width mm", "Height mm", "Thickness mm", "Qty", "Notes"]
+      [label("KROJNI DELOVI", "CUT PARTS")],
+      ["ID", label("Naziv", "Name"), label("Materijal", "Material"), label("Oblik", "Shape"), label("Širina mm", "Width mm"), label("Visina mm", "Height mm"), label("Debljina mm", "Thickness mm"), label("Kom.", "Qty"), label("Napomene", "Notes")]
     ];
 
     for (const part of compiled.cutParts) {
       rows.push([
         part.id,
         isSr ? part.nameSr : part.nameEn,
-        part.material,
-        part.shape,
+        cutPartMaterialLabel(part, locale),
+        part.shape === "trapezoid" ? label("trapez", "trapezoid") : label("pravougaonik", "rectangle"),
         part.widthMm,
         part.heightMm,
         part.thicknessMm,
         part.quantity,
-        isSr ? (part.notesSr ?? "") : (part.notesEn ?? "")
+        cutPartNote(part, locale) ?? ""
       ]);
     }
 
     rows.push(
       [],
-      ["FRAMING"],
-      ["ID", "Name", "Profile", "Length mm", "Qty", "Wall", "Position mm", "Provenance", "Notes"]
+      [label("RAM", "FRAMING")],
+      ["ID", label("Naziv", "Name"), label("Profil", "Profile"), label("Dužina mm", "Length mm"), label("Kom.", "Qty"), label("Zid", "Wall"), label("Položaj mm", "Position mm"), label("Poreklo podatka", "Provenance"), label("Napomene", "Notes")]
     );
 
     for (const part of compiled.linearParts) {
+      const wall = part.wall ?? "";
       rows.push([
         part.id,
         isSr ? part.nameSr : part.nameEn,
         `${part.profileMm[0]}x${part.profileMm[1]} mm`,
         part.lengthMm,
         part.quantity,
-        part.wall ?? "",
+        isSr ? (wallLabels[wall] ?? wall) : wall,
         part.positionMm ?? "",
-        part.provenance,
-        isSr ? (part.notesSr ?? "") : (part.notesEn ?? "")
+        provenanceLabel(part.provenance, locale),
+        linearPartNote(part, locale) ?? ""
       ]);
     }
 
     rows.push(
       [],
-      ["WALL JOINERY"],
-      ["Convention", compiled.joinery.convention],
-      ["Wall thickness mm", compiled.joinery.wallThicknessMm],
-      ["Side start Z mm", compiled.joinery.sideStartZmm.toFixed(1)],
-      ["Side end Z mm", compiled.joinery.sideEndZmm.toFixed(1)],
-      ["Side panel run mm", compiled.joinery.sideRunMm.toFixed(1)],
-      ["Side front height mm", compiled.joinery.sideFrontHeightMm.toFixed(1)],
-      ["Side rear height mm", compiled.joinery.sideRearHeightMm.toFixed(1)],
-      ["Side top slope length mm", compiled.joinery.sideTopSlopeLengthMm.toFixed(1)],
-      ["Corner return envelope m2", compiled.areas.cornerReturnM2.toFixed(4)]
+      [label("SPOJEVI ZIDOVA", "WALL JOINERY")],
+      [label("Koncepcija spojeva", "Convention"), compiled.joinery.convention],
+      [label("Debljina zida mm", "Wall thickness mm"), compiled.joinery.wallThicknessMm],
+      [label("Početak bočnog zida Z mm", "Side start Z mm"), compiled.joinery.sideStartZmm.toFixed(1)],
+      [label("Kraj bočnog zida Z mm", "Side end Z mm"), compiled.joinery.sideEndZmm.toFixed(1)],
+      [label("Dužina bočne ploče mm", "Side panel run mm"), compiled.joinery.sideRunMm.toFixed(1)],
+      [label("Visina bočnog zida napred mm", "Side front height mm"), compiled.joinery.sideFrontHeightMm.toFixed(1)],
+      [label("Visina bočnog zida pozadi mm", "Side rear height mm"), compiled.joinery.sideRearHeightMm.toFixed(1)],
+      [label("Dužina gornje kosine bočnog zida mm", "Side top slope length mm"), compiled.joinery.sideTopSlopeLengthMm.toFixed(1)],
+      [label("Površina povrata ugaonih ivica m2", "Corner return envelope m2"), compiled.areas.cornerReturnM2.toFixed(4)]
     );
 
     if (compiled.heating.zones.length > 0) {
       rows.push(
         [],
-        ["HEATING PROVISION"],
-        ["ID", "Chamber", "X mm", "Z mm", "Width mm", "Depth mm", "Area m2", "Chamber floor m2", "Actual product footprint"]
+        [label("REZERVISANA GREJNA ZONA", "HEATING PROVISION")],
+        ["ID", label("Komora", "Chamber"), "X mm", "Z mm", label("Širina mm", "Width mm"), label("Dubina mm", "Depth mm"), label("Površina m2", "Area m2"), label("Podna površina komore m2", "Chamber floor m2"), label("Površina stvarnog proizvoda", "Actual product footprint")]
       );
 
       for (const zone of compiled.heating.zones) {
@@ -115,34 +135,34 @@ export function PlanExportButtons({
 
     rows.push(
       [],
-      ["ROOF WEATHERING"],
-      ["Status", compiled.roofWeathering.status],
-      ["High edge", compiled.roofWeathering.highEdge],
-      ["Runoff edge", compiled.roofWeathering.runoffEdge],
-      ["Service roof hinge edge", compiled.hardware.hingeEdge ?? ""],
-      ["Hinge axis from panel front mm", compiled.hardware.hingeAxisFromPanelFrontMm.toFixed(1)],
-      ["Service roof latch edge", compiled.hardware.latchEdge ?? ""],
-      ["Latch axis from panel front mm", compiled.hardware.latchAxisFromPanelFrontMm.toFixed(1)],
-      ["Rear free drip overhang along slope mm", compiled.roofPanel.rearOverhangAlongSlopeMm.toFixed(1)],
-      ["Slope degrees", compiled.roofWeathering.slopeDegrees.toFixed(2)],
-      ["Rise mm", compiled.roofWeathering.riseMm],
-      ["Run mm", compiled.roofWeathering.runMm],
-      ["Rear drip edge m", compiled.roofWeathering.rearDripEdgeLengthM.toFixed(3)],
-      ["Full edge protection m", compiled.roofWeathering.fullEdgeProtectionLengthM.toFixed(3)],
-      ["Roofing compatibility", "VERIFY_SELECTED_PRODUCT_INSTRUCTIONS"]
+      [label("ZAŠTITA KROVA OD VODE", "ROOF WEATHERING")],
+      [label("Status", "Status"), compiled.roofWeathering.status],
+      [label("Visoka ivica", "High edge"), compiled.roofWeathering.highEdge],
+      [label("Ivica oticanja vode", "Runoff edge"), compiled.roofWeathering.runoffEdge],
+      [label("Ivica šarki servisnog krova", "Service roof hinge edge"), compiled.hardware.hingeEdge ?? ""],
+      [label("Osa šarki od prednje ivice panela mm", "Hinge axis from panel front mm"), compiled.hardware.hingeAxisFromPanelFrontMm.toFixed(1)],
+      [label("Ivica zatvarača servisnog krova", "Service roof latch edge"), compiled.hardware.latchEdge ?? ""],
+      [label("Osa zatvarača od prednje ivice panela mm", "Latch axis from panel front mm"), compiled.hardware.latchAxisFromPanelFrontMm.toFixed(1)],
+      [label("Slobodan prepust zadnje kapne ivice duž kosine mm", "Rear free drip overhang along slope mm"), compiled.roofPanel.rearOverhangAlongSlopeMm.toFixed(1)],
+      [label("Ugao nagiba", "Slope degrees"), compiled.roofWeathering.slopeDegrees.toFixed(2)],
+      [label("Visinska razlika mm", "Rise mm"), compiled.roofWeathering.riseMm],
+      [label("Dužina osnove mm", "Run mm"), compiled.roofWeathering.runMm],
+      [label("Dužina zadnje kapne ivice m", "Rear drip edge m"), compiled.roofWeathering.rearDripEdgeLengthM.toFixed(3)],
+      [label("Ukupna dužina zaštite ivica m", "Full edge protection m"), compiled.roofWeathering.fullEdgeProtectionLengthM.toFixed(3)],
+      [label("Kompatibilnost krovnog sistema", "Roofing compatibility"), "VERIFY_SELECTED_PRODUCT_INSTRUCTIONS"]
     );
 
     rows.push(
       [],
-      ["VENTILATION PROVISION"],
-      ["ID", "Chamber", "Wall", "Center X mm", "Bottom mm", "Zone width mm", "Zone height mm", "Provenance", "Actual opening"]
+      [label("REZERVISANE ZONE VENTILACIJE", "VENTILATION PROVISION")],
+      ["ID", label("Komora", "Chamber"), label("Zid", "Wall"), label("Centar X mm", "Center X mm"), label("Donja ivica mm", "Bottom mm"), label("Širina zone mm", "Zone width mm"), label("Visina zone mm", "Zone height mm"), label("Poreklo podatka", "Provenance"), label("Stvarni otvor", "Actual opening")]
     );
 
     for (const zone of compiled.ventilation.zones) {
       rows.push([
         zone.id,
         zone.chamber,
-        zone.wall,
+        isSr ? (wallLabels[zone.wall] ?? zone.wall) : zone.wall,
         zone.centerXmm.toFixed(0),
         zone.bottomMm.toFixed(0),
         zone.widthMm,
@@ -154,24 +174,24 @@ export function PlanExportButtons({
 
     rows.push(
       [],
-      ["HARDWARE"],
-      ["ID", "Name", "Quantity", "Unit", "Provenance", "Notes"]
+      [label("OKOV", "HARDWARE")],
+      ["ID", label("Naziv", "Name"), label("Količina", "Quantity"), label("Jedinica", "Unit"), label("Poreklo podatka", "Provenance"), label("Napomene", "Notes")]
     );
 
     for (const item of compiled.hardwareItems) {
       rows.push([
         item.id,
-        isSr ? item.nameSr : item.nameEn,
+        hardwareItemName(item, locale),
         item.quantity,
-        item.unit,
-        item.provenance,
-        isSr ? item.notesSr : item.notesEn
+        item.unit === "m" ? "m" : label("komad", "piece"),
+        provenanceLabel(item.provenance, locale),
+        hardwareItemNote(item, locale)
       ]);
     }
 
     const csv = "\uFEFF" + rows.map((row) => row.map(csvCell).join(",")).join("\r\n");
     downloadBlob(
-      `sapice-${model.slug}-v${model.version}-bom.csv`,
+      `sapice-${model.slug}-v${model.version}-${isSr ? "spisak-materijala" : "bom"}.csv`,
       csv,
       "text/csv;charset=utf-8"
     );
@@ -197,7 +217,7 @@ export function PlanExportButtons({
   return (
     <div className="export-actions" aria-label={isSr ? "Izvoz plana" : "Plan export"}>
       <button type="button" className="button secondary" onClick={exportCsv}>
-        {isSr ? "Izvezi BOM CSV" : "Export BOM CSV"}
+        {isSr ? "Izvezi spisak materijala (CSV)" : "Export BOM CSV"}
       </button>
       <button type="button" className="button secondary" onClick={exportJson}>
         {isSr ? "Izvezi JSON" : "Export JSON"}

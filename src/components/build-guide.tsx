@@ -3,6 +3,7 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import type {BuildStep} from "@/lib/compiler";
 import type {AppLocale} from "@/i18n/routing";
+import {modelBuildStepCopy} from "@/lib/model-presentation";
 
 export function BuildGuide({
   modelId,
@@ -119,6 +120,7 @@ export function BuildGuide({
   };
 
   const focused = focusIndex === null ? null : steps[focusIndex];
+  const focusedCopy = focused ? modelBuildStepCopy(focused, locale) : null;
 
   return (
     <>
@@ -145,6 +147,7 @@ export function BuildGuide({
       <ol className="build-steps interactive">
         {steps.map((step, index) => {
           const done = completeSet.has(step.id);
+          const copy = modelBuildStepCopy(step, locale);
           return (
             <li key={step.id} className={done ? "done" : ""}>
               <button
@@ -153,16 +156,16 @@ export function BuildGuide({
                 aria-pressed={done}
                 aria-label={
                   isSr
-                    ? `${done ? "Označi kao nezavršeno" : "Označi kao završeno"}: ${step.titleSr}`
-                    : `${done ? "Mark incomplete" : "Mark complete"}: ${step.titleEn}`
+                    ? `${done ? "Označi kao nezavršeno" : "Označi kao završeno"}: ${copy.title}`
+                    : `${done ? "Mark incomplete" : "Mark complete"}: ${copy.title}`
                 }
                 onClick={() => toggle(step.id)}
               >
                 {done ? "✓" : String(index + 1).padStart(2, "0")}
               </button>
               <div>
-                <h3>{isSr ? step.titleSr : step.titleEn}</h3>
-                <p>{isSr ? step.detailSr : step.detailEn}</p>
+                <h3>{copy.title}</h3>
+                <p>{copy.detail}</p>
                 <button type="button" className="step-focus-link" onClick={() => openFocusMode(index)}>
                   {isSr ? "Otvori korak" : "Open step"} →
                 </button>
@@ -172,7 +175,7 @@ export function BuildGuide({
         })}
       </ol>
 
-      {focused && focusIndex !== null && (
+      {focused && focusedCopy && focusIndex !== null && (
         <div ref={dialogRef} className="build-focus" role="dialog" aria-modal="true" aria-labelledby="build-focus-title">
           <div className="build-focus-card">
             <header>
@@ -180,7 +183,7 @@ export function BuildGuide({
                 <span className="kicker">
                   {isSr ? "Korak" : "Step"} {focusIndex + 1} / {steps.length}
                 </span>
-                <h2 id="build-focus-title">{isSr ? focused.titleSr : focused.titleEn}</h2>
+                <h2 id="build-focus-title">{focusedCopy.title}</h2>
               </div>
               <button
                 type="button"
@@ -193,7 +196,7 @@ export function BuildGuide({
               </button>
             </header>
 
-            <p>{isSr ? focused.detailSr : focused.detailEn}</p>
+            <p>{focusedCopy.detail}</p>
 
             <label className="focus-complete">
               <input

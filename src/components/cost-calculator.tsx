@@ -3,15 +3,30 @@
 import {useEffect, useState} from "react";
 import type {AppLocale} from "@/i18n/routing";
 import type {CostLine} from "@/lib/costing";
+import {costLineCopy} from "@/lib/model-presentation";
 
 type Currency = "RSD" | "EUR" | "USD" | "GBP";
 type PriceMap = Record<string, number>;
 
-function unitLabel(unit: "sheet" | "m2" | "m" | "item", locale: AppLocale) {
-  if (unit === "sheet") return locale === "sr" ? "tabla" : "sheet";
+function unitLabel(unit: "sheet" | "m2" | "m" | "item", locale: AppLocale, quantity: number) {
+  if (unit === "sheet") {
+    if (locale === "en") return quantity === 1 ? "sheet" : "sheets";
+    return serbianCountLabel(quantity, "ploča", "ploče", "ploča");
+  }
   if (unit === "m2") return "m²";
   if (unit === "m") return "m";
-  return locale === "sr" ? "stavka" : "item";
+  if (locale === "en") return quantity === 1 ? "item" : "items";
+  return serbianCountLabel(quantity, "stavka", "stavke", "stavki");
+}
+
+function serbianCountLabel(quantity: number, singular: string, paucal: string, plural: string) {
+  const count = Math.round(Math.abs(quantity));
+  const lastTwo = count % 100;
+  if (lastTwo >= 11 && lastTwo <= 14) return plural;
+  const lastDigit = count % 10;
+  if (lastDigit === 1) return singular;
+  if (lastDigit >= 2 && lastDigit <= 4) return paucal;
+  return plural;
 }
 
 export function CostCalculator({
@@ -96,38 +111,41 @@ export function CostCalculator({
         </div>
 
         <div className="cost-table">
-          {lines.map((line) => (
-            <div className="cost-row" key={line.id}>
-              <div>
-                <strong>{isSr ? line.labelSr : line.labelEn}</strong>
-                <small>{isSr ? line.noteSr : line.noteEn}</small>
-              </div>
-              <span className="cost-qty">
-                {line.quantity.toFixed(line.unit === "item" || line.unit === "sheet" ? 0 : 2)} {unitLabel(line.unit, locale)}
-              </span>
-              <label>
-                <span>{isSr ? "Cena po jedinici" : "Unit price"}</span>
-                <div className="price-input">
-                  <input
-                    inputMode="decimal"
-                    type="number"
-                    min="0"
-                    step="any"
-                    value={prices[line.id] ?? ""}
-                    placeholder="0"
-                    onChange={(event) => {
-                      const next = event.target.value === "" ? 0 : Number(event.target.value);
-                      setPrices((current) => ({...current, [line.id]: Number.isFinite(next) ? Math.max(0, next) : 0}));
-                    }}
-                  />
-                  <span>{currency}</span>
+          {lines.map((line) => {
+            const copy = costLineCopy(line, locale);
+            return (
+              <div className="cost-row" key={line.id}>
+                <div>
+                  <strong>{copy.label}</strong>
+                  <small>{copy.note}</small>
                 </div>
-              </label>
-              <strong className="cost-line-total">
-                {formatter.format(line.quantity * (prices[line.id] ?? 0))}
-              </strong>
-            </div>
-          ))}
+                <span className="cost-qty">
+                  {line.quantity.toFixed(line.unit === "item" || line.unit === "sheet" ? 0 : 2)} {unitLabel(line.unit, locale, line.quantity)}
+                </span>
+                <label>
+                  <span>{isSr ? "Cena po jedinici" : "Unit price"}</span>
+                  <div className="price-input">
+                    <input
+                      inputMode="decimal"
+                      type="number"
+                      min="0"
+                      step="any"
+                      value={prices[line.id] ?? ""}
+                      placeholder="0"
+                      onChange={(event) => {
+                        const next = event.target.value === "" ? 0 : Number(event.target.value);
+                        setPrices((current) => ({...current, [line.id]: Number.isFinite(next) ? Math.max(0, next) : 0}));
+                      }}
+                    />
+                    <span>{currency}</span>
+                  </div>
+                </label>
+                <strong className="cost-line-total">
+                  {formatter.format(line.quantity * (prices[line.id] ?? 0))}
+                </strong>
+              </div>
+            );
+          })}
         </div>
 
         <div className="cost-total">

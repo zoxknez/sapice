@@ -3,6 +3,14 @@ import type {CompiledShelterModel} from "@/lib/compiler";
 import {sources} from "@/data/sources";
 import {BuildGuide} from "@/components/build-guide";
 import {compiledSourceIds} from "@/lib/provenance";
+import {
+  cutPartMaterialLabel,
+  cutPartNote,
+  hardwareItemName,
+  hardwareItemNote,
+  linearPartNote,
+  provenanceLabel
+} from "@/lib/model-presentation";
 
 const workshopMm = (value: number) => String(Math.round(value * 10) / 10);
 const workshopNote = (value: string) => value.replace(/\b\d+\.\d{2,}\b/g, (number) => workshopMm(Number(number)));
@@ -40,7 +48,7 @@ export function ModelBuildBook({
             <div><span>{locale === "sr" ? "Korisna podna površina" : "Usable floor area"}</span><strong>{compiled.internal.usableFloorAreaM2.toFixed(2)} m²</strong></div>
             <div><span>{locale === "sr" ? "Približan korisni volumen" : "Approx. usable volume"}</span><strong>{compiled.internal.usableVolumeM3.toFixed(2)} m³</strong></div>
             <div><span>{locale === "sr" ? "Po preporučenoj životinji" : "Per recommended animal"}</span><strong>{compiled.internal.floorAreaPerRecommendedAnimalM2.toFixed(2)} m²</strong></div>
-            <div><span>{locale === "sr" ? "Po max kapacitetu" : "Per max capacity animal"}</span><strong>{compiled.internal.floorAreaPerMaxAnimalM2.toFixed(2)} m²</strong></div>
+            <div><span>{locale === "sr" ? "Po maksimalnom kapacitetu" : "Per max capacity animal"}</span><strong>{compiled.internal.floorAreaPerMaxAnimalM2.toFixed(2)} m²</strong></div>
           </div>
           <p className="metric-disclaimer">
             {locale === "sr"
@@ -70,28 +78,30 @@ export function ModelBuildBook({
               <span role="columnheader">{locale === "sr" ? "Dimenzije" : "Dimensions"}</span>
               <span role="columnheader">{locale === "sr" ? "Kom." : "Qty"}</span>
             </div>
-            {compiled.cutParts.map((part) => (
-              <div className="cut-row" role="row" key={part.id}>
-                <code role="cell">{part.id}</code>
-                <span role="cell">
-                  <strong>{locale === "sr" ? part.nameSr : part.nameEn}</strong>
-                  <small>
-                    {part.shape === "trapezoid"
-                      ? (locale === "sr" ? "trapezni profil" : "trapezoid profile")
-                      : part.material}
-                    {(locale === "sr" ? part.notesSr : part.notesEn)
-                      ? ` · ${workshopNote((locale === "sr" ? part.notesSr : part.notesEn) ?? "")}`
-                      : ""}
-                  </small>
-                </span>
-                <span role="cell">
-                  {part.shape === "trapezoid" && part.trapezoidRearHeightMm !== undefined
-                    ? `${workshopMm(part.widthMm)} × Hf ${workshopMm(part.heightMm)} / Hr ${workshopMm(part.trapezoidRearHeightMm)} × ${workshopMm(part.thicknessMm)} mm`
-                    : `${workshopMm(part.widthMm)} × ${workshopMm(part.heightMm)} × ${workshopMm(part.thicknessMm)} mm`}
-                </span>
-                <strong role="cell">{part.quantity}</strong>
-              </div>
-            ))}
+            {compiled.cutParts.map((part) => {
+              const material = cutPartMaterialLabel(part, locale);
+              const note = cutPartNote(part, locale);
+              return (
+                <div className="cut-row" role="row" key={part.id}>
+                  <code role="cell">{part.id}</code>
+                  <span role="cell">
+                    <strong>{locale === "sr" ? part.nameSr : part.nameEn}</strong>
+                    <small>
+                      {part.shape === "trapezoid"
+                        ? `${material} · ${locale === "sr" ? "trapezni oblik" : "trapezoid shape"}`
+                        : material}
+                      {note ? ` · ${workshopNote(note)}` : ""}
+                    </small>
+                  </span>
+                  <span role="cell">
+                    {part.shape === "trapezoid" && part.trapezoidRearHeightMm !== undefined
+                      ? `${workshopMm(part.widthMm)} × Hf ${workshopMm(part.heightMm)} / Hr ${workshopMm(part.trapezoidRearHeightMm)} × ${workshopMm(part.thicknessMm)} mm`
+                      : `${workshopMm(part.widthMm)} × ${workshopMm(part.heightMm)} × ${workshopMm(part.thicknessMm)} mm`}
+                  </span>
+                  <strong role="cell">{part.quantity}</strong>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -167,23 +177,27 @@ export function ModelBuildBook({
               <span role="columnheader">{locale === "sr" ? "Profil × dužina" : "Profile × length"}</span>
               <span role="columnheader">{locale === "sr" ? "Kom." : "Qty"}</span>
             </div>
-            {compiled.linearParts.map((part) => (
-              <div className="cut-row" role="row" key={part.id}>
-                <code role="cell">{part.id}</code>
-                <span role="cell">
-                  <strong>{locale === "sr" ? part.nameSr : part.nameEn}</strong>
-                  <small>
-                    {part.provenance}
-                    {typeof part.positionMm === "number" ? ` · @ ${part.positionMm.toFixed(0)} mm` : ""}
-                    {typeof part.positionXmm === "number" && typeof part.positionZmm === "number"
-                      ? ` · X ${part.positionXmm.toFixed(0)} / Z ${part.positionZmm.toFixed(0)} mm`
-                      : ""}
-                  </small>
-                </span>
-                <span role="cell">{part.profileMm[0]} × {part.profileMm[1]} mm · {workshopMm(part.lengthMm)} mm</span>
-                <strong role="cell">{part.quantity}</strong>
-              </div>
-            ))}
+            {compiled.linearParts.map((part) => {
+              const note = linearPartNote(part, locale);
+              return (
+                <div className="cut-row" role="row" key={part.id}>
+                  <code role="cell">{part.id}</code>
+                  <span role="cell">
+                    <strong>{locale === "sr" ? part.nameSr : part.nameEn}</strong>
+                    <small>
+                      {provenanceLabel(part.provenance, locale)}
+                      {typeof part.positionMm === "number" ? ` · @ ${part.positionMm.toFixed(0)} mm` : ""}
+                      {typeof part.positionXmm === "number" && typeof part.positionZmm === "number"
+                        ? ` · X ${part.positionXmm.toFixed(0)} / Z ${part.positionZmm.toFixed(0)} mm`
+                        : ""}
+                      {note ? ` · ${note}` : ""}
+                    </small>
+                  </span>
+                  <span role="cell">{part.profileMm[0]} × {part.profileMm[1]} mm · {workshopMm(part.lengthMm)} mm</span>
+                  <strong role="cell">{part.quantity}</strong>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -224,7 +238,7 @@ export function ModelBuildBook({
               <strong>{locale === "sr" ? "pozadi" : "rear"}</strong>
             </div>
             <div>
-              <span>{locale === "sr" ? "Drip ivica pozadi" : "Rear drip edge"}</span>
+              <span>{locale === "sr" ? "Zadnja kapna ivica" : "Rear drip edge"}</span>
               <strong>{compiled.roofWeathering.rearDripEdgeLengthM.toFixed(2)} m</strong>
             </div>
             <div>
@@ -244,19 +258,23 @@ export function ModelBuildBook({
               <span role="columnheader">{locale === "sr" ? "Količina" : "Quantity"}</span>
               <span role="columnheader">{locale === "sr" ? "Status" : "Status"}</span>
             </div>
-            {compiled.hardwareItems.map((item) => (
-              <div className="cut-row" role="row" key={item.id}>
-                <code role="cell">{item.id}</code>
-                <span role="cell">
-                  <strong>{locale === "sr" ? item.nameSr : item.nameEn}</strong>
-                  <small>{locale === "sr" ? item.notesSr : item.notesEn}</small>
-                </span>
-                <span role="cell">
-                  {item.quantity.toFixed(item.unit === "m" ? 2 : 0)} {item.unit === "m" ? "m" : (locale === "sr" ? "kom." : "pcs")}
-                </span>
-                <strong role="cell">{item.provenance}</strong>
-              </div>
-            ))}
+            {compiled.hardwareItems.map((item) => {
+              const name = hardwareItemName(item, locale);
+              const note = hardwareItemNote(item, locale);
+              return (
+                <div className="cut-row" role="row" key={item.id}>
+                  <code role="cell">{item.id}</code>
+                  <span role="cell">
+                    <strong>{name}</strong>
+                    <small>{note}</small>
+                  </span>
+                  <span role="cell">
+                    {item.quantity.toFixed(item.unit === "m" ? 2 : 0)} {item.unit === "m" ? "m" : (locale === "sr" ? "kom." : "pcs")}
+                  </span>
+                  <strong role="cell">{provenanceLabel(item.provenance, locale)}</strong>
+                </div>
+              );
+            })}
           </div>
 
           <div className="hardware-reference">

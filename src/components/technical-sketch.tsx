@@ -613,7 +613,7 @@ export function TechnicalSketch({
             {isSr ? "ZATVARAČI · LINIJA ZADNJEG ZIDA" : "LATCHES · REAR WALL LINE"}
           </text>
           <text x={roofX + rpw / 2} y={roofY + rpl - 7} textAnchor="middle" className="drawing-axis-label">
-            {isSr ? "SLOBODNA ZADNJA DRIP / RUNOFF IVICA" : "CLEAR REAR DRIP / RUNOFF EDGE"}
+            {isSr ? "SLOBODNA ZADNJA KAPNA IVICA" : "CLEAR REAR DRIP / RUNOFF EDGE"}
           </text>
 
           {compiled.hardware.hingePositionsAcrossRoofMm.map((positionMm, index) => {
