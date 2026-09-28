@@ -3,6 +3,7 @@ import type {AppLocale} from "@/i18n/routing";
 import {Link} from "@/i18n/navigation";
 import {ModelThumbnail} from "@/components/model-thumbnail";
 import type {ModelComparisonSummary} from "@/lib/catalog-summary";
+import {validationStageLabel} from "@/lib/validation-labels";
 
 export function ModelCard({
   model,
@@ -18,7 +19,7 @@ export function ModelCard({
     <article className="model-card">
       <div className="model-visual">
         <ModelThumbnail model={model} locale={locale} summary={summary} />
-        <span className="status-chip">{model.validationState.replaceAll("_", " ")}</span>
+        <span className="status-chip">{validationStageLabel(model.validationState, locale)}</span>
       </div>
       <div className="model-card-body">
         <div className="eyebrow-row">

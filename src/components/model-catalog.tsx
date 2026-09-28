@@ -5,6 +5,7 @@ import type {ShelterModel} from "@/lib/domain";
 import type {AppLocale} from "@/i18n/routing";
 import {ModelCard} from "./model-card";
 import type {ModelComparisonSummary} from "@/lib/catalog-summary";
+import {validationStageLabel} from "@/lib/validation-labels";
 import {
   defaultCatalogUrlState,
   parseCatalogUrlState,
@@ -185,12 +186,12 @@ export function ModelCatalog({
                   {selected.map((model) => <td key={model.id}>{model.heated ? (isSr ? "Predviđeno" : "Ready") : (isSr ? "Pasivno" : "Passive")}</td>)}
                 </tr>
                 <tr>
-                  <th>Wall U</th>
+                  <th>{isSr ? "U zida" : "Wall U"}</th>
                   {selected.map((model) => <td key={model.id}>{summaryFor(model).wallU.toFixed(2)} W/m²K</td>)}
                 </tr>
                 <tr>
                   <th>{isSr ? "Validacija" : "Validation"}</th>
-                  {selected.map((model) => <td key={model.id}>{model.validationState.replaceAll("_", " ")}</td>)}
+                  {selected.map((model) => <td key={model.id}>{validationStageLabel(model.validationState, locale)}</td>)}
                 </tr>
               </tbody>
             </table>

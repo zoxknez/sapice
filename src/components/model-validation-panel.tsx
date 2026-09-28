@@ -2,56 +2,41 @@ import type {AppLocale} from "@/i18n/routing";
 import type {CompiledShelterModel} from "@/lib/compiler";
 import type {ValidationState} from "@/lib/domain";
 import {compiledSourceIds} from "@/lib/provenance";
+import {validationStageLabel} from "@/lib/validation-labels";
+
+export {validationStageLabel} from "@/lib/validation-labels";
 
 const stages: Array<{
   state: ValidationState;
-  sr: string;
-  en: string;
   detailSr: string;
   detailEn: string;
 }> = [
   {
     state: "DATA_VALIDATED",
-    sr: "Podaci provereni",
-    en: "Data validated",
-    detailSr: "Schema, izvori, sklopovi, otvori, stock-fit, framing/hardware invarianti i proračunske vrednosti moraju biti konzistentni.",
+    detailSr: "Proveravaju se ispravnost šeme, izvori, konstrukcijski sklopovi, otvori, uklapanje delova u raspoložive formate materijala, pravila za ram i okov, kao i proračunske vrednosti.",
     detailEn: "Schema, sources, assemblies, openings, stock fit, framing/hardware invariants and calculation outputs must remain internally consistent."
   },
   {
     state: "GEOMETRY_VALIDATED",
-    sr: "Geometrija verifikovana",
-    en: "Geometry validated",
     detailSr: "Zahteva zabeleženu softversku i vizuelnu proveru 3D/crteža/krojnih delova, ne samo uspešno učitavanje podataka.",
     detailEn: "Requires recorded software and visual verification of 3D/drawings/cut parts, not merely successful data loading."
   },
   {
     state: "ENGINEERING_REVIEWED",
-    sr: "Engineering review",
-    en: "Engineering review",
-    detailSr: "Provisional framing, fastener, moisture, thermal i servisni detalji moraju proći stručnu reviziju za konkretan način izrade.",
+    detailSr: "Predlog rama i pričvršćivača, zaštita od vlage, termička procena i servisni detalji moraju proći stručnu proveru za konkretan način izrade.",
     detailEn: "Provisional framing, fastener, moisture, thermal and service details must be reviewed for the actual construction method."
   },
   {
     state: "PROTOTYPE_BUILT",
-    sr: "Fizički prototip",
-    en: "Physical prototype",
     detailSr: "Postoji stvarno izgrađen primerak sa dokumentovanim odstupanjima, fotografijama i završnom bezbednosnom inspekcijom.",
     detailEn: "A physical example exists with documented deviations, photographs and a final safety inspection."
   },
   {
     state: "FIELD_TESTED",
-    sr: "Terenska validacija",
-    en: "Field validation",
     detailSr: "Model ima dokumentovano korišćenje u realnim uslovima. Ni ovaj status sam po sebi nije univerzalna temperaturna garancija.",
     detailEn: "The model has documented real-world use. Even this status is not a universal safe-temperature guarantee."
   }
 ];
-
-export function validationStageLabel(state: ValidationState, locale: AppLocale): string {
-  const stage = stages.find((item) => item.state === state);
-  if (!stage) return state.replaceAll("_", " ");
-  return locale === "sr" ? stage.sr : stage.en;
-}
 
 export function ModelValidationPanel({
   compiled,
@@ -71,7 +56,7 @@ export function ModelValidationPanel({
       <div className="shell">
         <div className="section-heading">
           <div>
-            <span className="kicker">Validation ladder</span>
+            <span className="kicker">{isSr ? "Lestvica validacije" : "Validation ladder"}</span>
             <h2>{isSr ? "Šta je stvarno potvrđeno" : "What is actually validated"}</h2>
           </div>
           <p>
@@ -91,7 +76,7 @@ export function ModelValidationPanel({
             <strong>v{compiled.model.version}</strong>
           </div>
           <div>
-            <span>{isSr ? "Compiler" : "Compiler"}</span>
+            <span>{isSr ? "Kompajlator" : "Compiler"}</span>
             <strong>v{compiled.compilerVersion}</strong>
           </div>
           <div>
@@ -99,7 +84,7 @@ export function ModelValidationPanel({
             <strong><code>{compiled.planFingerprint}</code></strong>
           </div>
           <div>
-            <span>{isSr ? "Izvora u compiled planu" : "Sources in compiled plan"}</span>
+            <span>{isSr ? "Izvora u kompajliranom planu" : "Sources in compiled plan"}</span>
             <strong>{sourceCount}</strong>
           </div>
         </div>
@@ -119,7 +104,7 @@ export function ModelValidationPanel({
               >
                 <span className="validation-index">{String(index + 1).padStart(2, "0")}</span>
                 <div>
-                  <strong>{isSr ? stage.sr : stage.en}</strong>
+                  <strong>{validationStageLabel(stage.state, locale)}</strong>
                   <code>{stage.state}</code>
                   <p>{isSr ? stage.detailSr : stage.detailEn}</p>
                 </div>
