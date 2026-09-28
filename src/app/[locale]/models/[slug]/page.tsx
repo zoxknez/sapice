@@ -128,14 +128,21 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
             <span className="kicker">{validationStageLabel(model.validationState, locale)}</span>
             <h1>{copy.name}</h1>
             <p>{copy.description}</p>
-            <div className="notice">
-              {model.heated
-                ? (locale === "sr"
+            <div className="notice" role="note">
+              {model.heated && (
+                <p>
+                  {locale === "sr"
                     ? "Grejanje nije DIY električna specifikacija. Model zahteva kompatibilan namenski proizvod i poštovanje njegovog uputstva."
-                    : "Heating is not a DIY electrical specification. The model requires a compatible purpose-built product installed to its instructions.")
-                : (locale === "sr"
+                    : "Heating is not a DIY electrical specification. The model requires a compatible purpose-built product installed to its instructions."}
+                </p>
+              )}
+              {model.validationState === "DATA_VALIDATED" && (
+                <p>
+                  {locale === "sr"
                     ? "Status DATA_VALIDATED ne znači da je fizički prototip testiran. Takva tvrdnja će se pojaviti tek posle stvarne fizičke validacije."
-                    : "DATA_VALIDATED does not mean a physical prototype has been tested. That claim appears only after real physical validation.")}
+                    : "DATA_VALIDATED does not mean a physical prototype has been tested. That claim appears only after real physical validation."}
+                </p>
+              )}
             </div>
             <div className="metric-grid">
               <div>

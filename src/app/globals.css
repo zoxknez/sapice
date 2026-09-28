@@ -396,6 +396,8 @@ button { cursor: pointer; }
   line-height: 1.55;
   border-radius: 0 12px 12px 0;
 }
+.notice p { margin: 0; }
+.notice p + p { margin-top: 10px; padding-top: 10px; border-top: 1px solid #cfb99f; }
 
 .detail-content { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 40px; align-items: start; }
 .detail-content > * { min-width: 0; }

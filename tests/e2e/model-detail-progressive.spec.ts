@@ -66,6 +66,18 @@ test("model climate profile is localized on Serbian and English routes", async (
   await expect(meta).toContainText("Cold winter");
 });
 
+test("heated model detail keeps heating and physical-validation caveats in both locales", async ({page}) => {
+  const notice = page.locator(".notice");
+
+  await page.goto("/sr/modeli/nordic-quad-heated");
+  await expect(notice).toContainText("Grejanje nije DIY električna specifikacija");
+  await expect(notice).toContainText("Status DATA_VALIDATED ne znači da je fizički prototip testiran");
+
+  await page.goto("/en/models/nordic-quad-heated");
+  await expect(notice).toContainText("purpose-built product");
+  await expect(notice).toContainText("DATA_VALIDATED does not mean a physical prototype has been tested");
+});
+
 test("build mode manages keyboard focus and restores it when closed", async ({page}) => {
   await page.goto("/sr/modeli/nordic-quad-winter");
   const openBuildMode = page.getByRole("button", {name: "Režim izrade"});
