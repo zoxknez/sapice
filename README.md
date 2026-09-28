@@ -46,7 +46,7 @@ Every model carries an explicit validation state:
 4. `PROTOTYPE_BUILT`
 5. `FIELD_TESTED`
 
-The current catalog intentionally remains at **DATA_VALIDATED** until the software geometry checks can run on a working CI/build runner and the next review stages are actually completed.
+Automated software checks currently pass locally. Hosted GitHub Actions has not passed because GitHub reports a billing lock on the account. The catalog remains at **DATA_VALIDATED** until evidence for later validation stages is explicitly recorded.
 
 A software test is never treated as physical validation.
 
