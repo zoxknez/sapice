@@ -1,6 +1,7 @@
 import {defineConfig, devices} from "@playwright/test";
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3000";
+const isExternalBaseURL = new URL(baseURL).protocol === "https:";
 const webServerCommand = process.env.PLAYWRIGHT_WEB_SERVER_COMMAND ??
   (process.env.CI ? "pnpm start" : "pnpm dev");
 
@@ -35,7 +36,7 @@ export default defineConfig({
   webServer: {
     command: webServerCommand,
     url: new URL("/sr", baseURL).toString(),
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: !process.env.CI || isExternalBaseURL,
     timeout: 120_000
   }
 });
