@@ -2926,6 +2926,37 @@ button { cursor: pointer; }
   font-size: 12px;
 }
 .viewer-angle-control:focus-within { outline: 2px solid #273d35; outline-offset: 2px; }
+.viewer-rotation-controls {
+  position: absolute;
+  top: 70px;
+  right: 18px;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: repeat(2, 34px);
+  gap: 4px;
+  padding: 5px;
+  border: 1px solid #ffffff;
+  border-radius: 14px;
+  background: #fffcf4ed;
+  box-shadow: 0 8px 24px #21382b20;
+}
+.viewer-rotation-controls button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #d7d8ce;
+  border-radius: 9px;
+  background: #fffefa;
+  color: #273d35;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.viewer-rotation-controls button:hover { background: #e8ede5; }
+.viewer-rotation-controls button:focus-visible { outline: 2px solid #273d35; outline-offset: 2px; }
+.viewer-rotation-controls button:disabled { cursor: not-allowed; opacity: .45; }
 .viewer-badge { left: auto; right: 18px; bottom: 18px; color: #536254; font: 700 10px ui-sans-serif, system-ui, sans-serif; }
 .viewer-loading { display: grid; place-items: center; color: #536254; font-weight: 750; }
 .detail-summary h1 { font-size: clamp(46px, 5vw, 76px); }
@@ -2964,10 +2995,11 @@ button { cursor: pointer; }
   .catalog-search { width: 100%; }
   .model-detail-hero { padding-block: 22px 42px; }
   .viewer { height: 430px; border-radius: 18px; }
-  .viewer-toolbar { top: 10px; left: 10px; }
+  .viewer-toolbar { top: auto; bottom: 64px; left: 10px; }
   .viewer-toolbar button { font-size: 9px; padding-inline: 8px; }
-  .viewer-angle-control { top: 10px; right: 10px; min-width: 112px; padding: 6px 8px; }
-  .viewer-angle-control select { min-height: 28px; font-size: 11px; }
+  .viewer-angle-control { top: 32px; right: 10px; width: 112px; min-width: 0; padding: 6px 8px; }
+  .viewer-angle-control select { width: 100%; min-height: 28px; font-size: 11px; }
+  .viewer-rotation-controls { top: 98px; right: 10px; }
   .viewer-caption { top: 63px; left: 14px; }
   .viewer-badge { right: 10px; bottom: 10px; font-size: 9px; }
 }

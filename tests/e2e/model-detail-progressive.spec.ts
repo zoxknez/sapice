@@ -31,10 +31,72 @@ test("3D viewer loads only after the user requests it", async ({page}) => {
   await launch.click();
   await expect(page.locator(".viewer canvas")).toBeVisible();
 
-  const cameraAngle = page.getByLabel("Ugao kamere");
+  const cameraAngle = page.getByRole("combobox", {name: "Ugao kamere"});
   await expect(cameraAngle).toHaveValue("isometric");
   await cameraAngle.selectOption("front");
   await expect(cameraAngle).toHaveValue("front");
+});
+
+test("3D viewer controls stay clear of each other on narrow screens", async ({page}) => {
+  await page.setViewportSize({width: 320, height: 844});
+  await page.goto("/sr/modeli/nordic-quad-winter");
+  await page.getByRole("button", {name: "Pokreni interaktivni 3D prikaz"}).click();
+  await expect(page.locator(".viewer canvas")).toBeVisible();
+
+  const caption = await page.locator(".viewer-caption").boundingBox();
+  const cameraAngle = await page.locator(".viewer-angle-control").boundingBox();
+  const modeToolbar = await page.locator(".viewer-toolbar").boundingBox();
+  const rotationControls = await page.locator(".viewer-rotation-controls").boundingBox();
+  const siteHeader = await page.locator(".site-header").boundingBox();
+
+  expect(caption).not.toBeNull();
+  expect(cameraAngle).not.toBeNull();
+  expect(modeToolbar).not.toBeNull();
+  expect(rotationControls).not.toBeNull();
+  expect(siteHeader).not.toBeNull();
+  expect(caption!.x + caption!.width).toBeLessThanOrEqual(cameraAngle!.x);
+  const overlaps = (first: NonNullable<typeof modeToolbar>, second: NonNullable<typeof cameraAngle>) =>
+    first.x < second.x + second.width && first.x + first.width > second.x &&
+    first.y < second.y + second.height && first.y + first.height > second.y;
+  expect(overlaps(modeToolbar!, cameraAngle!)).toBe(false);
+  expect(overlaps(modeToolbar!, rotationControls!)).toBe(false);
+  expect(overlaps(cameraAngle!, rotationControls!)).toBe(false);
+  expect(overlaps(cameraAngle!, siteHeader!)).toBe(false);
+  expect(overlaps(modeToolbar!, siteHeader!)).toBe(false);
+});
+
+test("3D camera can be adjusted without dragging in both locales", async ({page}) => {
+  await page.goto("/sr/modeli/nordic-quad-winter");
+  await page.getByRole("button", {name: "Pokreni interaktivni 3D prikaz"}).click();
+
+  const srCameraAngle = page.getByRole("combobox", {name: "Ugao kamere"});
+  await expect(page.locator(".viewer-badge")).toContainText("strelice za ugao");
+  const srRotateLeft = page.getByRole("button", {name: "Rotiraj kameru ulevo za 15 stepeni"});
+  const srTiltDown = page.getByRole("button", {name: "Nagnite pogled nadole za 10 stepeni"});
+  await expect(srRotateLeft).toBeVisible();
+  await expect(srTiltDown).toBeVisible();
+  await expect(srRotateLeft).toBeEnabled();
+  await expect(srTiltDown).toBeEnabled();
+  await srRotateLeft.click();
+  await expect(srCameraAngle).toHaveValue("custom");
+  await srTiltDown.focus();
+  await page.keyboard.press("Enter");
+
+  await page.goto("/en/models/nordic-quad-winter");
+  await page.getByRole("button", {name: "Open interactive 3D view"}).click();
+
+  const enCameraAngle = page.getByRole("combobox", {name: "Camera angle"});
+  await expect(page.locator(".viewer-badge")).toContainText("arrows to adjust angle");
+  const enRotateRight = page.getByRole("button", {name: "Rotate camera right by 15 degrees"});
+  const enTiltUp = page.getByRole("button", {name: "Tilt camera up by 10 degrees"});
+  await expect(enRotateRight).toBeVisible();
+  await expect(enTiltUp).toBeVisible();
+  await expect(enRotateRight).toBeEnabled();
+  await expect(enTiltUp).toBeEnabled();
+  await enRotateRight.click();
+  await expect(enCameraAngle).toHaveValue("custom");
+  await enTiltUp.focus();
+  await page.keyboard.press("Enter");
 });
 
 test("3D launch panel contains a large model preview and its launch button", async ({page}) => {

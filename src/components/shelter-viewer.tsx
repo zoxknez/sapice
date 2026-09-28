@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect, useMemo, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import * as THREE from "three";
 import {Canvas, useThree} from "@react-three/fiber";
 import {ContactShadows, OrbitControls} from "@react-three/drei";
@@ -9,22 +9,53 @@ import type {AppLocale} from "@/i18n/routing";
 import type {CompiledShelterModel} from "@/lib/compiler";
 
 type ViewMode = "assembled" | "roof-off" | "exploded" | "frame";
-type CameraPreset = "isometric" | "front" | "rear" | "left" | "right" | "top";
+type CameraPreset = "isometric" | "front" | "rear" | "left" | "right" | "top" | "custom";
+type RotatableCameraControls = {
+  getAzimuthalAngle: () => number;
+  getPolarAngle: () => number;
+  setAzimuthalAngle: (angle: number) => void;
+  setPolarAngle: (angle: number) => void;
+  update: () => unknown;
+};
 
-function ModeCamera({mode, cameraPreset, maxSpan, inspectionSpan, targetY, defaultPosition}: {
+const cameraRotationStep = Math.PI / 12;
+const cameraTiltStep = Math.PI / 18;
+
+function ModeCamera({mode, cameraPreset, maxSpan, inspectionSpan, targetY, defaultPosition, controlsRef, onControlsReady}: {
   mode: ViewMode;
   cameraPreset: CameraPreset;
   maxSpan: number;
   inspectionSpan: number;
   targetY: number;
   defaultPosition: [number, number, number];
+  controlsRef: {current: RotatableCameraControls | null};
+  onControlsReady: (ready: boolean) => void;
 }) {
   const {camera, controls} = useThree();
 
   useEffect(() => {
+    const rotatable = controls as RotatableCameraControls | null;
+    const ready = Boolean(
+      rotatable &&
+      typeof rotatable.getAzimuthalAngle === "function" &&
+      typeof rotatable.getPolarAngle === "function" &&
+      typeof rotatable.setAzimuthalAngle === "function" &&
+      typeof rotatable.setPolarAngle === "function"
+    );
+    controlsRef.current = ready ? rotatable : null;
+    onControlsReady(ready);
+    return () => {
+      controlsRef.current = null;
+      onControlsReady(false);
+    };
+  }, [controls, controlsRef, onControlsReady]);
+
+  useEffect(() => {
+    if (cameraPreset === "custom") return;
+
     const viewDistance = Math.max(maxSpan, inspectionSpan) * 2.4;
     const frontHeight = Math.max(maxSpan * 0.9, targetY + maxSpan * 0.35);
-    const presetPositions: Record<Exclude<CameraPreset, "isometric">, [number, number, number]> = {
+    const presetPositions: Record<Exclude<CameraPreset, "isometric" | "custom">, [number, number, number]> = {
       front: [0, frontHeight, -viewDistance],
       rear: [0, frontHeight, viewDistance],
       left: [-viewDistance, frontHeight, 0],
@@ -688,6 +719,8 @@ export function ShelterViewer({
   const model = compiled.model;
   const [mode, setMode] = useState<ViewMode>("assembled");
   const [cameraPreset, setCameraPreset] = useState<CameraPreset>("isometric");
+  const [cameraControlsReady, setCameraControlsReady] = useState(false);
+  const orbitControls = useRef<RotatableCameraControls | null>(null);
   const widthM = model.dimensions.widthMm / 1000;
   const depthM = model.dimensions.depthMm / 1000;
   const heightM = (model.dimensions.frontHeightMm + model.dimensions.groundClearanceMm) / 1000;
@@ -699,6 +732,15 @@ export function ShelterViewer({
     -maxSpan * 2.2
   ];
   const orbitTarget: [number, number, number] = [0, heightM * 0.43, 0];
+  const adjustCamera = (azimuth: number, polar: number) => {
+    const controls = orbitControls.current;
+    if (!controls) return;
+
+    controls.setAzimuthalAngle(controls.getAzimuthalAngle() - azimuth);
+    controls.setPolarAngle(controls.getPolarAngle() - polar);
+    controls.update();
+    setCameraPreset("custom");
+  };
 
   return (
     <div className="viewer" role="group" aria-label={`${locale === "sr" ? "3D prikaz" : "3D preview"}: ${model.translations[locale].name}`}>
@@ -708,7 +750,7 @@ export function ShelterViewer({
         <directionalLight position={[-3, 7, -5]} intensity={2.8} castShadow shadow-mapSize={[1024, 1024]} />
         <directionalLight position={[4, 3, 5]} intensity={0.8} />
         <Shelter compiled={compiled} mode={mode} />
-        <ModeCamera mode={mode} cameraPreset={cameraPreset} maxSpan={maxSpan} inspectionSpan={inspectionSpan} targetY={orbitTarget[1]} defaultPosition={cameraPosition} />
+        <ModeCamera mode={mode} cameraPreset={cameraPreset} maxSpan={maxSpan} inspectionSpan={inspectionSpan} targetY={orbitTarget[1]} defaultPosition={cameraPosition} controlsRef={orbitControls} onControlsReady={setCameraControlsReady} />
         <ContactShadows position={[0, -0.015, 0]} opacity={0.3} scale={maxSpan * 3} blur={2.2} far={maxSpan * 2} />
         <OrbitControls
           makeDefault
@@ -755,8 +797,48 @@ export function ShelterViewer({
           <option value="left">{locale === "sr" ? "Levo" : "Left"}</option>
           <option value="right">{locale === "sr" ? "Desno" : "Right"}</option>
           <option value="top">{locale === "sr" ? "Odozgo" : "Top"}</option>
+          <option value="custom" disabled>{locale === "sr" ? "Prilagođen" : "Custom"}</option>
         </select>
       </label>
+
+      <div className="viewer-rotation-controls" role="group" aria-label={locale === "sr" ? "Podešavanje ugla kamere" : "Adjust camera angle"}>
+        <button
+          type="button"
+          disabled={!cameraControlsReady}
+          aria-label={locale === "sr" ? "Rotiraj kameru ulevo za 15 stepeni" : "Rotate camera left by 15 degrees"}
+          title={locale === "sr" ? "Rotiraj ulevo 15°" : "Rotate left 15°"}
+          onClick={() => adjustCamera(cameraRotationStep, 0)}
+        >
+          ↶
+        </button>
+        <button
+          type="button"
+          disabled={!cameraControlsReady}
+          aria-label={locale === "sr" ? "Nagnite pogled nagore za 10 stepeni" : "Tilt camera up by 10 degrees"}
+          title={locale === "sr" ? "Nagnite nagore 10°" : "Tilt up 10°"}
+          onClick={() => adjustCamera(0, cameraTiltStep)}
+        >
+          ↑
+        </button>
+        <button
+          type="button"
+          disabled={!cameraControlsReady}
+          aria-label={locale === "sr" ? "Nagnite pogled nadole za 10 stepeni" : "Tilt camera down by 10 degrees"}
+          title={locale === "sr" ? "Nagnite nadole 10°" : "Tilt down 10°"}
+          onClick={() => adjustCamera(0, -cameraTiltStep)}
+        >
+          ↓
+        </button>
+        <button
+          type="button"
+          disabled={!cameraControlsReady}
+          aria-label={locale === "sr" ? "Rotiraj kameru udesno za 15 stepeni" : "Rotate camera right by 15 degrees"}
+          title={locale === "sr" ? "Rotiraj udesno 15°" : "Rotate right 15°"}
+          onClick={() => adjustCamera(-cameraRotationStep, 0)}
+        >
+          ↷
+        </button>
+      </div>
 
       <div className="viewer-caption">
         <span>{locale === "sr" ? "Interaktivni 3D model" : "Interactive 3D model"}</span>
@@ -768,7 +850,9 @@ export function ShelterViewer({
           {locale === "sr" ? "Crveno: rezervisana zona, bez grejnog uređaja" : "Red: reserved zone, no heating device shown"}
         </small>}
       </div>
-      <div className="viewer-badge">{locale === "sr" ? "Prevuci za rotaciju · točkić za uvećanje" : "Drag to rotate · scroll to zoom"}</div>
+      <div className="viewer-badge">{locale === "sr"
+        ? "Prevuci ili koristi strelice za ugao · točkić za uvećanje"
+        : "Drag or use arrows to adjust angle · scroll to zoom"}</div>
     </div>
   );
 }
