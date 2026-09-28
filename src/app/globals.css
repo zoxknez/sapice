@@ -1575,6 +1575,7 @@ button { cursor: pointer; }
 
   .site-header,
   .site-footer,
+  .offline-status,
   .model-subnav,
   .viewer-toolbar,
   .viewer-badge,
@@ -2836,6 +2837,43 @@ button { cursor: pointer; }
 .brand-mark { background: linear-gradient(145deg, #bf8151, #795039); }
 .kicker { color: var(--accent-dark); }
 .button { border-radius: 12px; transition: transform .2s ease, box-shadow .2s ease, background .2s ease; }
+.offline-status {
+  position: fixed;
+  z-index: 100;
+  left: 50%;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 12px;
+  width: min(560px, calc(100vw - 32px));
+  box-sizing: border-box;
+  padding: 10px 10px 10px 16px;
+  transform: translateX(-50%);
+  border: 1px solid #607468;
+  border-radius: 14px;
+  background: #273d35;
+  box-shadow: 0 14px 36px #15251e45;
+  color: #fffdf8;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.45;
+}
+.offline-status button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #718579;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  font-size: 23px;
+  line-height: 1;
+}
+.offline-status button:hover { background: #ffffff18; }
+.offline-status button:focus-visible { outline-color: #f1d1a4; }
 .button:hover { transform: translateY(-2px); }
 .button.primary { background: #273d35; box-shadow: 0 12px 25px #1b3d301b; }
 .button.primary:hover { background: #1f302a; }

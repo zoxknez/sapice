@@ -90,7 +90,7 @@ export default async function LocaleLayout({
           {locale === "sr" ? "Preskoči na sadržaj" : "Skip to content"}
         </a>
         <NextIntlClientProvider>
-          <PwaRegistration />
+          <PwaRegistration locale={locale as AppLocale} />
           <SiteHeader locale={locale as AppLocale} />
           <main id="main-content">{children}</main>
           <footer className="site-footer">
