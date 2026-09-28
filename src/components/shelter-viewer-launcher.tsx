@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import {useState, type ReactNode} from "react";
 import type {AppLocale} from "@/i18n/routing";
 import type {CompiledShelterModel} from "@/lib/compiler";
+import styles from "./shelter-viewer-launcher.module.css";
 
 const InteractiveShelterViewer = dynamic(
   () => import("@/components/shelter-viewer").then((module) => module.ShelterViewer),
@@ -34,18 +35,18 @@ export function ShelterViewerLauncher({
   }
 
   return (
-    <div className="viewer viewer-launcher">
-      <div className="viewer-launcher-preview">{children}</div>
-      <div className="viewer-launcher-copy">
-        <div>
-          <span className="kicker">{isSr ? "3D pregled na zahtev" : "3D preview on demand"}</span>
-          <p>
+    <div className={`viewer viewer-launcher ${styles.launcher}`}>
+      <div className={`viewer-launcher-preview ${styles.preview}`}>{children}</div>
+      <div className={`viewer-launcher-copy ${styles.copy}`}>
+        <div className={styles.copyContent}>
+          <span className={`kicker ${styles.copyKicker}`}>{isSr ? "3D pregled na zahtev" : "3D preview on demand"}</span>
+          <p className={styles.description}>
             {isSr
               ? "Pokreni interaktivni prikaz da pregledaš konstrukciju iz različitih uglova."
               : "Open the interactive view to inspect the construction from different angles."}
           </p>
         </div>
-        <button type="button" onClick={() => setRequested(true)}>
+        <button className={styles.launchButton} type="button" onClick={() => setRequested(true)}>
           {isSr ? "Pokreni interaktivni 3D prikaz" : "Open interactive 3D view"}
         </button>
       </div>

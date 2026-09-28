@@ -37,6 +37,35 @@ test("3D viewer loads only after the user requests it", async ({page}) => {
   await expect(cameraAngle).toHaveValue("front");
 });
 
+test("3D launch panel contains a large model preview and its launch button", async ({page}) => {
+  await page.goto("/sr/modeli/nordic-quad-winter");
+
+  const panel = await page.locator(".viewer-launcher").boundingBox();
+  const preview = await page.locator(".viewer-launcher-preview").boundingBox();
+  const thumbnail = await page.locator(".viewer-launcher-preview .model-thumbnail").boundingBox();
+  const copy = await page.locator(".viewer-launcher-copy").boundingBox();
+  const launch = await page.getByRole("button", {name: "Pokreni interaktivni 3D prikaz"}).boundingBox();
+
+  expect(panel).not.toBeNull();
+  expect(preview).not.toBeNull();
+  expect(thumbnail).not.toBeNull();
+  expect(copy).not.toBeNull();
+  expect(launch).not.toBeNull();
+  expect(launch!.y + launch!.height).toBeLessThanOrEqual(panel!.y + panel!.height - 8);
+  expect(thumbnail!.width).toBeGreaterThan(panel!.width * 0.78);
+  expect(thumbnail!.y + thumbnail!.height).toBeLessThanOrEqual(copy!.y - 6);
+});
+
+test("model climate profile is localized on Serbian and English routes", async ({page}) => {
+  const meta = page.locator(".model-meta-line");
+
+  await page.goto("/sr/modeli/nordic-quad-winter");
+  await expect(meta).toContainText("Hladna zima");
+
+  await page.goto("/en/models/nordic-quad-winter");
+  await expect(meta).toContainText("Cold winter");
+});
+
 test("build mode manages keyboard focus and restores it when closed", async ({page}) => {
   await page.goto("/sr/modeli/nordic-quad-winter");
   const openBuildMode = page.getByRole("button", {name: "Režim izrade"});

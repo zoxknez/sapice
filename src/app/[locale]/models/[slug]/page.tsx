@@ -2,6 +2,7 @@ import type {Metadata} from "next";
 import {notFound} from "next/navigation";
 import {setRequestLocale} from "next-intl/server";
 import type {AppLocale} from "@/i18n/routing";
+import type {ShelterModel} from "@/lib/domain";
 import {shelterModels, getShelterModel} from "@/data/models";
 import {assemblyInsulationMm} from "@/data/assemblies";
 import {sources} from "@/data/sources";
@@ -26,6 +27,13 @@ import {compiledSourceIds} from "@/lib/provenance";
 import {costLinesForCompiled} from "@/lib/costing";
 import {modelComparisonSummaryFromCompiled} from "@/lib/catalog-summary";
 import {openGraphLocale, siteUrl} from "@/lib/seo";
+
+const climateProfileLabels: Record<ShelterModel["climateProfile"], Record<AppLocale, string>> = {
+  SHELTERED_MILD: {sr: "Zaštićeni blagi uslovi", en: "Sheltered mild conditions"},
+  WINTER_MODERATE: {sr: "Umerena zima", en: "Moderate winter"},
+  WINTER_COLD: {sr: "Hladna zima", en: "Cold winter"},
+  WINTER_SEVERE: {sr: "Vrlo hladna zima", en: "Very cold winter"}
+};
 
 export function generateStaticParams() {
   return shelterModels.map((model) => ({slug: model.slug}));
@@ -142,7 +150,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
               <span>model v{model.version}</span>
               <span>compiler v{compiled.compilerVersion}</span>
               <span>plan {compiled.planFingerprint}</span>
-              <span>{model.climateProfile.replaceAll("_", " ")}</span>
+              <span>{climateProfileLabels[model.climateProfile][locale]}</span>
               <span>{locale === "sr" ? "referentni spoljašnji scenario, nije rejting" : "reference outdoor scenario, not a rating"} {model.referenceOutsideC} °C</span>
             </div>
             <div className="detail-actions">
