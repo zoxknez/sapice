@@ -23,6 +23,7 @@ import {VentilationProvision} from "@/components/ventilation-provision";
 import {PrototypeEvidenceWorksheet} from "@/components/prototype-evidence-worksheet";
 import {HeatingProvision} from "@/components/heating-provision";
 import {compileShelterModel} from "@/lib/compiler";
+import {thermalMethod} from "@/lib/engineering";
 import {compiledSourceIds} from "@/lib/provenance";
 import {costLinesForCompiled} from "@/lib/costing";
 import {modelComparisonSummaryFromCompiled} from "@/lib/catalog-summary";
@@ -34,6 +35,37 @@ const climateProfileLabels: Record<ShelterModel["climateProfile"], Record<AppLoc
   WINTER_COLD: {sr: "Hladna zima", en: "Cold winter"},
   WINTER_SEVERE: {sr: "Vrlo hladna zima", en: "Very cold winter"}
 };
+
+const thermalLimitationCopy = {
+  "No validated entrance infiltration model": {
+    sr: "Nema validiranog modela infiltracije vazduha kroz ulaze.",
+    en: "No validated entrance infiltration model."
+  },
+  "No validated airflow model for the provisional ventilation insert zones": {
+    sr: "Nema validiranog modela strujanja vazduha kroz privremeno rezervisane zone za ventilacione umetke.",
+    en: "No validated airflow model for the provisional ventilation insert zones."
+  },
+  "No wind pressure model": {
+    sr: "Nema modela pritiska vetra.",
+    en: "No wind pressure model."
+  },
+  "No animal metabolic heat credit": {
+    sr: "Toplota koju stvara životinja nije uračunata.",
+    en: "No animal metabolic heat credit."
+  },
+  "No transient heat-storage model": {
+    sr: "Nema modela promene i zadržavanja toplote tokom vremena.",
+    en: "No transient heat-storage model."
+  },
+  "No 2D framing thermal-bridge correction": {
+    sr: "Nema 2D korekcije toplotnih mostova kroz ram.",
+    en: "No 2D framing thermal-bridge correction."
+  },
+  "No explicit corner/end-grain edge-return thermal-bridge model": {
+    sr: "Nema posebnog modela toplotnih mostova na uglovima, čeonom drvetu i povratnim ivicama.",
+    en: "No explicit corner/end-grain edge-return thermal-bridge model."
+  }
+} satisfies Record<(typeof thermalMethod.limitations)[number], Record<AppLocale, string>>;
 
 export function generateStaticParams() {
   return shelterModels.map((model) => ({slug: model.slug}));
@@ -302,7 +334,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
             <strong>{locale === "sr" ? "Trenutne limitacije modela" : "Current model limitations"}</strong>
             <ul>
               {thermal.limitations.map((limitation) => (
-                <li key={limitation}>{limitation}</li>
+                <li key={limitation}>{thermalLimitationCopy[limitation][locale]}</li>
               ))}
             </ul>
           </div>
