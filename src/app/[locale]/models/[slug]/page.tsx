@@ -2,7 +2,6 @@ import type {Metadata} from "next";
 import {notFound} from "next/navigation";
 import {setRequestLocale} from "next-intl/server";
 import type {AppLocale} from "@/i18n/routing";
-import type {ShelterModel} from "@/lib/domain";
 import {shelterModels, getShelterModel} from "@/data/models";
 import {assemblyInsulationMm} from "@/data/assemblies";
 import {sources} from "@/data/sources";
@@ -27,14 +26,8 @@ import {thermalMethod} from "@/lib/engineering";
 import {compiledSourceIds} from "@/lib/provenance";
 import {costLinesForCompiled} from "@/lib/costing";
 import {modelComparisonSummaryFromCompiled} from "@/lib/catalog-summary";
+import {animalSizeClassLabel, climateProfileLabel} from "@/lib/model-labels";
 import {openGraphLocale, siteUrl} from "@/lib/seo";
-
-const climateProfileLabels: Record<ShelterModel["climateProfile"], Record<AppLocale, string>> = {
-  SHELTERED_MILD: {sr: "Zaštićeni blagi uslovi", en: "Sheltered mild conditions"},
-  WINTER_MODERATE: {sr: "Umerena zima", en: "Moderate winter"},
-  WINTER_COLD: {sr: "Hladna zima", en: "Cold winter"},
-  WINTER_SEVERE: {sr: "Vrlo hladna zima", en: "Very cold winter"}
-};
 
 const thermalLimitationCopy = {
   "No validated entrance infiltration model": {
@@ -195,7 +188,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
             <div className="metric-grid">
               <div>
                 <span>{locale === "sr" ? (model.animal === "dog" ? "Veličina psa" : "Kapacitet") : (model.animal === "dog" ? "Dog size" : "Capacity")}</span>
-                <strong>{model.animal === "dog" ? model.animalSizeClass : model.capacity.recommended}</strong>
+                <strong>{model.animal === "dog" ? animalSizeClassLabel(model.animalSizeClass, locale) : model.capacity.recommended}</strong>
               </div>
               <div><span>{locale === "sr" ? "Širina" : "Width"}</span><strong>{model.dimensions.widthMm} mm</strong></div>
               <div><span>{locale === "sr" ? "Dubina" : "Depth"}</span><strong>{model.dimensions.depthMm} mm</strong></div>
@@ -205,7 +198,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
               <span>model v{model.version}</span>
               <span>{locale === "sr" ? "kompajler" : "compiler"} v{compiled.compilerVersion}</span>
               <span>{locale === "sr" ? "ID plana" : "plan"} {compiled.planFingerprint}</span>
-              <span>{climateProfileLabels[model.climateProfile][locale]}</span>
+              <span>{climateProfileLabel(model.climateProfile, locale)}</span>
               <span>{locale === "sr" ? "referentni spoljašnji scenario, nije rejting" : "reference outdoor scenario, not a rating"} {model.referenceOutsideC} °C</span>
             </div>
             <div className="detail-actions">
@@ -293,7 +286,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
           </div>
           <div className="thermal-grid">
             <div>
-              <span>{locale === "sr" ? "U zida · nominalno" : "Wall U · nominal"}</span>
+              <span>{locale === "sr" ? "U-vrednost zida · nominalno" : "Wall U · nominal"}</span>
               <strong>{thermal.wallU.toFixed(2)} W/m²K</strong>
               <small>{thermal.wallURange[0].toFixed(2)}–{thermal.wallURange[1].toFixed(2)} W/m²K</small>
             </div>

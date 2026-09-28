@@ -30,15 +30,25 @@ export default async function HomePage({params}: {params: Promise<{locale: AppLo
     description: locale === "sr"
       ? "Deterministička web aplikacija za izbor i izradu unapred definisanih zimskih kućica za pse i mačke."
       : "Deterministic web application for selecting and building predefined winter shelters for cats and dogs.",
-    featureList: [
-      "Parametric 3D",
-      "Technical dimensions",
-      "Cut lists",
-      "Sheet nesting",
-      "Thermal estimates",
-      "Cost profiles",
-      "Workshop build mode"
-    ]
+    featureList: locale === "sr"
+      ? [
+        "Parametarski 3D prikaz",
+        "Tehničke mere",
+        "Krojne liste",
+        "Raspored delova na ploče",
+        "Termičke procene",
+        "Troškovnik",
+        "Vodič za izradu u radionici"
+      ]
+      : [
+        "Parametric 3D",
+        "Technical dimensions",
+        "Cut lists",
+        "Sheet nesting",
+        "Thermal estimates",
+        "Cost profiles",
+        "Workshop build mode"
+      ]
   };
 
   return (
@@ -110,7 +120,7 @@ export default async function HomePage({params}: {params: Promise<{locale: AppLo
             </div>
             <p>
               {locale === "sr"
-                ? "Nema odvojenih marketing mera i tehničkih mera. Isti kanonski model pokreće prikaz, krojnu listu, proračune i build guide."
+                ? "Nema odvojenih marketinških i tehničkih mera. Isti kanonski model pokreće prikaz, krojnu listu, proračune i vodič za izradu."
                 : "There are no separate marketing and technical dimensions. The same canonical model drives the view, cut list, calculations and build guide."}
             </p>
           </div>
@@ -119,38 +129,38 @@ export default async function HomePage({params}: {params: Promise<{locale: AppLo
             <article>
               <span>01</span>
               <h3>{locale === "sr" ? "3D + tehničke mere" : "3D + technical dimensions"}</h3>
-              <p>{locale === "sr" ? "Parametarski 3D, roof-off/exploded prikaz i SVG tehnički crtež iz istih dimenzija." : "Parametric 3D, roof-off/exploded views and SVG technical drawings from the same dimensions."}</p>
+              <p>{locale === "sr" ? "Parametarski 3D prikaz kućice bez krova i u rastavljenim delovima, uz SVG tehnički crtež iz istih dimenzija." : "Parametric 3D, roof-off/exploded views and SVG technical drawings from the same dimensions."}</p>
             </article>
             <article>
               <span>02</span>
-              <h3>{locale === "sr" ? "Krojna lista + nesting" : "Cut list + nesting"}</h3>
-              <p>{locale === "sr" ? "12 mm, 9 mm i XPS delovi se kompajliraju i pakuju u planning stock sa marginom i kerf-om." : "12 mm, 9 mm and XPS parts are compiled and packed into planning stock with margins and kerf."}</p>
+              <h3>{locale === "sr" ? "Krojna lista i raspored delova" : "Cut list + nesting"}</h3>
+              <p>{locale === "sr" ? "Delovi od ploča debljine 12 mm i 9 mm i od XPS-a raspoređuju se na ploče, uz uračunatu marginu i širinu reza." : "12 mm, 9 mm and XPS parts are compiled and packed into planning stock with margins and kerf."}</p>
             </article>
             <article>
               <span>03</span>
-              <h3>{locale === "sr" ? "Framing + hardware" : "Framing + hardware"}</h3>
-              <p>{locale === "sr" ? "Linearne mere rama, servisni krov, šarke, zatvarači i preliminarni fastening schedule." : "Framing lengths, service roof, hinges, latches and a provisional fastening schedule."}</p>
+              <h3>{locale === "sr" ? "Drveni ram i okov" : "Framing + hardware"}</h3>
+              <p>{locale === "sr" ? "Dužine elemenata rama, servisni krov, šarke, zatvarači i preliminarni raspored pričvršćivača." : "Framing lengths, service roof, hinges, latches and a provisional fastening schedule."}</p>
             </article>
             <article>
               <span>04</span>
               <h3>{locale === "sr" ? "Troškovnik bez izmišljenih cena" : "Costing without fabricated prices"}</h3>
-              <p>{locale === "sr" ? "Količine dolaze iz compiler-a, a korisnik unosi sopstvene lokalne cene i valutu." : "Quantities come from the compiler while the user enters real local prices and currency."}</p>
+              <p>{locale === "sr" ? "Količine automatski proračunava kompajler plana, a korisnik unosi lokalne cene i valutu." : "Quantities come from the compiler while the user enters real local prices and currency."}</p>
             </article>
             <article>
               <span>05</span>
-              <h3>{locale === "sr" ? "Build mode u radionici" : "Workshop build mode"}</h3>
-              <p>{locale === "sr" ? "Koraci izrade sa lokalno sačuvanim napretkom, fokus režimom i print/PDF prikazom." : "Build steps with locally saved progress, focus mode and print/PDF output."}</p>
+              <h3>{locale === "sr" ? "Režim izrade za radionicu" : "Workshop build mode"}</h3>
+              <p>{locale === "sr" ? "Koraci izrade sa lokalno sačuvanim napretkom, fokusiranim prikazom i izlazom za štampu ili PDF." : "Build steps with locally saved progress, focus mode and print/PDF output."}</p>
             </article>
             <article>
               <span>06</span>
-              <h3>{locale === "sr" ? "Offline za već otvorene planove" : "Offline for visited plans"}</h3>
-              <p>{locale === "sr" ? "PWA keš čuva već posećene modele za situacije kada u radionici nema stabilne mreže." : "The PWA cache keeps previously visited models available when workshop connectivity is unreliable."}</p>
+              <h3>{locale === "sr" ? "Rad bez mreže" : "Offline for visited plans"}</h3>
+              <p>{locale === "sr" ? "Lokalna keš memorija čuva već otvorene stranice i modele kada u radionici nema stabilne internet veze." : "The PWA cache keeps previously visited models available when workshop connectivity is unreliable."}</p>
             </article>
           </div>
 
           <div className="validation-banner">
             <div>
-              <span className="kicker">Validation ladder</span>
+              <span className="kicker">{locale === "sr" ? "Nivoi validacije" : "Validation ladder"}</span>
               <strong>DATA_VALIDATED → GEOMETRY_VALIDATED → ENGINEERING_REVIEWED → PROTOTYPE_BUILT → FIELD_TESTED</strong>
             </div>
             <Link href="/methodology" locale={locale} className="button secondary">

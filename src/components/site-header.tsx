@@ -20,7 +20,7 @@ export async function SiteHeader({locale}: {locale: AppLocale}) {
           <span className="brand-mark" aria-hidden="true">Š</span>
           <span>
             <strong>Šapice</strong>
-            <small>Pet Shelter Engineering</small>
+            <small>{locale === "sr" ? "Projektovanje skloništa za ljubimce" : "Pet Shelter Engineering"}</small>
           </span>
         </Link>
 

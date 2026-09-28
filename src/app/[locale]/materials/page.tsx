@@ -30,7 +30,7 @@ export default async function MaterialsPage({params}: {params: Promise<{locale: 
   return (
     <section className="page-hero">
       <div className="shell">
-        <span className="kicker">Material library</span>
+        <span className="kicker">{locale === "sr" ? "Biblioteka materijala" : "Material library"}</span>
         <h1>{locale === "sr" ? "Materijali" : "Materials"}</h1>
         <p className="page-lead">
           {locale === "sr"

@@ -21,7 +21,7 @@ export default async function OfflinePage({
   return (
     <section className="page-hero offline-page">
       <div className="shell">
-        <span className="kicker">Offline</span>
+        <span className="kicker">{locale === "sr" ? "Bez mreže" : "Offline"}</span>
         <h1>{locale === "sr" ? "Trenutno nema mreže" : "You are currently offline"}</h1>
         <p className="page-lead">
           {locale === "sr"

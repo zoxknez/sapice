@@ -109,11 +109,11 @@ export default async function GuidesPage({params}: {params: Promise<{locale: App
   return (
     <section className="page-hero guides-page">
       <div className="shell">
-        <span className="kicker">Knowledge base</span>
+        <span className="kicker">{isSr ? "Baza vodiča" : "Knowledge base"}</span>
         <h1>{isSr ? "Vodiči" : "Guides"}</h1>
         <p className="page-lead">
           {isSr
-            ? "Praktična pravila koja dopunjuju tehnički plan. Svaki vodič navodi izvore i jasno odvaja proverenu welfare smernicu od projektantske pretpostavke."
+            ? "Praktična pravila koja dopunjuju tehnički plan. Svaki vodič navodi izvore i jasno odvaja smernice za dobrobit životinja potkrepljene izvorima od projektantskih pretpostavki."
             : "Practical rules that complement the technical plan. Each guide lists sources and separates sourced welfare guidance from design assumptions."}
         </p>
 

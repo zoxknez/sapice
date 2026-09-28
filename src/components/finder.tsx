@@ -4,6 +4,7 @@ import {useEffect, useMemo, useState} from "react";
 import type {ShelterModel} from "@/lib/domain";
 import type {AppLocale} from "@/i18n/routing";
 import type {ModelComparisonSummary} from "@/lib/catalog-summary";
+import {animalSizeClassLabel, climateProfileLabel} from "@/lib/model-labels";
 import {ModelCard} from "./model-card";
 import {
   matchShelterModels,
@@ -67,7 +68,7 @@ export function Finder({
     const items = [
       animal === "dog"
         ? (isSr
-            ? `Veličina psa: ${model.animalSizeClass}`
+            ? `Veličina psa: ${animalSizeClassLabel(model.animalSizeClass, locale)}`
             : `Dog size class: ${model.animalSizeClass}`)
         : (isSr
             ? `Kapacitet: do ${model.capacity.max} mačaka`
@@ -76,8 +77,8 @@ export function Finder({
         ? `Staje u ${maxWidth} × ${maxDepth} mm prostor`
         : `Fits within ${maxWidth} × ${maxDepth} mm`,
       isSr
-        ? `Profil: ${model.climateProfile.replaceAll("_", " ")}`
-        : `Profile: ${model.climateProfile.replaceAll("_", " ")}`
+        ? `Profil: ${climateProfileLabel(model.climateProfile, locale)}`
+        : `Profile: ${climateProfileLabel(model.climateProfile, locale)}`
     ];
 
     if (heating === "heated") {
@@ -202,7 +203,7 @@ export function Finder({
           </div>
         ) : (
           <div className="empty-state">
-            <span className="kicker">0 matches</span>
+            <span className="kicker">{isSr ? "Nema rezultata" : "0 matches"}</span>
             <h2>{isSr ? "Trenutno nema modela koji prolazi sve uslove." : "No current model passes every constraint."}</h2>
             <p>
               {isSr

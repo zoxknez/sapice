@@ -6,6 +6,7 @@ import type {AppLocale} from "@/i18n/routing";
 import {ModelCard} from "./model-card";
 import type {ModelComparisonSummary} from "@/lib/catalog-summary";
 import {validationStageLabel} from "@/lib/validation-labels";
+import {animalSizeClassLabel} from "@/lib/model-labels";
 import {
   defaultCatalogUrlState,
   parseCatalogUrlState,
@@ -99,7 +100,7 @@ export function ModelCatalog({
         <div className="segmented">
           {(["all", "passive", "heated"] as const).map((value) => (
             <button type="button" key={value} className={heating === value ? "active" : ""} aria-pressed={heating === value} onClick={() => setCatalogState((current) => ({...current, heating: value}))}>
-              {value === "all" ? (isSr ? "Sva grejanja" : "All heating") : value === "heated" ? (isSr ? "Grejane" : "Heated") : (isSr ? "Bez grejanja" : "Passive")}
+              {value === "all" ? (isSr ? "Svi tipovi" : "All heating") : value === "heated" ? (isSr ? "Grejani" : "Heated") : (isSr ? "Pasivni" : "Passive")}
             </button>
           ))}
         </div>
@@ -110,7 +111,7 @@ export function ModelCatalog({
         <section className="compare-panel" aria-labelledby="compare-title">
           <header>
             <div>
-              <span className="kicker">Side by side</span>
+              <span className="kicker">{isSr ? "Uporedni prikaz" : "Side by side"}</span>
               <h2 id="compare-title">{isSr ? "Poređenje modela" : "Model comparison"}</h2>
             </div>
             <button type="button" onClick={() => setCatalogState((current) => ({...current, compareSlugs: []}))}>
@@ -132,8 +133,8 @@ export function ModelCatalog({
                   {selected.map((model) => (
                     <td key={model.id}>
                       {model.animal === "dog"
-                        ? model.animalSizeClass
-                        : `${model.capacity.recommended} / max ${model.capacity.max}`}
+                        ? animalSizeClassLabel(model.animalSizeClass, locale)
+                        : `${model.capacity.recommended} / ${isSr ? "maks." : "max"} ${model.capacity.max}`}
                     </td>
                   ))}
                 </tr>
@@ -143,7 +144,7 @@ export function ModelCatalog({
                     <td key={model.id}>
                       {model.animal === "cat"
                         ? (isSr ? "standardna odrasla mačka" : "standard adult cat")
-                        : model.animalSizeClass}
+                        : animalSizeClassLabel(model.animalSizeClass, locale)}
                     </td>
                   ))}
                 </tr>
@@ -186,7 +187,7 @@ export function ModelCatalog({
                   {selected.map((model) => <td key={model.id}>{model.heated ? (isSr ? "Predviđeno" : "Ready") : (isSr ? "Pasivno" : "Passive")}</td>)}
                 </tr>
                 <tr>
-                  <th>{isSr ? "U zida" : "Wall U"}</th>
+                  <th>{isSr ? "U-vrednost zida" : "Wall U"}</th>
                   {selected.map((model) => <td key={model.id}>{summaryFor(model).wallU.toFixed(2)} W/m²K</td>)}
                 </tr>
                 <tr>

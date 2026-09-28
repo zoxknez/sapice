@@ -4,6 +4,7 @@ import {Link} from "@/i18n/navigation";
 import {ModelThumbnail} from "@/components/model-thumbnail";
 import type {ModelComparisonSummary} from "@/lib/catalog-summary";
 import {validationStageLabel} from "@/lib/validation-labels";
+import {animalSizeClassLabel} from "@/lib/model-labels";
 
 export function ModelCard({
   model,
@@ -24,7 +25,7 @@ export function ModelCard({
       <div className="model-card-body">
         <div className="eyebrow-row">
           <span>{model.animal === "cat" ? (locale === "sr" ? "Mačke" : "Cats") : (locale === "sr" ? "Psi" : "Dogs")}</span>
-          <span>{model.animal === "dog" ? model.animalSizeClass : `${model.capacity.recommended}×`}</span>
+          <span>{model.animal === "dog" ? animalSizeClassLabel(model.animalSizeClass, locale) : `${model.capacity.recommended}×`}</span>
           <span>{model.heated ? (locale === "sr" ? "Grejana" : "Heated") : (locale === "sr" ? "Pasivna" : "Passive")}</span>
         </div>
         <h3>{copy.name}</h3>

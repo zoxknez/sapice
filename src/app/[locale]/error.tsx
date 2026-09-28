@@ -25,7 +25,7 @@ export default function ErrorPage({
         <h1>{isSr ? "Ovaj prikaz trenutno nije moguće otvoriti." : "This view cannot be opened right now."}</h1>
         <p className="page-lead">
           {isSr
-            ? "Podaci u browseru nisu menjani. Možete ponoviti prikaz ili se vratiti na prethodnu stranicu."
+            ? "Podaci u pregledaču nisu menjani. Možete ponovo otvoriti prikaz ili se vratiti na prethodnu stranicu."
             : "Browser data has not been changed. You can retry the view or return to the previous page."}
         </p>
         <div className="hero-actions">

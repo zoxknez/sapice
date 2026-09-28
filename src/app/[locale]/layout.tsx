@@ -97,15 +97,15 @@ export default async function LocaleLayout({
             <div className="shell footer-grid">
               <div>
                 <strong>Šapice</strong>
-                <p>Open pet shelter engineering.</p>
+                <p>{locale === "sr" ? "Otvoreno inženjersko projektovanje kućica za ljubimce." : "Open pet shelter engineering."}</p>
               </div>
-              <nav className="footer-nav" aria-label={locale === "sr" ? "Footer navigacija" : "Footer navigation"}>
+              <nav className="footer-nav" aria-label={locale === "sr" ? "Navigacija u podnožju" : "Footer navigation"}>
                 <a href={`/${locale}/${locale === "sr" ? "metodologija" : "methodology"}`}>
                   {locale === "sr" ? "Metodologija" : "Methodology"}
                 </a>
                 <a href="https://github.com/zoxknez/sapice" target="_blank" rel="noreferrer">GitHub</a>
               </nav>
-              <p>© 2026 · SR / EN · Versioned models, transparent calculations.</p>
+              <p>© 2026 · SR / EN · {locale === "sr" ? "Modeli sa verzijama, transparentni proračuni." : "Versioned models, transparent calculations."}</p>
             </div>
           </footer>
         </NextIntlClientProvider>

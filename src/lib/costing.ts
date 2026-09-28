@@ -118,7 +118,7 @@ export function costLinesForCompiled(compiled: CompiledShelterModel): CostLine[]
   if (model.heated) {
     lines.push({
       id: "heating-product",
-      labelSr: "Namenski pet-heating proizvod",
+      labelSr: "Namenski proizvod za grejanje životinja",
       labelEn: "Purpose-built pet heating product",
       quantity: compiled.heating.zones.length,
       unit: "item",
