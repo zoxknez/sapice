@@ -50,7 +50,7 @@ When editing a model:
 
 ## Current release blockers
 
-- The local software gate passes; hosted GitHub Actions is blocked. On 2026-09-28, run `36397225636` failed before starting a runner, and GitHub's check annotation said the account was locked due to a billing issue (`runner_id: 0`, no workflow steps). Confirm billing is restored before treating hosted CI as green.
+- The local software gate passes; hosted GitHub Actions is blocked. On 2026-09-28, run `36412306293` for commit `e24710a` failed before starting a runner, and GitHub's check annotation said the account was locked due to a billing issue (`runner_id: 0`, no workflow steps). Confirm billing is restored before treating hosted CI as green.
 - Neon runtime schema lives in `db/0001_runtime.sql`; plan-identity migration `db/0002_plan_identity.sql` is versioned but was not applied from this session
 - physical prototype/field testing has not been performed
 

@@ -200,4 +200,4 @@ WebGPU is not required. The production 3D baseline remains WebGL.
 
 The repository has unit, typecheck, lint, production-build and browser E2E scripts.
 
-At the current project state, GitHub Actions is failing before runner allocation, and the active automation environment cannot independently clone/build the repository. A real pnpm environment must still generate and commit `pnpm-lock.yaml` and execute the full quality gate before the catalog should move beyond `DATA_VALIDATED`.
+On 28 September 2026, GitHub Actions run `36412306293` for commit `e24710a` failed before runner startup. GitHub's check annotation says the account is locked due to a billing issue (`runner_id: 0`), so no workflow steps ran. The repository already commits the required `pnpm-lock.yaml`. Restore GitHub Actions billing and execute the full quality gate before considering any validation-state change.

@@ -277,6 +277,6 @@ Database state must not silently override canonical engineering geometry.
 
 ## Current release limitation
 
-The repository has unit and E2E quality gates prepared, but GitHub Actions currently fails before runner allocation. The active automation environment also cannot resolve GitHub directly for an independent clone/build.
+The repository has unit and E2E quality gates prepared. On 28 September 2026, GitHub Actions run `36412306293` for commit `e24710a` failed before runner startup because GitHub reported that the account was locked due to a billing issue (`runner_id: 0`). No project checks ran in that job.
 
 Until a real runner successfully executes install, typecheck, lint, unit tests, production build and browser smoke tests, public models remain conservatively at `DATA_VALIDATED`.

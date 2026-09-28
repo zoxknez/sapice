@@ -236,7 +236,7 @@ The schema is deliberately separate from canonical model definitions.
 
 The application code is under active construction.
 
-GitHub Actions is the remote release gate. On 28 September 2026, the latest observed `main` run ended before its first workflow step; GitHub exposed neither step results nor a job log. This does not show whether application checks passed or failed, so the remote gate remains unconfirmed. The committed `pnpm-lock.yaml` is required by the workflow. A successful software run does not establish physical prototype or field-test evidence.
+GitHub Actions is the remote release gate. On 28 September 2026, run `36412306293` for commit `e24710a` was blocked before runner startup. Its check annotation says the account is locked because of a billing issue (`runner_id: 0`), so no application workflow step ran and the run provides no results for project checks. The committed `pnpm-lock.yaml` is required by the workflow. Restore GitHub Actions billing and rerun the gate before treating hosted CI as green. A successful software run does not establish physical prototype or field-test evidence.
 
 Physical prototype and field-test status require real-world evidence, not code completion.
 
