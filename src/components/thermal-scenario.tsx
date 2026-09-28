@@ -25,7 +25,7 @@ export function ThermalScenario({
     <div className="thermal-scenario">
       <div className="thermal-scenario-head">
         <div>
-          <span className="kicker">ΔT explorer</span>
+          <span className="kicker">{isSr ? "Podešavanje ΔT" : "ΔT explorer"}</span>
           <strong>{isSr ? "Scenarijska razlika temperature" : "Scenario temperature difference"}</strong>
         </div>
         <output>{deltaTK} K</output>
@@ -47,14 +47,14 @@ export function ThermalScenario({
           <strong>{nominal.toFixed(0)} W</strong>
         </div>
         <div>
-          <span>{isSr ? "Sensitivity band" : "Sensitivity band"}</span>
+          <span>{isSr ? "Opseg osetljivosti" : "Sensitivity band"}</span>
           <strong>{low.toFixed(0)}–{high.toFixed(0)} W</strong>
         </div>
       </div>
 
       <p>
         {isSr
-          ? "Ovo je samo skaliranje steady-state transmisije kroz zid/pod/krov. ΔT nije spoljašnja temperatura niti garantovana unutrašnja temperatura; infiltracija, vetar, termički mostovi rama i drugi efekti nisu dodati."
+          ? "Ovo samo skalira ustaljeni prenos toplote kroz zidove, pod i krov. ΔT nije spoljašnja niti garantovana unutrašnja temperatura; infiltracija, vetar, toplotni mostovi rama i drugi efekti nisu obuhvaćeni."
           : "This only scales steady-state transmission through wall/floor/roof. ΔT is not an outdoor temperature or guaranteed indoor temperature; infiltration, wind, framing thermal bridges and other effects are not added."}
       </p>
     </div>

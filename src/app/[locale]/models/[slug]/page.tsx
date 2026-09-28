@@ -266,35 +266,35 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
         <div className="shell">
           <div className="section-heading">
             <div>
-              <span className="kicker">Thermal</span>
+              <span className="kicker">{locale === "sr" ? "Termika" : "Thermal"}</span>
               <h2>{locale === "sr" ? "Transparentna termička procena" : "Transparent thermal estimate"}</h2>
             </div>
             <p>
               {locale === "sr"
-                ? "Steady-state procena prolaza toplote kroz omotač. Ne uključuje validirani model infiltracije kroz ulaz i zato nije temperaturna garancija."
+                ? "Procena ustaljenog prenosa toplote kroz omotač. Ne uključuje validirani model infiltracije kroz ulaz i zato nije temperaturna garancija."
                 : "Steady-state envelope transmission estimate. It does not include a validated entrance-infiltration model and is not a temperature guarantee."}
             </p>
           </div>
           <div className="thermal-grid">
             <div>
-              <span>Wall U · nominal</span>
+              <span>{locale === "sr" ? "U zida · nominalno" : "Wall U · nominal"}</span>
               <strong>{thermal.wallU.toFixed(2)} W/m²K</strong>
               <small>{thermal.wallURange[0].toFixed(2)}–{thermal.wallURange[1].toFixed(2)} W/m²K</small>
             </div>
             <div>
-              <span>Floor U · nominal</span>
+              <span>{locale === "sr" ? "U poda · nominalno" : "Floor U · nominal"}</span>
               <strong>{thermal.floorU.toFixed(2)} W/m²K</strong>
               <small>{thermal.floorURange[0].toFixed(2)}–{thermal.floorURange[1].toFixed(2)} W/m²K</small>
             </div>
             <div>
-              <span>Roof U · nominal</span>
+              <span>{locale === "sr" ? "U krova · nominalno" : "Roof U · nominal"}</span>
               <strong>{thermal.roofU.toFixed(2)} W/m²K</strong>
               <small>{thermal.roofURange[0].toFixed(2)}–{thermal.roofURange[1].toFixed(2)} W/m²K</small>
             </div>
             <div>
-              <span>ΔT comparison</span>
+              <span>{locale === "sr" ? "Poređenje ΔT" : "ΔT comparison"}</span>
               <strong>{thermal.deltaTK} K</strong>
-              <small>method v{thermal.methodVersion}</small>
+              <small>{locale === "sr" ? "metod" : "method"} v{thermal.methodVersion}</small>
             </div>
             <div className="wide">
               <span>{locale === "sr" ? "Nominalna transmisija omotača" : "Nominal envelope transmission"}</span>
@@ -304,17 +304,17 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
           </div>
           <div className="surface-resistance-grid">
             <div>
-              <span>Wall Rsi</span>
+              <span>{locale === "sr" ? "Rsi zida" : "Wall Rsi"}</span>
               <strong>{thermal.surfaceResistances.wallRsi.toFixed(2)} m²K/W</strong>
               <small>{locale === "sr" ? "horizontalni tok" : "horizontal heat flow"}</small>
             </div>
             <div>
-              <span>Roof Rsi</span>
+              <span>{locale === "sr" ? "Rsi krova" : "Roof Rsi"}</span>
               <strong>{thermal.surfaceResistances.roofRsi.toFixed(2)} m²K/W</strong>
               <small>{locale === "sr" ? "tok naviše" : "upward heat flow"}</small>
             </div>
             <div>
-              <span>Floor Rsi</span>
+              <span>{locale === "sr" ? "Rsi poda" : "Floor Rsi"}</span>
               <strong>{thermal.surfaceResistances.floorRsi.toFixed(2)} m²K/W</strong>
               <small>{locale === "sr" ? "tok naniže" : "downward heat flow"}</small>
             </div>
