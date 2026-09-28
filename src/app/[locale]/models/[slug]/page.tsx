@@ -160,7 +160,16 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
             <span className="kicker">{validationStageLabel(model.validationState, locale)}</span>
             <h1>{copy.name}</h1>
             <p>{copy.description}</p>
-            <div className="notice" role="note">
+            <div className="notice model-hero-notice" role="note">
+              <p>
+                {model.animal === "dog"
+                  ? locale === "sr"
+                    ? "Ovo je pomoćno spoljašnje sklonište. Tokom opasne hladnoće, snežne oluje ili ledene kiše psu obezbedite sigurno unutrašnje sklonište."
+                    : "This is auxiliary outdoor shelter. During dangerous cold, snowstorms, or freezing rain, provide safe indoor shelter for the dog."
+                  : locale === "sr"
+                    ? "Postavite sklonište na zaštićeno, suvo i podignuto mesto. Za community mačke koristite slamu; peškiri i ćebad mogu da zadržavaju vlagu."
+                    : "Place the shelter somewhere protected, dry and raised. For community cats, use straw; towels and blankets can retain moisture."}
+              </p>
               {model.heated && (
                 <p>
                   {locale === "sr"
@@ -171,10 +180,17 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
               {model.validationState === "DATA_VALIDATED" && (
                 <p>
                   {locale === "sr"
-                    ? "Status DATA_VALIDATED ne znači da je fizički prototip testiran. Takva tvrdnja će se pojaviti tek posle stvarne fizičke validacije."
-                    : "DATA_VALIDATED does not mean a physical prototype has been tested. That claim appears only after real physical validation."}
+                    ? "Status „Podaci provereni” potvrđuje proveru podataka, ali ne i geometrijsku validaciju, stručnu reviziju, fizički prototip ili terensku proveru."
+                    : "“Data validated” confirms data checks only. Geometry verification, engineering review, a physical prototype and field testing are not yet confirmed."}
+                  {" "}
+                  <a href="#validation">
+                    {locale === "sr" ? "Pogledaj nivoe validacije" : "See validation stages"}
+                  </a>
                 </p>
               )}
+              <a className="model-guidance-link" href="#operation">
+                {locale === "sr" ? "Pročitaj sve zimske smernice" : "Read the full winter-use guidance"}
+              </a>
             </div>
             <div className="metric-grid">
               <div>

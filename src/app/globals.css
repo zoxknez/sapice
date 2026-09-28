@@ -398,6 +398,9 @@ button { cursor: pointer; }
 }
 .notice p { margin: 0; }
 .notice p + p { margin-top: 10px; padding-top: 10px; border-top: 1px solid #cfb99f; }
+.model-hero-notice { margin-top: 18px; }
+.model-hero-notice a { color: #294c3d; font-weight: 800; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.model-guidance-link { display: inline-flex; margin-top: 12px; font-size: 11px; }
 
 .detail-content { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 40px; align-items: start; }
 .detail-content > * { min-width: 0; }
