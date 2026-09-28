@@ -46,7 +46,7 @@ Every model carries an explicit validation state:
 4. `PROTOTYPE_BUILT`
 5. `FIELD_TESTED`
 
-Automated software checks currently pass locally. Hosted GitHub Actions has not passed because GitHub reports a billing lock on the account. The catalog remains at **DATA_VALIDATED** until evidence for later validation stages is explicitly recorded.
+Local typecheck, lint, unit tests and production build pass; the full E2E suite passes against the production server. Hosted GitHub Actions status is summarized under Repository status. The catalog remains at **DATA_VALIDATED** until evidence for later validation stages is explicitly recorded.
 
 A software test is never treated as physical validation.
 
@@ -236,7 +236,7 @@ The schema is deliberately separate from canonical model definitions.
 
 The application code is under active construction.
 
-GitHub Actions is the remote release gate. At the latest review on 28 September 2026, the `main` workflow ended before its first step; GitHub exposed neither step results nor a job log. This does not show whether application checks passed or failed, so the remote gate remains unconfirmed. The committed `pnpm-lock.yaml` is required by the workflow. A successful software run does not establish physical prototype or field-test evidence.
+GitHub Actions is the remote release gate. On 28 September 2026, the latest observed `main` run ended before its first workflow step; GitHub exposed neither step results nor a job log. This does not show whether application checks passed or failed, so the remote gate remains unconfirmed. The committed `pnpm-lock.yaml` is required by the workflow. A successful software run does not establish physical prototype or field-test evidence.
 
 Physical prototype and field-test status require real-world evidence, not code completion.
 
