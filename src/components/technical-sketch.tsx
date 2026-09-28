@@ -174,7 +174,7 @@ export function TechnicalSketch({
     >
       <div className="technical-sheet-head">
         <div>
-          <span className="kicker">Compiled drawing sheet</span>
+          <span className="kicker">{isSr ? "Kompajlirani tehnički crtež" : "Compiled drawing sheet"}</span>
           <strong>{model.translations[locale].name}</strong>
         </div>
         <div>
@@ -182,7 +182,7 @@ export function TechnicalSketch({
           <strong>{model.id}</strong>
         </div>
         <div>
-          <span>VERSION</span>
+          <span>{isSr ? "VERZIJA" : "VERSION"}</span>
           <strong>v{model.version}</strong>
         </div>
         <div>
@@ -190,7 +190,7 @@ export function TechnicalSketch({
           <strong>{model.validationState.replaceAll("_", " ")}</strong>
         </div>
         <div>
-          <span>PLAN ID</span>
+          <span>{isSr ? "ID PLANA" : "PLAN ID"}</span>
           <strong>{compiled.planFingerprint}</strong>
         </div>
       </div>
@@ -666,19 +666,19 @@ export function TechnicalSketch({
           <line x1="0" y1="0" x2="28" y2="0" className="drawing-frame" />
           <text x="36" y="4" className="drawing-legend">{isSr ? "geometrijski ram / osa" : "geometry frame / axis"}</text>
           <line x1="220" y1="0" x2="248" y2="0" className="drawing-frame drawing-frame-assumption" />
-          <text x="256" y="4" className="drawing-legend">{isSr ? "PROVISIONAL framing" : "PROVISIONAL framing"}</text>
+          <text x="256" y="4" className="drawing-legend">{isSr ? "ram · pretpostavka" : "PROVISIONAL framing"}</text>
           <line x1="475" y1="0" x2="503" y2="0" className="drawing-divider" />
           <text x="511" y="4" className="drawing-legend">{isSr ? "pregrada" : "divider"}</text>
           <line x1="650" y1="0" x2="678" y2="0" className="drawing-hinge" />
           <text x="686" y="4" className="drawing-legend">{isSr ? "šarka" : "hinge"}</text>
           <line x1="785" y1="0" x2="813" y2="0" className="drawing-vent-provision" />
-          <text x="821" y="4" className="drawing-legend">{isSr ? "vent. PROVISION zona" : "vent PROVISION zone"}</text>
+          <text x="821" y="4" className="drawing-legend">{isSr ? "ventilaciona rezerva" : "vent PROVISION zone"}</text>
           <rect x="955" y="-5" width="20" height="10" className="drawing-base-post" />
           <text x="983" y="4" className="drawing-legend">{isSr ? "oslonac baze" : "base support"}</text>
           {compiled.heating.zones.length > 0 && (
             <>
               <rect x="1040" y="-5" width="20" height="10" className="drawing-heating-provision" />
-              <text x="1068" y="4" className="drawing-legend">{isSr ? "grejna PROVISION zona" : "heating PROVISION zone"}</text>
+              <text x="1068" y="4" className="drawing-legend">{isSr ? "grejna rezerva" : "heating PROVISION zone"}</text>
             </>
           )}
         </g>
@@ -686,7 +686,7 @@ export function TechnicalSketch({
 
       <figcaption>
         {isSr
-          ? "Sheet je izveden iz compiler-a. Pune kote i komore su geometrija; framing/hardware elementi označeni kao PROVISIONAL ostaju projektantska pretpostavka do engineering review-a."
+          ? "Crtež je izveden iz kompajliranog plana. Pune kote i komore predstavljaju geometriju; elementi rama i okova označeni kao PROVISIONAL ostaju projektantske pretpostavke do stručne tehničke provere."
           : "This sheet is compiler-derived. Solid dimensions and chambers are geometry; framing/hardware elements marked PROVISIONAL remain design assumptions until engineering review."}
       </figcaption>
     </figure>

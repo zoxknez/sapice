@@ -7,6 +7,7 @@ export type SourceRecord = {
   tier: 1 | 2 | 3;
   topics: string[];
   notes: string;
+  notesSr: string;
 };
 
 export const sources: Record<string, SourceRecord> = {
@@ -18,7 +19,8 @@ export const sources: Record<string, SourceRecord> = {
     accessedAt: "2026-09-27",
     tier: 1,
     topics: ["community-cats", "winter", "entrances", "bedding", "raised-floor"],
-    notes: "Supports small insulated shelters, cat-sized entrances, elevation from wet ground, straw bedding and predator-aware entrance decisions."
+    notes: "Supports small insulated shelters, cat-sized entrances, elevation from wet ground, straw bedding and predator-aware entrance decisions.",
+    notesSr: "Podržava male izolovane kućice, ulaze prilagođene mačkama, podizanje od vlažnog tla, slamnatu posteljinu i izbor ulaza uz procenu rizika od predatora."
   },
   "gov-uk-dog-kennel-ventilation": {
     id: "gov-uk-dog-kennel-ventilation",
@@ -28,7 +30,8 @@ export const sources: Record<string, SourceRecord> = {
     accessedAt: "2026-09-27",
     tier: 1,
     topics: ["dogs", "ventilation", "humidity", "drafts", "heating-safety"],
-    notes: "Requires adequate ventilation without excessive localised draughts and to avoid excess humidity. Šapice uses this only as a qualitative ventilation principle; it is commercial-kennel guidance, not a dimensional standard for these small auxiliary shelters."
+    notes: "Requires adequate ventilation without excessive localised draughts and to avoid excess humidity. Šapice uses this only as a qualitative ventilation principle; it is commercial-kennel guidance, not a dimensional standard for these small auxiliary shelters.",
+    notesSr: "Preporučuje odgovarajuću ventilaciju bez jake lokalne promaje i sprečavanje prekomerne vlage. Šapice ovo koristi samo kao kvalitativni princip ventilacije; smernice se odnose na komercijalne odgajivačnice i ne propisuju dimenzije za mala pomoćna skloništa."
   },
   "humane-world-pets-cold": {
     id: "humane-world-pets-cold",
@@ -38,7 +41,8 @@ export const sources: Record<string, SourceRecord> = {
     accessedAt: "2026-09-27",
     tier: 1,
     topics: ["dogs", "winter", "shelter", "raised-floor"],
-    notes: "Emphasizes indoor shelter when possible; when a dog must be outside, shelter should be dry, draft-free, raised and appropriately sized."
+    notes: "Emphasizes indoor shelter when possible; when a dog must be outside, shelter should be dry, draft-free, raised and appropriately sized.",
+    notesSr: "Prednost daje boravku u zatvorenom kada je to moguće; ako pas mora da bude napolju, sklonište treba da bude suvo, bez promaje, podignuto i odgovarajuće veličine."
   },
   "aspca-cold-weather": {
     id: "aspca-cold-weather",
@@ -48,7 +52,8 @@ export const sources: Record<string, SourceRecord> = {
     accessedAt: "2026-09-27",
     tier: 1,
     topics: ["pets", "winter", "safety"],
-    notes: "Supports the limitation that outdoor auxiliary shelters are not a substitute for keeping companion animals indoors during severe cold."
+    notes: "Supports the limitation that outdoor auxiliary shelters are not a substitute for keeping companion animals indoors during severe cold.",
+    notesSr: "Potkrepljuje ograničenje da pomoćno spoljašnje sklonište ne zamenjuje boravak kućnog ljubimca u zatvorenom tokom velikih hladnoća."
   },
   "apa-panel-fastening-n335": {
     id: "apa-panel-fastening-n335",
@@ -58,7 +63,8 @@ export const sources: Record<string, SourceRecord> = {
     accessedAt: "2026-09-27",
     tier: 1,
     topics: ["plywood", "fasteners", "spacing", "panel-edges"],
-    notes: "Reference starting point for panel fastening geometry: approximately 6 in edge spacing, 12 in intermediate spacing and about 3/8 in edge offset. Šapice does not treat this roof-sheathing guide as a certified fastening design for pet shelters."
+    notes: "Reference starting point for panel fastening geometry: approximately 6 in edge spacing, 12 in intermediate spacing and about 3/8 in edge offset. Šapice does not treat this roof-sheathing guide as a certified fastening design for pet shelters.",
+    notesSr: "Referentna početna tačka za raspored pričvršćivača panela: približno 6 inča na ivicama, 12 inča u polju i odmak od ivice oko 3/8 inča. Šapice ovo uputstvo za krovne ploče ne predstavlja kao sertifikovan proračun pričvršćivanja za kućice za ljubimce."
   },
   "owens-corning-roof-installation": {
     id: "owens-corning-roof-installation",
@@ -68,7 +74,8 @@ export const sources: Record<string, SourceRecord> = {
     accessedAt: "2026-09-27",
     tier: 1,
     topics: ["roofing", "low-slope", "underlayment", "drip-edge", "water-management"],
-    notes: "Manufacturer example showing that low-slope roof assemblies require slope-specific underlayment/edge details. Šapice uses this as evidence that final roof covering compatibility must follow the selected product instructions, not as a universal shelter roofing specification."
+    notes: "Manufacturer example showing that low-slope roof assemblies require slope-specific underlayment/edge details. Šapice uses this as evidence that final roof covering compatibility must follow the selected product instructions, not as a universal shelter roofing specification.",
+    notesSr: "Primer proizvođača pokazuje da krovovi malog nagiba zahtevaju detalje podloge i ivica prilagođene konkretnom nagibu. Šapice ga koristi da pokaže da pokrivač krova mora biti kompatibilan sa uputstvom izabranog proizvoda; nije univerzalna specifikacija krova skloništa."
   },
   "fibran-xps-300": {
     id: "fibran-xps-300",
@@ -78,7 +85,8 @@ export const sources: Record<string, SourceRecord> = {
     accessedAt: "2026-09-27",
     tier: 1,
     topics: ["xps", "thermal-conductivity", "stock-dimensions"],
-    notes: "Declares 1250 × 600 mm board dimensions and λD 0.033 W/mK for thicknesses up to 60 mm."
+    notes: "Declares 1250 × 600 mm board dimensions and λD 0.033 W/mK for thicknesses up to 60 mm.",
+    notesSr: "Navodi dimenzije ploče 1250 × 600 mm i λD 0.033 W/mK za debljine do 60 mm."
   },
   "usfs-wood-handbook-2021": {
     id: "usfs-wood-handbook-2021",
@@ -88,7 +96,8 @@ export const sources: Record<string, SourceRecord> = {
     accessedAt: "2026-09-27",
     tier: 1,
     topics: ["wood", "thermal-conductivity", "moisture"],
-    notes: "Documents that wood thermal conductivity varies materially with species, density, moisture content and grain direction."
+    notes: "Documents that wood thermal conductivity varies materially with species, density, moisture content and grain direction.",
+    notesSr: "Dokumentuje da toplotna provodljivost drveta značajno varira prema vrsti, gustini, vlažnosti i smeru vlakana."
   },
   "nord-marine-birch-plywood": {
     id: "nord-marine-birch-plywood",
@@ -98,7 +107,8 @@ export const sources: Record<string, SourceRecord> = {
     accessedAt: "2026-09-27",
     tier: 2,
     topics: ["plywood", "thermal-conductivity", "marine-plywood"],
-    notes: "Manufacturer technical specification lists thermal conductivity of 0.17 W/mK for birch marine plywood."
+    notes: "Manufacturer technical specification lists thermal conductivity of 0.17 W/mK for birch marine plywood.",
+    notesSr: "Tehnička specifikacija proizvođača navodi toplotnu provodljivost od 0.17 W/mK za brezovu vodootpornu šperploču."
   },
   "iso-10456-2007": {
     id: "iso-10456-2007",
@@ -108,7 +118,8 @@ export const sources: Record<string, SourceRecord> = {
     accessedAt: "2026-09-27",
     tier: 1,
     topics: ["thermal", "materials", "design-values", "moisture"],
-    notes: "Current published edition, confirmed in 2023; provides procedures for declared/design thermal values and conversion for temperature and moisture conditions."
+    notes: "Current published edition, confirmed in 2023; provides procedures for declared/design thermal values and conversion for temperature and moisture conditions.",
+    notesSr: "Važeće objavljeno izdanje, potvrđeno 2023. godine; opisuje postupke za deklarisane i projektne toplotne vrednosti i preračunavanja prema uslovima temperature i vlažnosti."
   },
   "iso-6946-2017": {
     id: "iso-6946-2017",
@@ -118,7 +129,8 @@ export const sources: Record<string, SourceRecord> = {
     accessedAt: "2026-09-27",
     tier: 1,
     topics: ["thermal", "u-value", "r-value", "surface-resistance"],
-    notes: "Methodological reference for steady-state layer resistance and transmittance. Thermal method v1.1 applies orientation-specific internal surface resistances: Rsi 0.10 m²K/W for upward heat flow, 0.13 for horizontal and 0.17 for downward, with Rse 0.04 m²K/W. The app does not claim ISO certification."
+    notes: "Methodological reference for steady-state layer resistance and transmittance. Thermal method v1.1 applies orientation-specific internal surface resistances: Rsi 0.10 m²K/W for upward heat flow, 0.13 for horizontal and 0.17 for downward, with Rse 0.04 m²K/W. The app does not claim ISO certification.",
+    notesSr: "Metodološka referenca za stacionarni otpor i prolaz toplote kroz slojeve. Termički metod v1.1 koristi unutrašnje površinske otpore prema smeru toka: Rsi 0.10 m²K/W za tok naviše, 0.13 horizontalno i 0.17 naniže, uz Rse 0.04 m²K/W. Aplikacija ne tvrdi da je sertifikovana prema ISO standardu."
   },
   "iso-13789-2017": {
     id: "iso-13789-2017",
@@ -128,7 +140,8 @@ export const sources: Record<string, SourceRecord> = {
     accessedAt: "2026-09-27",
     tier: 1,
     topics: ["thermal", "ventilation", "steady-state"],
-    notes: "Methodological reference for separating transmission and ventilation heat transfer. The MVP does not claim a validated infiltration model."
+    notes: "Methodological reference for separating transmission and ventilation heat transfer. The MVP does not claim a validated infiltration model.",
+    notesSr: "Metodološka referenca za razdvajanje prenosa toplote i ventilacionih gubitaka. MVP ne tvrdi da poseduje validiran model infiltracije."
   },
   "iso-13788-2012": {
     id: "iso-13788-2012",
@@ -138,7 +151,8 @@ export const sources: Record<string, SourceRecord> = {
     accessedAt: "2026-09-27",
     tier: 1,
     topics: ["moisture", "condensation"],
-    notes: "Documents limitations of simplified moisture indicators; full hygrothermal simulation is outside the MVP."
+    notes: "Documents limitations of simplified moisture indicators; full hygrothermal simulation is outside the MVP.",
+    notesSr: "Dokumentuje ograničenja pojednostavljenih pokazatelja vlage; potpuna higrotermička simulacija nije deo MVP-a."
   },
   "iec-60335-2-71-2018": {
     id: "iec-60335-2-71-2018",
@@ -148,6 +162,7 @@ export const sources: Record<string, SourceRecord> = {
     accessedAt: "2026-09-27",
     tier: 1,
     topics: ["heating", "electrical-safety", "animals"],
-    notes: "Safety reference for electrical animal-heating appliances. The app only accommodates purpose-built products and does not claim product certification."
+    notes: "Safety reference for electrical animal-heating appliances. The app only accommodates purpose-built products and does not claim product certification.",
+    notesSr: "Bezbednosna referenca za električne uređaje za grejanje životinja. Aplikacija predviđa samo namenski izrađene proizvode i ne tvrdi da je proizvod sertifikovan."
   }
 };

@@ -70,12 +70,12 @@ export function CostCalculator({
       <div className="shell">
         <div className="section-heading">
           <div>
-            <span className="kicker">Local price profile</span>
+            <span className="kicker">{isSr ? "Lokalne cene materijala" : "Local price profile"}</span>
             <h2>{isSr ? "Troškovnik" : "Cost estimate"}</h2>
           </div>
           <p>
             {isSr
-              ? "Količine dolaze iz modela. Cene nisu izmišljene: unesite ono što stvarno plaćate lokalno, a procena se čuva samo u vašem browseru."
+              ? "Količine dolaze iz modela. Cene nisu izmišljene: unesite ono što stvarno plaćate lokalno, a procena se čuva samo u vašem pregledaču."
               : "Quantities come from the model. Prices are not fabricated: enter what you actually pay locally and the estimate stays in your browser."}
           </p>
         </div>
@@ -136,7 +136,7 @@ export function CostCalculator({
         </div>
         <p className="cost-disclaimer">
           {isSr
-            ? "Količine za table, XPS, framing i hardware dolaze iz compiler-a. Troškovnik i dalje ne uključuje dostavu, alat, rad, lokalne poreze ni nepredviđene gubitke izvan navedenih rezervi. PROVISIONAL i product-specific stavke ostaju jasno označene."
+            ? "Količine za ploče, XPS, ram i okov dolaze iz kompajlera. Troškovnik ne uključuje dostavu, alat, rad, lokalne poreze ni nepredviđene gubitke izvan navedenih rezervi. Stavke označene kao PROVISIONAL ili vezane za konkretan proizvod ostaju jasno označene."
             : "Sheet, XPS, framing and hardware quantities come from the compiler. The estimate still excludes delivery, tools, labor, local taxes and unforeseen losses beyond the stated allowances. PROVISIONAL and product-specific items remain explicitly labeled."}
         </p>
       </div>

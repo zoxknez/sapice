@@ -176,21 +176,21 @@ export function PrototypeEvidenceWorksheet({
       <div className="shell">
         <div className="section-heading">
           <div>
-            <span className="kicker">Prototype evidence · local only</span>
+            <span className="kicker">{isSr ? "Evidencija prototipa · čuva se lokalno" : "Prototype evidence · local only"}</span>
             <h2>{isSr ? "Radni list fizičke provere" : "Physical validation worksheet"}</h2>
           </div>
           <p>
             {isSr
-              ? "Beleške se čuvaju samo u ovom browseru i vezane su za tačan Plan ID. Popunjavanje ne podiže javni status modela - služi da fizička provera jednog dana ima uredan dokazni trag."
+              ? "Beleške se čuvaju samo u ovom pregledaču i vezane su za tačan ID plana. Popunjavanje ne podiže javni status modela; služi da buduća fizička provera ima uredan trag dokaza."
               : "Notes stay only in this browser and are tied to the exact Plan ID. Completing the worksheet does not promote the public model state - it creates an evidence trail for future physical validation."}
           </p>
         </div>
 
         <div className="prototype-identity">
           <div><span>MODEL</span><strong>{modelId}</strong></div>
-          <div><span>MODEL VERSION</span><strong>v{modelVersion}</strong></div>
-          <div><span>COMPILER</span><strong>v{compilerVersion}</strong></div>
-          <div><span>PLAN ID</span><strong><code>{planFingerprint}</code></strong></div>
+          <div><span>{isSr ? "VERZIJA MODELA" : "MODEL VERSION"}</span><strong>v{modelVersion}</strong></div>
+          <div><span>{isSr ? "KOMPAJLATOR" : "COMPILER"}</span><strong>v{compilerVersion}</strong></div>
+          <div><span>{isSr ? "ID PLANA" : "PLAN ID"}</span><strong><code>{planFingerprint}</code></strong></div>
         </div>
 
         <div className="prototype-form-grid">
@@ -250,7 +250,7 @@ export function PrototypeEvidenceWorksheet({
             />
           </label>
           <label>
-            <span>{isSr ? "Unutrašnja RH (%)" : "Interior RH (%)"}</span>
+            <span>{isSr ? "Unutrašnja relativna vlažnost (%)" : "Interior RH (%)"}</span>
             <input
               inputMode="decimal"
               type="number"
@@ -296,7 +296,7 @@ export function PrototypeEvidenceWorksheet({
               value={state.deviationNotes}
               onChange={(event) => setField("deviationNotes", event.target.value)}
               placeholder={isSr
-                ? "Zabeležite svaku promenu dimenzije, materijala, spoja ili hardware-a."
+                ? "Zabeležite svaku promenu dimenzije, materijala, spoja ili okova."
                 : "Record every change in dimensions, materials, joints or hardware."}
             />
           </label>
@@ -315,7 +315,7 @@ export function PrototypeEvidenceWorksheet({
 
         <div className="prototype-actions">
           <button type="button" className="button primary" onClick={exportEvidence}>
-            {isSr ? "Izvezi evidence JSON" : "Export evidence JSON"}
+            {isSr ? "Izvezi JSON sa dokazima" : "Export evidence JSON"}
           </button>
           <button
             type="button"
@@ -328,7 +328,7 @@ export function PrototypeEvidenceWorksheet({
 
         <p className="prototype-disclaimer">
           {isSr
-            ? "Ovaj radni list nije sertifikat, veterinarska procena niti automatski FIELD_TESTED status. Objavljeni validation state menja se tek nakon odvojene revizije stvarnih dokaza."
+            ? "Ovaj radni list nije sertifikat, veterinarska procena niti automatski FIELD_TESTED status. Objavljeni status validacije menja se tek nakon odvojene revizije stvarnih dokaza."
             : "This worksheet is not a certificate, veterinary assessment or automatic FIELD_TESTED state. The published validation state changes only after separate review of real evidence."}
         </p>
       </div>

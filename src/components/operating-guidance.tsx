@@ -17,12 +17,12 @@ export function OperatingGuidance({
         ? [
           "Postavite sklonište na zaštićeno mesto, van direktnog vetra i rizika od predatora.",
           "Držite sklonište podignuto i suvo; ulaz ne treba da bude u nivou mokrog tla ili snega.",
-          "Za community mačke koristite slamu kao zimsku posteljinu; peškiri i ćebad mogu zadržavati vlagu.",
+          "Za mačke koje borave napolju koristite slamu kao zimsku posteljinu; peškiri i ćebad mogu zadržavati vlagu.",
           model.layout.entrances > 1
-            ? "Više ulaza daje dodatni escape route, ali povećava prodor hladnog vazduha; zaštita ulaza je zato važnija."
+            ? "Više ulaza daje dodatnu mogućnost bekstva, ali povećava prodor hladnog vazduha; zaštita ulaza je zato važnija."
             : "Jedan mali ulaz smanjuje razmenu hladnog vazduha; procenite rizik od predatora na konkretnoj lokaciji.",
           "Posle snega ili jake kiše proverite ulaz, suvoću posteljine i stabilnost kućice.",
-          "Pratite kondenzaciju i vlagu u gornjoj zoni. PROVISION ventilaciona zona nije unapred definisan otvor; konkretan umetak treba podesiti tako da ne stvara direktnu lokalnu promaju."
+          "Pratite kondenzaciju i vlagu u gornjoj zoni. Rezervisana ventilaciona zona nije unapred definisan otvor; konkretan umetak treba podesiti tako da ne stvara direktnu lokalnu promaju."
         ]
         : [
           "Place the shelter in a protected location away from direct wind and predator hazards.",
@@ -41,7 +41,7 @@ export function OperatingGuidance({
           "Pas mora imati dovoljno prostora da normalno ustane, okrene se i legne, ali prevelik unutrašnji volumen otežava zadržavanje toplote.",
           "Redovno proveravajte vodu, posteljinu, prodor vlage i stanje ulaza.",
           "Tokom ekstremne hladnoće, snežne oluje ili ledene kiše prioritet je bezbedno unutrašnje sklonište.",
-          "Ventilacija treba da spreči višak vlage bez direktne lokalne promaje. PROVISION zona određuje samo koordinacioni položaj, dok stvarni ventilacioni umetak zahteva proveru u realnoj upotrebi."
+          "Ventilacija treba da spreči višak vlage bez direktne lokalne promaje. Rezervisana zona određuje samo koordinacioni položaj, dok stvarni ventilacioni umetak zahteva proveru u realnoj upotrebi."
         ]
         : [
           "This is an auxiliary outdoor shelter, not a substitute for keeping a dog indoors during dangerous cold or severe weather.",
@@ -60,7 +60,7 @@ export function OperatingGuidance({
     <section className="section operation-section" id="operation">
       <div className="shell operation-layout">
         <div>
-          <span className="kicker">Operation & welfare</span>
+          <span className="kicker">{isSr ? "Upotreba i dobrobit životinje" : "Operation & welfare"}</span>
           <h2>{isSr ? "Kako koristiti model zimi" : "How to use the model in winter"}</h2>
           <p>
             {isSr

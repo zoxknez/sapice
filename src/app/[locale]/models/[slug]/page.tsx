@@ -164,11 +164,11 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
               <p>
                 {model.animal === "dog"
                   ? locale === "sr"
-                    ? "Ovo je pomoćno spoljašnje sklonište. Tokom opasne hladnoće, snežne oluje ili ledene kiše psu obezbedite sigurno unutrašnje sklonište."
-                    : "This is auxiliary outdoor shelter. During dangerous cold, snowstorms, or freezing rain, provide safe indoor shelter for the dog."
+                    ? "Ovo je pomoćno spoljašnje sklonište. Tokom opasne hladnoće ili teškog nevremena psu obezbedite sigurno sklonište u zatvorenom."
+                    : "This is auxiliary outdoor shelter. During dangerous cold or severe weather, provide safe indoor shelter for the dog."
                   : locale === "sr"
-                    ? "Postavite sklonište na zaštićeno, suvo i podignuto mesto. Za community mačke koristite slamu; peškiri i ćebad mogu da zadržavaju vlagu."
-                    : "Place the shelter somewhere protected, dry and raised. For community cats, use straw; towels and blankets can retain moisture."}
+                    ? "Postavite kućicu na zaštićeno, suvo i podignuto mesto. Za ležaj koristite slamu; peškiri i ćebad mogu zadržavati vlagu."
+                    : "Keep the shelter raised, dry and protected from wind. Use straw for winter bedding; towels and blankets can retain moisture."}
               </p>
               {model.heated && (
                 <p>
@@ -180,8 +180,8 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
               {model.validationState === "DATA_VALIDATED" && (
                 <p>
                   {locale === "sr"
-                    ? "Status „Podaci provereni” potvrđuje proveru podataka, ali ne i geometrijsku validaciju, stručnu reviziju, fizički prototip ili terensku proveru."
-                    : "“Data validated” confirms data checks only. Geometry verification, engineering review, a physical prototype and field testing are not yet confirmed."}
+                    ? "Status „Podaci provereni” ne potvrđuje geometrijsku validaciju, stručnu reviziju, izradu prototipa ni terensko testiranje."
+                    : "“Data validated” does not confirm geometry verification, engineering review, a prototype build or field testing."}
                   {" "}
                   <a href="#validation">
                     {locale === "sr" ? "Pogledaj nivoe validacije" : "See validation stages"}
@@ -203,8 +203,8 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
             </div>
             <div className="model-meta-line">
               <span>model v{model.version}</span>
-              <span>compiler v{compiled.compilerVersion}</span>
-              <span>plan {compiled.planFingerprint}</span>
+              <span>{locale === "sr" ? "kompajler" : "compiler"} v{compiled.compilerVersion}</span>
+              <span>{locale === "sr" ? "ID plana" : "plan"} {compiled.planFingerprint}</span>
               <span>{climateProfileLabels[model.climateProfile][locale]}</span>
               <span>{locale === "sr" ? "referentni spoljašnji scenario, nije rejting" : "reference outdoor scenario, not a rating"} {model.referenceOutsideC} °C</span>
             </div>
@@ -362,7 +362,9 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
 
       <section className="section" id="materials">
         <div className="shell">
-          <span className="kicker">Fabrication BOM · compiler output</span>
+          <span className="kicker">
+            {locale === "sr" ? "Materijali za izradu · izlaz kompajlera" : "Fabrication BOM · compiler output"}
+          </span>
           <h2>{locale === "sr" ? "Materijali za krojenje" : "Fabrication materials"}</h2>
           <div className="material-table">
             {materials.map((item) => (

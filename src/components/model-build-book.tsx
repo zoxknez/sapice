@@ -23,12 +23,12 @@ export function ModelBuildBook({
         <div className="shell">
           <div className="section-heading">
             <div>
-              <span className="kicker">Compiled geometry</span>
+              <span className="kicker">{locale === "sr" ? "Izvedena geometrija" : "Compiled geometry"}</span>
               <h2>{locale === "sr" ? "Korisni unutrašnji prostor" : "Usable interior space"}</h2>
             </div>
             <p>
               {locale === "sr"
-                ? "Ove vrednosti nisu ručno upisane. Compiler ih izvodi iz spoljašnjih mera i debljine konstrukcije."
+                ? "Ove vrednosti nisu ručno upisane. Kompajler ih izvodi iz spoljašnjih mera i debljine konstrukcije."
                 : "These values are not manually duplicated. The compiler derives them from external dimensions and construction thickness."}
             </p>
           </div>
@@ -44,7 +44,7 @@ export function ModelBuildBook({
           </div>
           <p className="metric-disclaimer">
             {locale === "sr"
-              ? "Površina i volumen po životinji su geometrijske metrike za poređenje modela. Nisu veterinarski, zakonski ili welfare minimum."
+              ? "Površina i zapremina po životinji geometrijske su mere za poređenje modela. Ne predstavljaju veterinarski ili zakonski minimum niti potvrdu dobrobiti životinje."
               : "Per-animal area and volume are geometric comparison metrics. They are not veterinary, legal or welfare minimums."}
           </p>
         </div>
@@ -54,7 +54,7 @@ export function ModelBuildBook({
         <div className="shell">
           <div className="section-heading">
             <div>
-              <span className="kicker">Cut list · compiler output</span>
+              <span className="kicker">{locale === "sr" ? "Krojna lista · izlaz kompajlera" : "Cut list · compiler output"}</span>
               <h2>{locale === "sr" ? "Početna krojna lista" : "Initial cut list"}</h2>
             </div>
             <p>
@@ -100,12 +100,12 @@ export function ModelBuildBook({
         <div className="shell">
           <div className="section-heading">
             <div>
-              <span className="kicker">Framing · {compiled.framing.status}</span>
+              <span className="kicker">{locale === "sr" ? "Ram" : "Framing"} · {compiled.framing.status}</span>
               <h2>{locale === "sr" ? "Raspored letvi i nosača" : "Framing and support schedule"}</h2>
             </div>
             <p>
               {locale === "sr"
-                ? "Dužine su izvedene iz geometrije modela. Profil rama i baze je V1 projektantska pretpostavka i ostaje jasno označen kao PROVISIONAL dok ne prođe engineering review i fizičku proveru."
+                ? "Dužine su izvedene iz geometrije modela. Profili rama i baze su projektantska pretpostavka V1 i ostaju označeni kao PROVISIONAL dok ih ne pregleda stručnjak i dok ne prođu fizičku proveru."
                 : "Lengths are derived from model geometry. Frame and base profiles are a V1 design assumption and remain explicitly PROVISIONAL until engineering review and physical validation."}
             </p>
           </div>
@@ -120,7 +120,7 @@ export function ModelBuildBook({
               <strong>{compiled.framing.baseProfileMm[0]} × {compiled.framing.baseProfileMm[1]} mm</strong>
             </div>
             <div>
-              <span>{locale === "sr" ? "Uzdužni runner-i" : "Base runners"}</span>
+              <span>{locale === "sr" ? "Uzdužni nosači baze" : "Base runners"}</span>
               <strong>{compiled.framing.baseRunnerPositionsXmm.length}</strong>
             </div>
             <div>
@@ -135,23 +135,23 @@ export function ModelBuildBook({
               <strong>{compiled.framing.baseSupportPostHeightMm} mm</strong>
             </div>
             <div>
-              <span>{locale === "sr" ? "Max zidni razmak" : "Max wall stud spacing"}</span>
+              <span>{locale === "sr" ? "Najveći razmak zidnih stubova" : "Max wall stud spacing"}</span>
               <strong>≈ {compiled.framing.maxStudSpacingMm} mm</strong>
             </div>
             <div>
-              <span>{locale === "sr" ? "Max podna međuprečka" : "Max floor joist spacing"}</span>
+              <span>{locale === "sr" ? "Najveći razmak podnih poprečnih nosača" : "Max floor joist spacing"}</span>
               <strong>≈ {compiled.framing.maxFloorJoistSpacingMm} mm</strong>
             </div>
             <div>
-              <span>{locale === "sr" ? "Max krovni nosač" : "Max roof rafter spacing"}</span>
+              <span>{locale === "sr" ? "Najveći razmak krovnih nosača" : "Max roof rafter spacing"}</span>
               <strong>≈ {compiled.framing.maxRoofRafterSpacingMm} mm</strong>
             </div>
             <div>
-              <span>{locale === "sr" ? "Max razmak runner-a" : "Max runner spacing"}</span>
+              <span>{locale === "sr" ? "Najveći razmak nosača baze" : "Max runner spacing"}</span>
               <strong>≈ {compiled.framing.maxBaseRunnerSpacingMm} mm</strong>
             </div>
             <div>
-              <span>{locale === "sr" ? "Max red oslonaca" : "Max support-row spacing"}</span>
+              <span>{locale === "sr" ? "Najveći razmak redova oslonaca" : "Max support-row spacing"}</span>
               <strong>≈ {compiled.framing.maxBasePostSpacingMm} mm</strong>
             </div>
             <div>
@@ -192,12 +192,12 @@ export function ModelBuildBook({
         <div className="shell">
           <div className="section-heading">
             <div>
-              <span className="kicker">Hardware · {compiled.hardware.status}</span>
+              <span className="kicker">{locale === "sr" ? "Okov" : "Hardware"} · {compiled.hardware.status}</span>
               <h2>{locale === "sr" ? "Pričvršćivači, servisni krov i voda" : "Fasteners, service roof and water"}</h2>
             </div>
             <p>
               {locale === "sr"
-                ? "Količine i geometrija su V1 radionički plan. Razmak pričvršćivača koristi APA referentni obrazac kao konzervativan početak, ali nije sertifikovan fastening design ovog proizvoda."
+                ? "Količine i geometrija čine radionički plan V1. Razmak pričvršćivača koristi APA referentni obrazac kao konzervativnu polaznu tačku, ali ne predstavlja potvrđen proračun pričvršćivanja za ovaj proizvod."
                 : "Quantities and geometry are a V1 workshop plan. Fastener spacing uses an APA reference pattern as a conservative starting point, but it is not a certified fastening design for this product."}
             </p>
           </div>
@@ -237,7 +237,7 @@ export function ModelBuildBook({
             </div>
           </div>
 
-          <div className="cut-table hardware-table" role="table" aria-label={locale === "sr" ? "Hardware lista" : "Hardware schedule"}>
+          <div className="cut-table hardware-table" role="table" aria-label={locale === "sr" ? "Spisak okova" : "Hardware schedule"}>
             <div className="cut-row cut-head" role="row">
               <span role="columnheader">ID</span>
               <span role="columnheader">{locale === "sr" ? "Stavka" : "Item"}</span>
@@ -270,7 +270,7 @@ export function ModelBuildBook({
             </a>
           </div>
           <div className="hardware-reference">
-            <span>{locale === "sr" ? "Roof weathering gate" : "Roof weathering gate"}</span>
+            <span>{locale === "sr" ? "Provera zaštite krova od vode" : "Roof weathering gate"}</span>
             <a
               href={sources[compiled.roofWeathering.referenceSourceId]?.url}
               target="_blank"
@@ -291,7 +291,7 @@ export function ModelBuildBook({
         <div className="shell">
           <div className="section-heading">
             <div>
-              <span className="kicker">Build sequence</span>
+              <span className="kicker">{locale === "sr" ? "Redosled izrade" : "Build sequence"}</span>
               <h2>{locale === "sr" ? "Redosled izrade" : "Build sequence"}</h2>
             </div>
             <p>
@@ -312,20 +312,20 @@ export function ModelBuildBook({
       <section className="section" id="sources">
         <div className="shell source-layout">
           <div>
-            <span className="kicker">Provenance</span>
+            <span className="kicker">{locale === "sr" ? "Poreklo podataka" : "Provenance"}</span>
             <h2>{locale === "sr" ? "Izvori i ograničenja" : "Sources and limitations"}</h2>
             <p className="page-lead source-intro">
               {locale === "sr"
-                ? "Izvor potvrđuje metod ili welfare smernicu, ali ne pretvara ovaj konkretan model u sertifikovan proizvod. Fizička validacija ima poseban status."
+                ? "Izvor potkrepljuje metod ili smernicu za dobrobit životinje, ali ne pretvara ovaj konkretan model u sertifikovan proizvod. Fizička validacija ima poseban status."
                 : "A source supports a method or welfare guideline; it does not turn this specific model into a certified product. Physical validation has a separate status."}
             </p>
           </div>
           <div className="source-list">
             {referencedSources.map((source) => (
               <a key={source.id} href={source.url} target="_blank" rel="noreferrer">
-                <span>{source.publisher} · Tier {source.tier}</span>
+                <span>{source.publisher} · {locale === "sr" ? "nivo" : "Tier"} {source.tier}</span>
                 <strong>{source.title}</strong>
-                <small>{source.notes}</small>
+                <small>{locale === "sr" ? source.notesSr : source.notes}</small>
               </a>
             ))}
           </div>

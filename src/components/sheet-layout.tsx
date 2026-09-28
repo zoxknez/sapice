@@ -142,7 +142,7 @@ function StockLayout({
       <header className="stock-layout-head">
         <div>
           <span className="kicker">
-            {profile.widthMm} × {profile.heightMm} mm · kerf {profile.kerfMm} mm · margin {profile.marginMm} mm
+            {profile.widthMm} × {profile.heightMm} mm · {locale === "sr" ? "širina reza" : "kerf"} {profile.kerfMm} mm · {locale === "sr" ? "margina" : "margin"} {profile.marginMm} mm
           </span>
           <h3>{locale === "sr" ? profile.titleSr : profile.titleEn}</h3>
         </div>
@@ -159,7 +159,7 @@ function StockLayout({
               <strong>{locale === "sr" ? "Tabla" : "Sheet"} {sheet.index + 1}</strong>
               <span>
                 {Math.round(sheet.materialUtilization * 100)}% {locale === "sr" ? "materijal" : "material"} ·{" "}
-                {Math.round(sheet.packingEnvelopeUtilization * 100)}% envelope
+                {Math.round(sheet.packingEnvelopeUtilization * 100)}% {locale === "sr" ? "rezervisani prostor" : "envelope"}
               </span>
             </header>
             <svg
@@ -206,12 +206,14 @@ export function SheetLayout({
       <div className="shell">
         <div className="section-heading">
           <div>
-            <span className="kicker">Sheet planning · deterministic V1</span>
+            <span className="kicker">
+              {locale === "sr" ? "Planiranje materijala · deterministički V1" : "Sheet planning · deterministic V1"}
+            </span>
             <h2>{locale === "sr" ? "Raspored na tablama" : "Sheet layout"}</h2>
           </div>
           <p>
             {locale === "sr"
-              ? "Stvarna geometrija dela se prikazuje punom linijom, a isprekidani pravougaonik je konzervativni packing envelope. V1 i dalje pakuje trapeze po bounding-box-u, pa nije polygon-optimalni nesting. Material % meri stvarnu površinu delova, envelope % prostor rezervisan algoritmom."
+              ? "Stvarna geometrija dela prikazana je punom linijom, a isprekidani pravougaonik predstavlja konzervativni prostor potreban za pakovanje. V1 slaže trapeze prema pravougaoniku koji ih obuhvata, pa raspored nije optimalan prema obliku poligona. Procenat materijala meri stvarnu površinu delova, a procenat rezervisanog prostora meri prostor koji koristi algoritam."
               : "Actual part geometry is shown with a solid outline while the dashed rectangle is the conservative packing envelope. V1 still packs trapezoids by bounding box, so it is not polygon-optimal nesting. Material % measures actual part area; envelope % is the space reserved by the algorithm."}
           </p>
         </div>

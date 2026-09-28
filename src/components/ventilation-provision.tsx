@@ -15,12 +15,12 @@ export function VentilationProvision({
       <div className="shell">
         <div className="section-heading">
           <div>
-            <span className="kicker">Ventilation · {compiled.ventilation.status}</span>
-            <h2>{isSr ? "Rezervisane high-rear zone" : "Reserved high-rear zones"}</h2>
+            <span className="kicker">{isSr ? "Ventilacija" : "Ventilation"} · {compiled.ventilation.status}</span>
+            <h2>{isSr ? "Rezervisane visoke zone zadnjeg zida" : "Reserved high-rear zones"}</h2>
           </div>
           <p>
             {isSr
-              ? "Ovo nisu propisane dimenzije ventilacionog otvora. Compiler samo rezerviše zone koje ne seku provisional framing; stvarni cutout i net free area ostaju vezani za izabrani podesivi ventilacioni umetak i fizičku validaciju."
+              ? "Ovo nisu propisane dimenzije ventilacionog otvora. Kompajler rezerviše zone koje se ne preklapaju sa privremenim rasporedom rama; stvarni otvor i slobodna površina za protok vazduha zavise od izabranog podesivog umetka i provere u praksi."
               : "These are not prescribed vent-opening dimensions. The compiler only reserves zones that avoid provisional framing; the actual cutout and net free area remain specific to the selected adjustable vent insert and physical validation."}
           </p>
         </div>
@@ -28,7 +28,7 @@ export function VentilationProvision({
         <div className="ventilation-summary">
           <div>
             <span>{isSr ? "Strategija" : "Strategy"}</span>
-            <strong>HIGH REAR</strong>
+            <strong>{isSr ? "Gornja zona zadnjeg zida" : "HIGH REAR"}</strong>
           </div>
           <div>
             <span>{isSr ? "Zona po komori" : "Zone per chamber"}</span>
@@ -40,7 +40,7 @@ export function VentilationProvision({
           </div>
           <div>
             <span>{isSr ? "Stvarni otvor" : "Actual opening"}</span>
-            <strong>{isSr ? "TBD po umetku" : "TBD by insert"}</strong>
+            <strong>{isSr ? "Određuje izabrani umetak" : "TBD by insert"}</strong>
           </div>
         </div>
 

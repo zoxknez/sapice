@@ -19,12 +19,12 @@ export function HeatingProvision({
       <div className="shell">
         <div className="section-heading">
           <div>
-            <span className="kicker">Heating · {compiled.heating.status}</span>
+            <span className="kicker">{isSr ? "Grejanje" : "Heating"} · {compiled.heating.status}</span>
             <h2>{isSr ? "Zone za namenski grejni proizvod" : "Purpose-built heating zones"}</h2>
           </div>
           <p>
             {isSr
-              ? "Compiler rezerviše po jednu zonu u svakoj komori, ali ne određuje snagu, napon, termostat niti improvizovano ožičenje. Konkretan proizvod mora biti namenjen životinjama i ugrađen po sopstvenom uputstvu."
+              ? "Kompajler rezerviše po jednu zonu u svakoj komori, ali ne određuje snagu, napon, termostat niti improvizovano ožičenje. Konkretan proizvod mora biti namenjen životinjama i ugrađen po sopstvenom uputstvu."
               : "The compiler reserves one zone in each chamber, but does not specify power, voltage, thermostat behavior or improvised wiring. The selected product must be purpose-built for animals and installed to its own instructions."}
           </p>
         </div>
@@ -66,10 +66,10 @@ export function HeatingProvision({
         </div>
 
         <div className="heating-safety-note">
-          <strong>{isSr ? "Bez DIY mrežnog grejanja" : "No DIY mains heating"}</strong>
+          <strong>{isSr ? "Bez samostalno izvedenog mrežnog grejanja" : "No DIY mains heating"}</strong>
           <p>
             {isSr
-              ? "Zone su koordinaciona geometrija, ne električni projekat. Adapter, kontroler i nezaštićeni spojevi ne pripadaju prostoru životinje. Cable-entry stavke u BOM-u samo rezervišu zaštićeni prolaz za konkretan kompatibilan proizvod."
+              ? "Zone su koordinaciona geometrija, ne električni projekat. Adapter, kontroler i nezaštićeni spojevi ne pripadaju prostoru životinje. Stavke za prolaz kabla u spisku materijala samo rezervišu zaštićeni prolaz za konkretan kompatibilan proizvod."
               : "Zones are coordination geometry, not an electrical design. Adapters, controllers and unprotected connections do not belong in the animal space. Cable-entry BOM items only reserve protected routing for a selected compatible product."}
           </p>
           {source && (
