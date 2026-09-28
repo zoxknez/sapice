@@ -2018,6 +2018,7 @@ button { cursor: pointer; }
   padding: 0;
   overflow: hidden;
 }
+.technical-sheet-scroll-hint { display: none; }
 .technical-sheet-head {
   display: grid;
   grid-template-columns: 1.8fr repeat(4, minmax(110px, .7fr));
@@ -2169,6 +2170,29 @@ button { cursor: pointer; }
 @media (max-width: 700px) {
   .technical-sheet {
     overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #897968 #eee7de;
+  }
+  .technical-sheet::-webkit-scrollbar { height: 6px; }
+  .technical-sheet::-webkit-scrollbar-thumb { border-radius: 999px; background: #897968; }
+  .technical-sheet::-webkit-scrollbar-track { background: #eee7de; }
+  .technical-sheet:focus-visible { outline: 3px solid #365f55; outline-offset: 3px; }
+  .technical-sheet-scroll-hint {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--line);
+    background: #f8f4ed;
+    color: #536254;
+    font-size: 11px;
+    font-weight: 750;
+    line-height: 1.4;
   }
   .technical-sheet-head {
     min-width: 860px;

@@ -165,7 +165,13 @@ export function TechnicalSketch({
   );
 
   return (
-    <figure className="technical-sketch technical-sheet">
+    <figure
+      className="technical-sketch technical-sheet"
+      tabIndex={0}
+      aria-label={isSr
+        ? "Tehnički crtež kućice; sadržaj se pomera vodoravno"
+        : "Shelter technical drawing; content scrolls horizontally"}
+    >
       <div className="technical-sheet-head">
         <div>
           <span className="kicker">Compiled drawing sheet</span>
@@ -188,6 +194,12 @@ export function TechnicalSketch({
           <strong>{compiled.planFingerprint}</strong>
         </div>
       </div>
+
+      <p className="technical-sheet-scroll-hint">
+        {isSr
+          ? "Prevucite plan vodoravno da pregledate sve crteže."
+          : "Swipe the plan horizontally to inspect every view."}
+      </p>
 
       <svg viewBox="0 0 1160 830" aria-labelledby="technical-title technical-desc">
         <title id="technical-title">
