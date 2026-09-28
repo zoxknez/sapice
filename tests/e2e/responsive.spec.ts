@@ -17,9 +17,9 @@ const pages = [
   ["large multichamber model", "/sr/modeli/rescue-modular-eight"],
   ["methodology", "/sr/metodologija"],
   ["model sources", "/sr/modeli/nordic-quad-winter#sources"],
-  ["offline page", "/sr/offline"],
-  ["not-found page", "/sr/modeli/nonexistent-model"]
+  ["offline page", "/sr/offline"]
 ] as const;
+const notFoundPath = "/sr/modeli/nonexistent-model";
 
 test("core routes fit the requested responsive widths", async ({page}, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "Uses exact CSS viewport sizes.");
@@ -50,7 +50,7 @@ test("core routes fit the requested responsive widths", async ({page}, testInfo)
 
     for (const [pageName, path] of pages) {
       currentPage = pageName;
-      checkRuntimeErrors = pageName !== "not-found page";
+      checkRuntimeErrors = true;
       const response = await page.goto(path);
       expect(response?.status(), `${pageName} response at ${viewport.width}px`)
         .toBeLessThan(500);
@@ -76,4 +76,21 @@ test("core routes fit the requested responsive widths", async ({page}, testInfo)
   }
 
   expect(runtimeErrors, JSON.stringify(runtimeErrors, null, 2)).toEqual([]);
+
+  for (const viewport of viewports) {
+    currentPage = "not-found page";
+    currentWidth = viewport.width;
+    checkRuntimeErrors = false;
+    await page.setViewportSize(viewport);
+    const response = await page.goto(notFoundPath);
+    expect(response?.status(), `not-found response at ${viewport.width}px`)
+      .toBeLessThan(500);
+    await expect(page.locator("body")).toBeVisible();
+
+    const documentWidth = await page.evaluate(() =>
+      Math.max(document.body.scrollWidth, document.documentElement.scrollWidth)
+    );
+    expect(documentWidth, `not-found page overflows at ${viewport.width}px`)
+      .toBeLessThanOrEqual(viewport.width + 1);
+  }
 });
