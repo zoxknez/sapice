@@ -2874,7 +2874,13 @@ button { cursor: pointer; }
 .catalog-empty button { min-height: 42px; padding: 0 16px; border: 0; border-radius: 10px; background: #273d35; color: white; font-weight: 750; }
 
 .model-detail-hero { padding-block: 44px 58px; background: radial-gradient(circle at 17% 45%, #e9e6dc, var(--paper) 54%); }
-.detail-grid { grid-template-columns: minmax(0, 1.16fr) minmax(0, .84fr); gap: clamp(30px, 4vw, 64px); }
+.detail-grid {
+  grid-template-columns: minmax(0, 1.16fr) minmax(0, .84fr);
+  grid-template-areas: "viewer summary";
+  gap: clamp(30px, 4vw, 64px);
+}
+.detail-summary { grid-area: summary; }
+.detail-grid > .viewer { grid-area: viewer; }
 .viewer {
   height: 620px;
   min-height: 0;
@@ -2891,7 +2897,94 @@ button { cursor: pointer; }
 .viewer-toolbar { top: 18px; left: 18px; background: #fffcf4ed; border-color: #ffffff; box-shadow: 0 8px 24px #21382b20; }
 .viewer-toolbar button { font-size: 11px; }
 .viewer-toolbar button.active { background: #273d35; }
+.viewer-angle-control {
+  position: absolute;
+  z-index: 2;
+  top: 18px;
+  right: 18px;
+  display: grid;
+  gap: 5px;
+  min-width: 142px;
+  padding: 8px 10px;
+  border: 1px solid #ffffff;
+  border-radius: 12px;
+  background: #fffcf4ed;
+  box-shadow: 0 8px 24px #21382b20;
+  color: #46534a;
+  font-size: 10px;
+  font-weight: 750;
+}
+.viewer-angle-control select {
+  min-width: 0;
+  min-height: 32px;
+  border: 0;
+  background: transparent;
+  color: #273d35;
+  font: inherit;
+  font-size: 12px;
+}
+.viewer-angle-control:focus-within { outline: 2px solid #273d35; outline-offset: 2px; }
 .viewer-badge { left: auto; right: 18px; bottom: 18px; color: #536254; font: 700 10px ui-sans-serif, system-ui, sans-serif; }
+.viewer-launcher {
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse at 48% 45%, #f8f5ed 0, #e9e4d9 68%),
+    #e9e4d9;
+}
+.viewer-launcher::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(135deg, #f9f5eb66, transparent 55%, #a7b29c2b);
+  content: "";
+}
+.viewer-launcher-preview {
+  position: absolute;
+  inset: 5% 7% 20%;
+  display: grid;
+  place-items: center;
+}
+.viewer-launcher-preview .model-thumbnail {
+  width: min(100%, 500px);
+  height: 100%;
+  max-height: 100%;
+  filter: drop-shadow(0 24px 24px #263c2a1c);
+}
+.viewer-launcher-copy {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 20px;
+  border: 1px solid #ffffffc9;
+  border-radius: 18px;
+  background: #fffcf4e8;
+  box-shadow: 0 14px 40px #263c2a16;
+  backdrop-filter: blur(16px);
+}
+.viewer-launcher-copy .kicker { color: #61745f; font-size: 9px; }
+.viewer-launcher-copy p { max-width: 360px; margin: 5px 0 0; color: #58645a; font-size: 12px; line-height: 1.45; }
+.viewer-launcher-copy button {
+  flex: 0 0 auto;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 11px;
+  background: #273d35;
+  color: #fffdf8;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.viewer-launcher-copy button:hover { background: #385445; }
+.viewer-launcher-copy button:focus-visible { outline: 3px solid #a3b59c; outline-offset: 3px; }
+.viewer-loading { display: grid; place-items: center; color: #536254; font-weight: 750; }
 .detail-summary h1 { font-size: clamp(46px, 5vw, 76px); }
 .metric-grid div { border-radius: 14px; background: #ffffffc4; }
 .metric-grid strong { font-size: 21px; }
@@ -2903,6 +2996,7 @@ button { cursor: pointer; }
 
 @media (max-width: 960px) {
   .hero-grid, .detail-grid { grid-template-columns: 1fr; }
+  .detail-grid { grid-template-areas: "summary" "viewer"; }
   .hero-grid { padding-block: 64px; }
   .hero-showcase { width: 100%; min-height: 410px; }
   .viewer { height: 540px; }
@@ -2929,6 +3023,12 @@ button { cursor: pointer; }
   .viewer { height: 430px; border-radius: 18px; }
   .viewer-toolbar { top: 10px; left: 10px; }
   .viewer-toolbar button { font-size: 9px; padding-inline: 8px; }
+  .viewer-angle-control { top: 10px; right: 10px; min-width: 112px; padding: 6px 8px; }
+  .viewer-angle-control select { min-height: 28px; font-size: 11px; }
+  .viewer-launcher-preview { inset: 4% 2% 29%; }
+  .viewer-launcher-copy { right: 10px; bottom: 10px; left: 10px; display: grid; gap: 12px; padding: 14px; border-radius: 15px; }
+  .viewer-launcher-copy p { font-size: 11px; }
+  .viewer-launcher-copy button { width: 100%; min-height: 46px; }
   .viewer-caption { top: 63px; left: 14px; }
   .viewer-badge { right: 10px; bottom: 10px; font-size: 9px; }
 }

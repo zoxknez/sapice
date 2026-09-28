@@ -1,12 +1,22 @@
 import type {Metadata} from "next";
 import type {AppLocale} from "@/i18n/routing";
 
-const productionSiteUrl = "https://sapice.space";
+const productionSiteUrl = "https://www.sapice.space";
 
-export const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.NODE_ENV === "production" ? productionSiteUrl : "http://localhost:3000")
-).replace(/\/+$/, "");
+export function resolveSiteUrl({
+  publicSiteUrl = process.env.NEXT_PUBLIC_SITE_URL,
+  environment = process.env.NODE_ENV
+}: {
+  publicSiteUrl?: string | null;
+  environment?: string;
+} = {}): string {
+  return (
+    publicSiteUrl ??
+    (environment === "production" ? productionSiteUrl : "http://localhost:3000")
+  ).replace(/\/+$/, "");
+}
+
+export const siteUrl = resolveSiteUrl();
 
 type SocialImage = {url: string; width: number; height: number; type: string; alt: string};
 

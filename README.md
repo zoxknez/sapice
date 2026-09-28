@@ -236,7 +236,7 @@ The schema is deliberately separate from canonical model definitions.
 
 The application code is under active construction.
 
-GitHub Actions currently fails before runner allocation, so the repository still lacks an independently executed full install/typecheck/test/build/E2E gate. The active environment also cannot reach GitHub directly for a fallback clone/build. A committed `pnpm-lock.yaml` is still a release gate. It cannot be generated correctly until a real pnpm resolver/build environment is available.
+GitHub Actions is the remote release gate. At the latest review on 28 September 2026, the `main` workflow ended before its first step; GitHub exposed neither step results nor a job log. This does not show whether application checks passed or failed, so the remote gate remains unconfirmed. The committed `pnpm-lock.yaml` is required by the workflow. A successful software run does not establish physical prototype or field-test evidence.
 
 Physical prototype and field-test status require real-world evidence, not code completion.
 

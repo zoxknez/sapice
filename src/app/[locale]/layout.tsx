@@ -36,6 +36,7 @@ export async function generateMetadata({
   return {
     metadataBase: new URL(siteUrl),
     applicationName: "Šapice",
+    manifest: isSr ? "/manifest-sr.webmanifest" : "/manifest-en.webmanifest",
     title: {
       default: title,
       template: "%s · Šapice"

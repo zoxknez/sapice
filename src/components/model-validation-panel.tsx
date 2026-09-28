@@ -12,8 +12,8 @@ const stages: Array<{
 }> = [
   {
     state: "DATA_VALIDATED",
-    sr: "Podaci i compiler gate",
-    en: "Data and compiler gate",
+    sr: "Podaci provereni",
+    en: "Data validated",
     detailSr: "Schema, izvori, sklopovi, otvori, stock-fit, framing/hardware invarianti i proračunske vrednosti moraju biti konzistentni.",
     detailEn: "Schema, sources, assemblies, openings, stock fit, framing/hardware invariants and calculation outputs must remain internally consistent."
   },
@@ -47,6 +47,12 @@ const stages: Array<{
   }
 ];
 
+export function validationStageLabel(state: ValidationState, locale: AppLocale): string {
+  const stage = stages.find((item) => item.state === state);
+  if (!stage) return state.replaceAll("_", " ");
+  return locale === "sr" ? stage.sr : stage.en;
+}
+
 export function ModelValidationPanel({
   compiled,
   locale
@@ -78,7 +84,7 @@ export function ModelValidationPanel({
         <div className="validation-overview">
           <div>
             <span>{isSr ? "Trenutni status" : "Current state"}</span>
-            <strong>{compiled.model.validationState.replaceAll("_", " ")}</strong>
+            <strong>{validationStageLabel(compiled.model.validationState, locale)}</strong>
           </div>
           <div>
             <span>{isSr ? "Verzija modela" : "Model version"}</span>

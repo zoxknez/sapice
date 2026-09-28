@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect, useMemo, useState} from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import type {BuildStep} from "@/lib/compiler";
 import type {AppLocale} from "@/i18n/routing";
 
@@ -20,6 +20,9 @@ export function BuildGuide({
   const [completed, setCompleted] = useState<string[]>([]);
   const [focusIndex, setFocusIndex] = useState<number | null>(null);
   const [ready, setReady] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -45,18 +48,65 @@ export function BuildGuide({
     window.localStorage.setItem(storageKey, JSON.stringify(completed));
   }, [completed, ready, storageKey]);
 
+  const closeFocusMode = useCallback(() => {
+    setFocusIndex(null);
+    window.requestAnimationFrame(() => triggerRef.current?.focus());
+  }, []);
+
+  const openFocusMode = (index: number) => {
+    if (focusIndex === null) {
+      triggerRef.current = document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    }
+    setFocusIndex(index);
+  };
+
+  const focusModeOpen = focusIndex !== null;
+
+  useEffect(() => {
+    if (!focusModeOpen) return;
+    closeButtonRef.current?.focus();
+  }, [focusModeOpen]);
+
   useEffect(() => {
     if (focusIndex === null) return;
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setFocusIndex(null);
+        event.preventDefault();
+        closeFocusMode();
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      const dialog = dialogRef.current;
+      if (!dialog) return;
+      const focusable = dialog.querySelectorAll<HTMLElement>(
+        'button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), a[href], [tabindex]:not([tabindex="-1"])'
+      );
+      const first = focusable.item(0);
+      const last = focusable.item(focusable.length - 1);
+
+      if (!first || !last) {
+        event.preventDefault();
+        dialog.focus();
+      } else if (!dialog.contains(document.activeElement)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [focusIndex]);
+  }, [closeFocusMode, focusIndex]);
 
   const completeSet = useMemo(() => new Set(completed), [completed]);
   const doneCount = steps.filter((step) => completeSet.has(step.id)).length;
@@ -77,10 +127,17 @@ export function BuildGuide({
           <strong>{doneCount} / {steps.length}</strong>
           <span>{isSr ? "koraka završeno" : "steps completed"}</span>
         </div>
-        <div className="build-progress" aria-label={isSr ? "Napredak izrade" : "Build progress"}>
+        <div
+          className="build-progress"
+          role="progressbar"
+          aria-label={isSr ? "Napredak izrade" : "Build progress"}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={progress}
+        >
           <span style={{width: `${progress}%`}} />
         </div>
-        <button type="button" onClick={() => setFocusIndex(0)} disabled={steps.length === 0}>
+        <button type="button" onClick={() => openFocusMode(0)} disabled={steps.length === 0}>
           {isSr ? "Režim izrade" : "Build mode"}
         </button>
       </div>
@@ -106,7 +163,7 @@ export function BuildGuide({
               <div>
                 <h3>{isSr ? step.titleSr : step.titleEn}</h3>
                 <p>{isSr ? step.detailSr : step.detailEn}</p>
-                <button type="button" className="step-focus-link" onClick={() => setFocusIndex(index)}>
+                <button type="button" className="step-focus-link" onClick={() => openFocusMode(index)}>
                   {isSr ? "Otvori korak" : "Open step"} →
                 </button>
               </div>
@@ -116,7 +173,7 @@ export function BuildGuide({
       </ol>
 
       {focused && focusIndex !== null && (
-        <div className="build-focus" role="dialog" aria-modal="true" aria-labelledby="build-focus-title">
+        <div ref={dialogRef} className="build-focus" role="dialog" aria-modal="true" aria-labelledby="build-focus-title">
           <div className="build-focus-card">
             <header>
               <div>
@@ -128,8 +185,9 @@ export function BuildGuide({
               <button
                 type="button"
                 className="focus-close"
+                ref={closeButtonRef}
                 aria-label={isSr ? "Zatvori režim izrade" : "Close build mode"}
-                onClick={() => setFocusIndex(null)}
+                onClick={closeFocusMode}
               >
                 ×
               </button>

@@ -1,0 +1,18 @@
+{
+  "id": "/sr",
+  "name": "Šapice · planovi zimskih kućica za pse i mačke",
+  "short_name": "Šapice",
+  "description": "Dvojezični tehnički planovi zimskih kućica i skloništa za pse i mačke.",
+  "start_url": "/sr",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4f0e8",
+  "theme_color": "#f4f0e8",
+  "lang": "sr-Latn",
+  "categories": ["utilities", "education", "lifestyle"],
+  "icons": [
+    {"src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

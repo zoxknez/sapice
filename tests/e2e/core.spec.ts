@@ -81,7 +81,7 @@ test("heated finder coverage exists for every dog size", async ({page}) => {
   await page.goto("/sr/pronadji-model");
 
   await page.getByLabel("Životinja").selectOption("dog");
-  await page.getByLabel("Grejanje").selectOption("heated");
+  await page.getByRole("combobox", {name: /Grejanje/}).selectOption("heated");
   await page.getByLabel("Zimski profil").selectOption("severe");
 
   for (const [size, modelName] of [

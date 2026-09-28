@@ -9,9 +9,11 @@ import type {AppLocale} from "@/i18n/routing";
 import type {CompiledShelterModel} from "@/lib/compiler";
 
 type ViewMode = "assembled" | "roof-off" | "exploded" | "frame";
+type CameraPreset = "isometric" | "front" | "rear" | "left" | "right" | "top";
 
-function ModeCamera({mode, maxSpan, inspectionSpan, targetY, defaultPosition}: {
+function ModeCamera({mode, cameraPreset, maxSpan, inspectionSpan, targetY, defaultPosition}: {
   mode: ViewMode;
+  cameraPreset: CameraPreset;
   maxSpan: number;
   inspectionSpan: number;
   targetY: number;
@@ -20,17 +22,27 @@ function ModeCamera({mode, maxSpan, inspectionSpan, targetY, defaultPosition}: {
   const {camera, controls} = useThree();
 
   useEffect(() => {
-    const position: [number, number, number] = mode === "roof-off"
+    const viewDistance = Math.max(maxSpan, inspectionSpan) * 2.4;
+    const frontHeight = Math.max(maxSpan * 0.9, targetY + maxSpan * 0.35);
+    const presetPositions: Record<Exclude<CameraPreset, "isometric">, [number, number, number]> = {
+      front: [0, frontHeight, -viewDistance],
+      rear: [0, frontHeight, viewDistance],
+      left: [-viewDistance, frontHeight, 0],
+      right: [viewDistance, frontHeight, 0],
+      top: [0, viewDistance, 0.001]
+    };
+    const modePosition: [number, number, number] = mode === "roof-off"
       ? [inspectionSpan * 0.55, inspectionSpan * 2.25, -inspectionSpan * 0.45]
       : mode === "frame"
         ? [maxSpan * 1.35, maxSpan * 1.75, -maxSpan * 1.85]
         : mode === "exploded"
           ? [maxSpan * 1.45, maxSpan * 1.7, -maxSpan * 2]
           : defaultPosition;
+    const position = cameraPreset === "isometric" ? modePosition : presetPositions[cameraPreset];
     camera.position.set(...position);
     camera.lookAt(0, targetY, 0);
     (controls as {update?: () => void} | null)?.update?.();
-  }, [camera, controls, defaultPosition, inspectionSpan, maxSpan, mode, targetY]);
+  }, [camera, cameraPreset, controls, defaultPosition, inspectionSpan, maxSpan, mode, targetY]);
 
   return null;
 }
@@ -675,6 +687,7 @@ export function ShelterViewer({
 }) {
   const model = compiled.model;
   const [mode, setMode] = useState<ViewMode>("assembled");
+  const [cameraPreset, setCameraPreset] = useState<CameraPreset>("isometric");
   const widthM = model.dimensions.widthMm / 1000;
   const depthM = model.dimensions.depthMm / 1000;
   const heightM = (model.dimensions.frontHeightMm + model.dimensions.groundClearanceMm) / 1000;
@@ -688,14 +701,14 @@ export function ShelterViewer({
   const orbitTarget: [number, number, number] = [0, heightM * 0.43, 0];
 
   return (
-    <div className="viewer" aria-label={`${locale === "sr" ? "3D prikaz" : "3D preview"}: ${model.translations[locale].name}`}>
-      <Canvas camera={{position: cameraPosition, fov: 35}} dpr={[1, 1.75]} shadows>
+    <div className="viewer" role="group" aria-label={`${locale === "sr" ? "3D prikaz" : "3D preview"}: ${model.translations[locale].name}`}>
+      <Canvas camera={{position: cameraPosition, fov: 35}} dpr={[1, 1.75]} shadows aria-hidden="true">
         <color attach="background" args={["#e9e4d9"]} />
         <hemisphereLight args={["#fff8eb", "#a49b8e", 2]} />
         <directionalLight position={[-3, 7, -5]} intensity={2.8} castShadow shadow-mapSize={[1024, 1024]} />
         <directionalLight position={[4, 3, 5]} intensity={0.8} />
         <Shelter compiled={compiled} mode={mode} />
-        <ModeCamera mode={mode} maxSpan={maxSpan} inspectionSpan={inspectionSpan} targetY={orbitTarget[1]} defaultPosition={cameraPosition} />
+        <ModeCamera mode={mode} cameraPreset={cameraPreset} maxSpan={maxSpan} inspectionSpan={inspectionSpan} targetY={orbitTarget[1]} defaultPosition={cameraPosition} />
         <ContactShadows position={[0, -0.015, 0]} opacity={0.3} scale={maxSpan * 3} blur={2.2} far={maxSpan * 2} />
         <OrbitControls
           makeDefault
@@ -707,7 +720,7 @@ export function ShelterViewer({
         />
       </Canvas>
 
-      <div className="viewer-toolbar" aria-label={locale === "sr" ? "Kontrole 3D prikaza" : "3D view controls"}>
+      <div className="viewer-toolbar" role="group" aria-label={locale === "sr" ? "Kontrole 3D prikaza" : "3D view controls"}>
         {([
           ["assembled", "3D"],
           ["roof-off", locale === "sr" ? "Bez krova" : "Roof off"],
@@ -719,12 +732,31 @@ export function ShelterViewer({
             type="button"
             aria-pressed={mode === value}
             className={mode === value ? "active" : ""}
-            onClick={() => setMode(value)}
+            onClick={() => {
+              setMode(value);
+              setCameraPreset("isometric");
+            }}
           >
             {label}
           </button>
         ))}
       </div>
+
+      <label className="viewer-angle-control">
+        <span>{locale === "sr" ? "Ugao kamere" : "Camera angle"}</span>
+        <select
+          aria-label={locale === "sr" ? "Ugao kamere" : "Camera angle"}
+          value={cameraPreset}
+          onChange={(event) => setCameraPreset(event.currentTarget.value as CameraPreset)}
+        >
+          <option value="isometric">{locale === "sr" ? "Izometrija" : "Isometric"}</option>
+          <option value="front">{locale === "sr" ? "Napred" : "Front"}</option>
+          <option value="rear">{locale === "sr" ? "Pozadi" : "Rear"}</option>
+          <option value="left">{locale === "sr" ? "Levo" : "Left"}</option>
+          <option value="right">{locale === "sr" ? "Desno" : "Right"}</option>
+          <option value="top">{locale === "sr" ? "Odozgo" : "Top"}</option>
+        </select>
+      </label>
 
       <div className="viewer-caption">
         <span>{locale === "sr" ? "Interaktivni 3D model" : "Interactive 3D model"}</span>

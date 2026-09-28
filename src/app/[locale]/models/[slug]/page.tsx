@@ -5,7 +5,8 @@ import type {AppLocale} from "@/i18n/routing";
 import {shelterModels, getShelterModel} from "@/data/models";
 import {assemblyInsulationMm} from "@/data/assemblies";
 import {sources} from "@/data/sources";
-import {ShelterViewer} from "@/components/shelter-viewer";
+import {ShelterViewerLauncher} from "@/components/shelter-viewer-launcher";
+import {ModelThumbnail} from "@/components/model-thumbnail";
 import {TechnicalSketch} from "@/components/technical-sketch";
 import {ModelBuildBook} from "@/components/model-build-book";
 import {SheetLayout} from "@/components/sheet-layout";
@@ -16,13 +17,14 @@ import {PlanExportButtons} from "@/components/plan-export-buttons";
 import {OperatingGuidance} from "@/components/operating-guidance";
 import {StructuredData} from "@/components/structured-data";
 import {ThermalScenario} from "@/components/thermal-scenario";
-import {ModelValidationPanel} from "@/components/model-validation-panel";
+import {ModelValidationPanel, validationStageLabel} from "@/components/model-validation-panel";
 import {VentilationProvision} from "@/components/ventilation-provision";
 import {PrototypeEvidenceWorksheet} from "@/components/prototype-evidence-worksheet";
 import {HeatingProvision} from "@/components/heating-provision";
 import {compileShelterModel} from "@/lib/compiler";
 import {compiledSourceIds} from "@/lib/provenance";
 import {costLinesForCompiled} from "@/lib/costing";
+import {modelComparisonSummaryFromCompiled} from "@/lib/catalog-summary";
 import {openGraphLocale, siteUrl} from "@/lib/seo";
 
 export function generateStaticParams() {
@@ -77,6 +79,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
 
   const copy = model.translations[locale];
   const compiled = compileShelterModel(model);
+  const thumbnailSummary = modelComparisonSummaryFromCompiled(compiled);
   const thermal = compiled.thermal;
   const materials = compiled.fabricationMaterials;
   const roof = compiled.roof;
@@ -113,11 +116,19 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
       <StructuredData data={structuredData} />
       <section className="model-detail-hero">
         <div className="shell detail-grid">
-          <ShelterViewer compiled={compiled} locale={locale} />
           <div className="detail-summary">
-            <span className="kicker">{model.validationState.replaceAll("_", " ")}</span>
+            <span className="kicker">{validationStageLabel(model.validationState, locale)}</span>
             <h1>{copy.name}</h1>
             <p>{copy.description}</p>
+            <div className="notice">
+              {model.heated
+                ? (locale === "sr"
+                    ? "Grejanje nije DIY električna specifikacija. Model zahteva kompatibilan namenski proizvod i poštovanje njegovog uputstva."
+                    : "Heating is not a DIY electrical specification. The model requires a compatible purpose-built product installed to its instructions.")
+                : (locale === "sr"
+                    ? "Status DATA_VALIDATED ne znači da je fizički prototip testiran. Takva tvrdnja će se pojaviti tek posle stvarne fizičke validacije."
+                    : "DATA_VALIDATED does not mean a physical prototype has been tested. That claim appears only after real physical validation.")}
+            </div>
             <div className="metric-grid">
               <div>
                 <span>{locale === "sr" ? (model.animal === "dog" ? "Veličina psa" : "Kapacitet") : (model.animal === "dog" ? "Dog size" : "Capacity")}</span>
@@ -139,16 +150,10 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
               <SharePlanButton locale={locale} title={copy.name} />
               <PlanExportButtons compiled={compiled} locale={locale} />
             </div>
-            <div className="notice">
-              {model.heated
-                ? (locale === "sr"
-                    ? "Grejanje nije DIY električna specifikacija. Model zahteva kompatibilan namenski proizvod i poštovanje njegovog uputstva."
-                    : "Heating is not a DIY electrical specification. The model requires a compatible purpose-built product installed to its instructions.")
-                : (locale === "sr"
-                    ? "Status DATA_VALIDATED ne znači da je fizički prototip testiran. Takva tvrdnja će se pojaviti tek posle stvarne fizičke validacije."
-                    : "DATA_VALIDATED does not mean a physical prototype has been tested. That claim appears only after real physical validation.")}
-            </div>
           </div>
+          <ShelterViewerLauncher compiled={compiled} locale={locale}>
+            <ModelThumbnail model={model} locale={locale} summary={thumbnailSummary} />
+          </ShelterViewerLauncher>
         </div>
       </section>
 

@@ -1,5 +1,5 @@
 import type {ShelterModel} from "@/lib/domain";
-import {compileShelterModel} from "@/lib/compiler";
+import {compileShelterModel, type CompiledShelterModel} from "@/lib/compiler";
 import {assemblyInsulationMm} from "@/data/assemblies";
 
 export type ModelComparisonSummary = {
@@ -29,7 +29,13 @@ export type ModelComparisonSummary = {
 export function modelComparisonSummary(
   model: ShelterModel
 ): ModelComparisonSummary {
-  const compiled = compileShelterModel(model);
+  return modelComparisonSummaryFromCompiled(compileShelterModel(model));
+}
+
+export function modelComparisonSummaryFromCompiled(
+  compiled: CompiledShelterModel
+): ModelComparisonSummary {
+  const model = compiled.model;
 
   return {
     modelId: model.id,

@@ -1,5 +1,9 @@
 import {defineConfig, devices} from "@playwright/test";
 
+const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3000";
+const webServerCommand = process.env.PLAYWRIGHT_WEB_SERVER_COMMAND ??
+  (process.env.CI ? "pnpm start" : "pnpm dev");
+
 export default defineConfig({
   testDir: "./tests/e2e",
   timeout: 30_000,
@@ -12,7 +16,7 @@ export default defineConfig({
   workers: 2,
   reporter: process.env.CI ? [["list"], ["html", {open: "never"}]] : "list",
   use: {
-    baseURL: "http://127.0.0.1:3000",
+    baseURL,
     reducedMotion: "reduce",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
@@ -29,8 +33,8 @@ export default defineConfig({
     }
   ],
   webServer: {
-    command: process.env.CI ? "pnpm start" : "pnpm dev",
-    url: "http://127.0.0.1:3000/sr",
+    command: webServerCommand,
+    url: new URL("/sr", baseURL).toString(),
     reuseExistingServer: !process.env.CI,
     timeout: 120_000
   }

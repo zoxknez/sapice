@@ -1,4 +1,4 @@
-const CACHE_VERSION = "sapice-v2";
+const CACHE_VERSION = "sapice-v3";
 const STATIC_CACHE = `${CACHE_VERSION}:static`;
 const PAGE_CACHE = `${CACHE_VERSION}:pages`;
 const STATIC_SEED = [
@@ -6,8 +6,12 @@ const STATIC_SEED = [
   "/en",
   "/sr/offline",
   "/en/offline",
-  "/manifest.webmanifest",
-  "/icon.svg"
+  "/manifest-sr.webmanifest",
+  "/manifest-en.webmanifest",
+  "/icon.svg",
+  "/icon-192.png",
+  "/icon-512.png",
+  "/icon-maskable-512.png"
 ];
 
 self.addEventListener("install", (event) => {

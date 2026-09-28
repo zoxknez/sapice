@@ -2,8 +2,10 @@ import {describe, expect, it} from "vitest";
 import {shelterModels} from "@/data/models";
 import {
   modelComparisonSummary,
-  modelComparisonSummaryMap
+  modelComparisonSummaryMap,
+  modelComparisonSummaryFromCompiled
 } from "@/lib/catalog-summary";
+import {compileShelterModel} from "@/lib/compiler";
 
 describe("catalog comparison summaries", () => {
   it("builds one compact summary for every published model", () => {
@@ -28,6 +30,14 @@ describe("catalog comparison summaries", () => {
       expect(summary.floorAreaPerRecommendedAnimalM2).toBeGreaterThan(0);
       expect(summary.wallInsulationMm).toBeGreaterThan(0);
       expect(summary.wallU).toBeGreaterThan(0);
+    }
+  });
+
+  it("derives the thumbnail summary from the already compiled plan", () => {
+    for (const model of shelterModels) {
+      const compiled = compileShelterModel(model);
+      expect(modelComparisonSummaryFromCompiled(compiled))
+        .toEqual(modelComparisonSummary(model));
     }
   });
 });

@@ -1,0 +1,18 @@
+{
+  "id": "/en",
+  "name": "Šapice · Winter shelter plans for cats and dogs",
+  "short_name": "Šapice",
+  "description": "Bilingual engineering plans for winter cat and dog shelters.",
+  "start_url": "/en",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4f0e8",
+  "theme_color": "#f4f0e8",
+  "lang": "en",
+  "categories": ["utilities", "education", "lifestyle"],
+  "icons": [
+    {"src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
