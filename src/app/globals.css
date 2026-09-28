@@ -2018,6 +2018,7 @@ button { cursor: pointer; }
   padding: 0;
   overflow: hidden;
 }
+.technical-sheet:focus-visible { outline: 3px solid #365f55; outline-offset: 3px; }
 .technical-sheet-scroll-hint { display: none; }
 .technical-sheet-head {
   display: grid;
@@ -2177,7 +2178,6 @@ button { cursor: pointer; }
   .technical-sheet::-webkit-scrollbar { height: 6px; }
   .technical-sheet::-webkit-scrollbar-thumb { border-radius: 999px; background: #897968; }
   .technical-sheet::-webkit-scrollbar-track { background: #eee7de; }
-  .technical-sheet:focus-visible { outline: 3px solid #365f55; outline-offset: 3px; }
   .technical-sheet-scroll-hint {
     position: sticky;
     left: 0;

@@ -169,8 +169,8 @@ export function TechnicalSketch({
       className="technical-sketch technical-sheet"
       tabIndex={0}
       aria-label={isSr
-        ? "Tehnički crtež kućice; sadržaj se pomera vodoravno"
-        : "Shelter technical drawing; content scrolls horizontally"}
+        ? "Tehnički crtež kućice; na uskom ekranu sadržaj se pomera vodoravno"
+        : "Shelter technical drawing; horizontally scrollable on narrow screens"}
     >
       <div className="technical-sheet-head">
         <div>
