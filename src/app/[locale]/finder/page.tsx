@@ -5,6 +5,12 @@ import {shelterModels} from "@/data/models";
 import {Finder} from "@/components/finder";
 import {localizedMetadata} from "@/lib/seo";
 import {modelComparisonSummaryMap} from "@/lib/catalog-summary";
+import {
+  defaultFinderUrlState,
+  parseFinderUrlState,
+  searchParamsRecordToURLSearchParams,
+  type SearchParamsRecord
+} from "@/lib/view-url-state";
 
 
 export async function generateMetadata({
@@ -24,12 +30,22 @@ export async function generateMetadata({
   });
 }
 
-export default async function FinderPage({params}: {params: Promise<{locale: AppLocale}>}) {
+export default async function FinderPage({
+  params,
+  searchParams
+}: {
+  params: Promise<{locale: AppLocale}>;
+  searchParams: Promise<SearchParamsRecord>;
+}) {
   const {locale: routeLocale} = await params;
+  const query = await searchParams;
   const locale: AppLocale = routeLocale === "en" ? "en" : "sr";
   setRequestLocale(locale);
   const t = await getTranslations({locale, namespace: "Finder"});
   const comparisonSummaries = modelComparisonSummaryMap(shelterModels);
+  const initialState = query
+    ? parseFinderUrlState(searchParamsRecordToURLSearchParams(query))
+    : defaultFinderUrlState;
 
   return (
     <section className="page-hero">
@@ -41,6 +57,7 @@ export default async function FinderPage({params}: {params: Promise<{locale: App
           models={shelterModels}
           comparisonSummaries={comparisonSummaries}
           locale={locale}
+          initialState={initialState}
         />
       </div>
     </section>

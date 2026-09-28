@@ -5,6 +5,12 @@ import {shelterModels} from "@/data/models";
 import {ModelCatalog} from "@/components/model-catalog";
 import {localizedMetadata} from "@/lib/seo";
 import {modelComparisonSummaryMap} from "@/lib/catalog-summary";
+import {
+  defaultCatalogUrlState,
+  parseCatalogUrlState,
+  searchParamsRecordToURLSearchParams,
+  type SearchParamsRecord
+} from "@/lib/view-url-state";
 
 
 export async function generateMetadata({
@@ -24,12 +30,25 @@ export async function generateMetadata({
   });
 }
 
-export default async function ModelsPage({params}: {params: Promise<{locale: AppLocale}>}) {
+export default async function ModelsPage({
+  params,
+  searchParams
+}: {
+  params: Promise<{locale: AppLocale}>;
+  searchParams: Promise<SearchParamsRecord>;
+}) {
   const {locale: routeLocale} = await params;
+  const query = await searchParams;
   const locale: AppLocale = routeLocale === "en" ? "en" : "sr";
   setRequestLocale(locale);
   const t = await getTranslations({locale, namespace: "Models"});
   const comparisonSummaries = modelComparisonSummaryMap(shelterModels);
+  const initialState = query
+    ? parseCatalogUrlState(
+        searchParamsRecordToURLSearchParams(query),
+        shelterModels.map((model) => model.slug)
+      )
+    : defaultCatalogUrlState;
 
   return (
     <section className="page-hero">
@@ -37,7 +56,12 @@ export default async function ModelsPage({params}: {params: Promise<{locale: App
         <span className="kicker">{locale === "sr" ? "Katalog konstrukcija" : "Engineering catalog"}</span>
         <h1>{t("title")}</h1>
         <p className="page-lead">{t("lead")}</p>
-        <ModelCatalog models={shelterModels} comparisonSummaries={comparisonSummaries} locale={locale} />
+        <ModelCatalog
+          models={shelterModels}
+          comparisonSummaries={comparisonSummaries}
+          locale={locale}
+          initialState={initialState}
+        />
       </div>
     </section>
   );

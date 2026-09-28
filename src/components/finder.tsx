@@ -1,6 +1,6 @@
 "use client";
 
-import {useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import type {ShelterModel} from "@/lib/domain";
 import type {AppLocale} from "@/i18n/routing";
 import type {ModelComparisonSummary} from "@/lib/catalog-summary";
@@ -11,36 +11,48 @@ import {
   type HeatingNeed,
   type DogSizeNeed
 } from "@/lib/finder";
+import {
+  defaultFinderUrlState,
+  parseFinderUrlState,
+  replaceBrowserSearchParams,
+  serializeFinderUrlState,
+  type FinderUrlState
+} from "@/lib/view-url-state";
 
 export function Finder({
   models,
   comparisonSummaries,
-  locale
+  locale,
+  initialState = defaultFinderUrlState
 }: {
   models: ShelterModel[];
   comparisonSummaries: Record<string, ModelComparisonSummary>;
   locale: AppLocale;
+  initialState?: FinderUrlState;
 }) {
   const isSr = locale === "sr";
-  const [animal, setAnimal] = useState<"cat" | "dog">("cat");
-  const [count, setCount] = useState(2);
-  const [dogSize, setDogSize] = useState<DogSizeNeed>("medium");
-  const [heating, setHeating] = useState<HeatingNeed>("any");
-  const [climate, setClimate] = useState<ClimateNeed>("cold");
-  const [maxWidth, setMaxWidth] = useState(1400);
-  const [maxDepth, setMaxDepth] = useState(1400);
+  const [criteria, setCriteria] = useState<FinderUrlState>(initialState);
+  const {animal, count, dogSize, heating, climate, maxWidthMm: maxWidth, maxDepthMm: maxDepth} = criteria;
+
+  useEffect(() => {
+    const syncFromLocation = () => {
+      setCriteria(parseFinderUrlState(new URLSearchParams(window.location.search)));
+    };
+    window.addEventListener("popstate", syncFromLocation);
+    return () => window.removeEventListener("popstate", syncFromLocation);
+  }, []);
+
+  useEffect(() => {
+    replaceBrowserSearchParams(serializeFinderUrlState(new URLSearchParams(window.location.search), criteria));
+  }, [criteria]);
+
+  function updateCriteria<K extends keyof FinderUrlState>(key: K, value: FinderUrlState[K]) {
+    setCriteria((current) => ({...current, [key]: value}));
+  }
 
   const matches = useMemo(
-    () => matchShelterModels(models, {
-      animal,
-      count,
-      dogSize,
-      heating,
-      climate,
-      maxWidthMm: maxWidth,
-      maxDepthMm: maxDepth
-    }),
-    [models, animal, count, dogSize, heating, climate, maxWidth, maxDepth]
+    () => matchShelterModels(models, criteria),
+    [models, criteria]
   );
 
   function summaryFor(model: ShelterModel) {
@@ -80,7 +92,7 @@ export function Finder({
       <section className="finder-panel" aria-label={isSr ? "Uslovi za izbor modela" : "Model matching constraints"}>
         <label>
           <span>{isSr ? "Životinja" : "Animal"}</span>
-          <select value={animal} onChange={(event) => setAnimal(event.target.value as "cat" | "dog")}>
+          <select value={animal} onChange={(event) => updateCriteria("animal", event.target.value as "cat" | "dog")}>
             <option value="cat">{isSr ? "Mačka" : "Cat"}</option>
             <option value="dog">{isSr ? "Pas" : "Dog"}</option>
           </select>
@@ -94,13 +106,13 @@ export function Finder({
               min={1}
               max={12}
               value={count}
-              onChange={(event) => setCount(Math.max(1, Number(event.target.value) || 1))}
+              onChange={(event) => updateCriteria("count", Math.min(12, Math.max(1, Math.round(Number(event.target.value) || 1))))}
             />
           </label>
         ) : (
           <label>
             <span>{isSr ? "Veličina psa" : "Dog size"}</span>
-            <select value={dogSize} onChange={(event) => setDogSize(event.target.value as DogSizeNeed)}>
+            <select value={dogSize} onChange={(event) => updateCriteria("dogSize", event.target.value as DogSizeNeed)}>
               <option value="small">{isSr ? "Mali" : "Small"}</option>
               <option value="medium">{isSr ? "Srednji" : "Medium"}</option>
               <option value="large">{isSr ? "Veliki" : "Large"}</option>
@@ -115,7 +127,7 @@ export function Finder({
 
         <label>
           <span>{isSr ? "Zimski profil" : "Winter profile"}</span>
-          <select value={climate} onChange={(event) => setClimate(event.target.value as ClimateNeed)}>
+          <select value={climate} onChange={(event) => updateCriteria("climate", event.target.value as ClimateNeed)}>
             <option value="moderate">{isSr ? "Umerena zima" : "Moderate winter"}</option>
             <option value="cold">{isSr ? "Hladna zima" : "Cold winter"}</option>
             <option value="severe">{isSr ? "Vrlo hladni projektni uslovi" : "Severe design conditions"}</option>
@@ -124,7 +136,7 @@ export function Finder({
 
         <label>
           <span>{isSr ? "Grejanje" : "Heating"}</span>
-          <select value={heating} onChange={(event) => setHeating(event.target.value as HeatingNeed)}>
+          <select value={heating} onChange={(event) => updateCriteria("heating", event.target.value as HeatingNeed)}>
             <option value="any">{isSr ? "Svejedno" : "Either"}</option>
             <option value="passive">{isSr ? "Bez aktivnog grejanja" : "No active heating"}</option>
             <option value="heated">{isSr ? "Model predviđen za grejanje" : "Heating-ready model"}</option>
@@ -139,7 +151,7 @@ export function Finder({
             max={2400}
             step={50}
             value={maxWidth}
-            onChange={(event) => setMaxWidth(Number(event.target.value))}
+            onChange={(event) => updateCriteria("maxWidthMm", Number(event.target.value))}
           />
         </label>
 
@@ -151,7 +163,7 @@ export function Finder({
             max={1800}
             step={50}
             value={maxDepth}
-            onChange={(event) => setMaxDepth(Number(event.target.value))}
+            onChange={(event) => updateCriteria("maxDepthMm", Number(event.target.value))}
           />
         </label>
 
