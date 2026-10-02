@@ -1,5 +1,6 @@
 import type {AppLocale} from "@/i18n/routing";
 import type {CompiledShelterModel} from "@/lib/compiler";
+import {validationStageLabel} from "@/lib/validation-labels";
 
 function HDimension({
   x1,
@@ -187,7 +188,7 @@ export function TechnicalSketch({
         </div>
         <div>
           <span>STATUS</span>
-          <strong>{model.validationState.replaceAll("_", " ")}</strong>
+          <strong>{isSr ? validationStageLabel(model.validationState, locale) : model.validationState.replaceAll("_", " ")}</strong>
         </div>
         <div>
           <span>{isSr ? "ID PLANA" : "PLAN ID"}</span>
@@ -201,7 +202,7 @@ export function TechnicalSketch({
           : "Swipe the plan horizontally to inspect every view."}
       </p>
 
-      <svg viewBox="0 0 1160 830" aria-labelledby="technical-title technical-desc">
+      <svg viewBox="0 0 1160 862" aria-labelledby="technical-title technical-desc">
         <title id="technical-title">
           {isSr ? "Kompajlirani tehnički crtež kućice" : "Compiled technical shelter drawing"}
         </title>
@@ -211,7 +212,7 @@ export function TechnicalSketch({
             : "Front elevation, side elevation, plan and roof panel with dimensions derived from the canonical model."}
         </desc>
 
-        <rect x="24" y="24" width="1112" height="770" rx="12" className="drawing-border" />
+        <rect x="24" y="24" width="1112" height="814" rx="12" className="drawing-border" />
 
         <ViewTitle x={54} y={58} code="A" title={isSr ? "POGLED SPREDA + RAM" : "FRONT ELEVATION + FRAME"} />
         <g className="drawing-shape">
@@ -609,10 +610,10 @@ export function TechnicalSketch({
           <text x={roofX + rpw / 2} y={roofHingeY + 16} textAnchor="middle" className="drawing-label">
             {isSr ? "OSA ŠARKE · LINIJA PREDNJEG ZIDA" : "HINGE AXIS · FRONT WALL LINE"}
           </text>
-          <text x={roofX + rpw / 2} y={roofLatchY - 8} textAnchor="middle" className="drawing-label">
+          <text x={roofX + rpw / 2} y={roofLatchY - 24} textAnchor="middle" className="drawing-label">
             {isSr ? "ZATVARAČI · LINIJA ZADNJEG ZIDA" : "LATCHES · REAR WALL LINE"}
           </text>
-          <text x={roofX + rpw / 2} y={roofY + rpl - 7} textAnchor="middle" className="drawing-axis-label">
+          <text x={roofX + rpw / 2} y={roofY + rpl + 13} textAnchor="middle" className="drawing-axis-label">
             {isSr ? "SLOBODNA ZADNJA KAPNA IVICA" : "CLEAR REAR DRIP / RUNOFF EDGE"}
           </text>
 
@@ -647,38 +648,38 @@ export function TechnicalSketch({
                   rx="2"
                   className="drawing-hardware-latch"
                 />
-                <text x={x} y={roofLatchY + 16} textAnchor="middle" className="drawing-axis-label">
+                <text x={x} y={roofLatchY - 9} textAnchor="middle" className="drawing-axis-label">
                   L{index + 1}
                 </text>
               </g>
             );
           })}
         </g>
-        <HDimension x1={roofX} x2={roofX + rpw} y={roofY + rpl + 28} label={`${Math.ceil(compiled.roofPanel.panelWidthMm)} mm`} />
+        <HDimension x1={roofX} x2={roofX + rpw} y={roofY + rpl + 34} label={`${Math.ceil(compiled.roofPanel.panelWidthMm)} mm`} />
         <VDimension x={roofX - 24} y1={roofY} y2={roofY + rpl} label={`${Math.ceil(compiled.roofPanel.panelLengthMm)} mm`} />
-        <text x={roofX + rpw / 2} y={roofY + rpl + 53} textAnchor="middle" className="drawing-note">
+        <text x={roofX + rpw / 2} y={roofY + rpl + 58} textAnchor="middle" className="drawing-note">
           {isSr
             ? `prepust bočno ${model.roof.sideOverhangMm} mm · napred ${model.roof.frontOverhangMm} mm · nazad ${model.roof.rearOverhangMm} mm`
             : `overhang side ${model.roof.sideOverhangMm} mm · front ${model.roof.frontOverhangMm} mm · rear ${model.roof.rearOverhangMm} mm`}
         </text>
 
-        <g transform="translate(54 770)">
+        <g transform="translate(54 796)">
           <line x1="0" y1="0" x2="28" y2="0" className="drawing-frame" />
           <text x="36" y="4" className="drawing-legend">{isSr ? "geometrijski ram / osa" : "geometry frame / axis"}</text>
-          <line x1="220" y1="0" x2="248" y2="0" className="drawing-frame drawing-frame-assumption" />
-          <text x="256" y="4" className="drawing-legend">{isSr ? "ram · pretpostavka" : "PROVISIONAL framing"}</text>
-          <line x1="475" y1="0" x2="503" y2="0" className="drawing-divider" />
-          <text x="511" y="4" className="drawing-legend">{isSr ? "pregrada" : "divider"}</text>
-          <line x1="650" y1="0" x2="678" y2="0" className="drawing-hinge" />
-          <text x="686" y="4" className="drawing-legend">{isSr ? "šarka" : "hinge"}</text>
-          <line x1="785" y1="0" x2="813" y2="0" className="drawing-vent-provision" />
-          <text x="821" y="4" className="drawing-legend">{isSr ? "ventilaciona rezerva" : "vent PROVISION zone"}</text>
-          <rect x="955" y="-5" width="20" height="10" className="drawing-base-post" />
-          <text x="983" y="4" className="drawing-legend">{isSr ? "oslonac baze" : "base support"}</text>
+          <line x1="270" y1="0" x2="298" y2="0" className="drawing-frame drawing-frame-assumption" />
+          <text x="306" y="4" className="drawing-legend">{isSr ? "ram · pretpostavka" : "PROVISIONAL framing"}</text>
+          <line x1="540" y1="0" x2="568" y2="0" className="drawing-divider" />
+          <text x="576" y="4" className="drawing-legend">{isSr ? "pregrada" : "divider"}</text>
+          <line x1="810" y1="0" x2="838" y2="0" className="drawing-hinge" />
+          <text x="846" y="4" className="drawing-legend">{isSr ? "šarka" : "hinge"}</text>
+          <line x1="0" y1="22" x2="28" y2="22" className="drawing-vent-provision" />
+          <text x="36" y="26" className="drawing-legend">{isSr ? "ventilaciona rezerva" : "vent PROVISION zone"}</text>
+          <rect x="274" y="17" width="20" height="10" className="drawing-base-post" />
+          <text x="306" y="26" className="drawing-legend">{isSr ? "oslonac baze" : "base support"}</text>
           {compiled.heating.zones.length > 0 && (
             <>
-              <rect x="1040" y="-5" width="20" height="10" className="drawing-heating-provision" />
-              <text x="1068" y="4" className="drawing-legend">{isSr ? "grejna rezerva" : "heating PROVISION zone"}</text>
+              <rect x="544" y="17" width="20" height="10" className="drawing-heating-provision" />
+              <text x="576" y="26" className="drawing-legend">{isSr ? "grejna rezerva" : "heating PROVISION zone"}</text>
             </>
           )}
         </g>
@@ -686,7 +687,7 @@ export function TechnicalSketch({
 
       <figcaption>
         {isSr
-          ? "Crtež je izveden iz kompajliranog plana. Pune kote i komore predstavljaju geometriju; elementi rama i okova označeni kao PROVISIONAL ostaju projektantske pretpostavke do stručne tehničke provere."
+          ? "Crtež je izveden iz kompajliranog plana. Pune kote i komore predstavljaju geometriju; elementi rama i okova označeni kao privremeni ostaju projektantske pretpostavke do stručne tehničke provere."
           : "This sheet is compiler-derived. Solid dimensions and chambers are geometry; framing/hardware elements marked PROVISIONAL remain design assumptions until engineering review."}
       </figcaption>
     </figure>

@@ -1,6 +1,7 @@
 import type {AppLocale} from "@/i18n/routing";
 import type {CompiledShelterModel} from "@/lib/compiler";
 import {sources} from "@/data/sources";
+import {planStatusLabel} from "@/lib/model-presentation";
 
 export function HeatingProvision({
   compiled,
@@ -19,7 +20,7 @@ export function HeatingProvision({
       <div className="shell">
         <div className="section-heading">
           <div>
-            <span className="kicker">{isSr ? "Grejanje" : "Heating"} · {compiled.heating.status}</span>
+            <span className="kicker">{isSr ? "Grejanje" : "Heating"} · {planStatusLabel(compiled.heating.status, locale)}</span>
             <h2>{isSr ? "Zone za namenski grejni proizvod" : "Purpose-built heating zones"}</h2>
           </div>
           <p>

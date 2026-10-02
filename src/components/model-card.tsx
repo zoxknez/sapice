@@ -5,6 +5,7 @@ import {ModelThumbnail} from "@/components/model-thumbnail";
 import type {ModelComparisonSummary} from "@/lib/catalog-summary";
 import {validationStageLabel} from "@/lib/validation-labels";
 import {animalSizeClassLabel} from "@/lib/model-labels";
+import {modelDescription} from "@/lib/model-presentation";
 
 export function ModelCard({
   model,
@@ -29,14 +30,16 @@ export function ModelCard({
           <span>{model.heated ? (locale === "sr" ? "Grejana" : "Heated") : (locale === "sr" ? "Pasivna" : "Passive")}</span>
         </div>
         <h3>{copy.name}</h3>
-        <p>{copy.description}</p>
+        <p>{modelDescription(model, locale)}</p>
         <dl className="spec-strip">
           <div><dt>{locale === "sr" ? "Širina" : "Width"}</dt><dd>{model.dimensions.widthMm} mm</dd></div>
           <div><dt>{locale === "sr" ? "Izolacija" : "Insulation"}</dt><dd>{summary.wallInsulationMm} mm</dd></div>
           <div><dt>{locale === "sr" ? "Komore" : "Chambers"}</dt><dd>{model.layout.chambers}</dd></div>
         </dl>
-        <Link href={{pathname: "/models/[slug]", params: {slug: model.slug}}} locale={locale} className="text-link">
-          {locale === "sr" ? "Detalji modela" : "Model details"} <span aria-hidden="true">→</span>
+        <Link href={{pathname: "/models/[slug]", params: {slug: model.slug}}} locale={locale} className="text-link card-link">
+          {locale === "sr" ? "Detalji modela" : "Model details"}
+          <span className="sr-only">: {copy.name}</span>
+          <span aria-hidden="true">→</span>
         </Link>
       </div>
     </article>

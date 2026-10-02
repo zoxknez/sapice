@@ -7,8 +7,12 @@ import type {ModelComparisonSummary} from "@/lib/catalog-summary";
 import {animalSizeClassLabel, climateProfileLabel} from "@/lib/model-labels";
 import {ModelCard} from "./model-card";
 import {
+  finderCatCountLimits,
+  finderSpaceLimits,
   matchShelterModels,
+  suggestFinderRelaxations,
   type ClimateNeed,
+  type FinderRelaxation,
   type HeatingNeed,
   type DogSizeNeed
 } from "@/lib/finder";
@@ -55,6 +59,69 @@ export function Finder({
     () => matchShelterModels(models, criteria),
     [models, criteria]
   );
+  const relaxations = useMemo(
+    () => (matches.length === 0 ? suggestFinderRelaxations(models, criteria) : []),
+    [matches.length, models, criteria]
+  );
+  const isDefault = (Object.keys(defaultFinderUrlState) as (keyof FinderUrlState)[])
+    .every((key) => criteria[key] === defaultFinderUrlState[key]);
+
+  function setCount(next: number) {
+    updateCriteria(
+      "count",
+      Math.min(finderCatCountLimits.max, Math.max(finderCatCountLimits.min, Math.round(next) || finderCatCountLimits.min))
+    );
+  }
+
+  function climateLabel(value: ClimateNeed) {
+    if (value === "moderate") return isSr ? "Umerena zima" : "Moderate winter";
+    if (value === "cold") return isSr ? "Hladna zima" : "Cold winter";
+    return isSr ? "Vrlo hladni projektni uslovi" : "Severe design conditions";
+  }
+
+  function modelCountLabel(value: number) {
+    if (!isSr) return value === 1 ? "1 model" : `${value} models`;
+    return `${value} ${value % 10 === 1 && value % 100 !== 11 ? "model" : "modela"}`;
+  }
+
+  function relaxationCopy(relaxation: FinderRelaxation) {
+    switch (relaxation.kind) {
+      case "space":
+        return {
+          title: isSr
+            ? `Proširite prostor na ${relaxation.criteria.maxWidthMm} × ${relaxation.criteria.maxDepthMm} mm`
+            : `Allow ${relaxation.criteria.maxWidthMm} × ${relaxation.criteria.maxDepthMm} mm of space`,
+          detail: isSr
+            ? "Najmanji model koji ispunjava ostale uslove ne staje u zadati prostor."
+            : "The smallest model that meets the other constraints does not fit the current space."
+        };
+      case "capacity":
+        return {
+          title: isSr
+            ? `Prikaži modele za ${relaxation.largestCapacity} mačaka`
+            : `Show models for ${relaxation.largestCapacity} cats`,
+          detail: isSr
+            ? `Najveći objavljeni kapacitet je ${relaxation.largestCapacity} mačaka. Za veću koloniju planirajte više kućica.`
+            : `The largest published capacity is ${relaxation.largestCapacity} cats. Plan several shelters for a larger colony.`
+        };
+      case "heating":
+        return {
+          title: isSr ? "Uključi i modele predviđene za grejanje" : "Include heating-ready models",
+          detail: isSr
+            ? "Za izabrane uslove postoje samo modeli sa predviđenim namenskim grejanjem."
+            : "For the selected conditions, only models designed for purpose-built heating are available."
+        };
+      case "climate":
+        return {
+          title: isSr
+            ? `Prikaži modele za profil „${climateLabel(relaxation.criteria.climate)}”`
+            : `Show models for “${climateLabel(relaxation.criteria.climate)}”`,
+          detail: isSr
+            ? "Niži zimski profil je projektantski filter za blaže uslove, ne preporuka za vaše podneblje."
+            : "A lower winter profile is a design filter for milder conditions, not a recommendation for your climate."
+        };
+    }
+  }
 
   function summaryFor(model: ShelterModel) {
     const summary = comparisonSummaries[model.id];
@@ -69,7 +136,7 @@ export function Finder({
       animal === "dog"
         ? (isSr
             ? `Veličina psa: ${animalSizeClassLabel(model.animalSizeClass, locale)}`
-            : `Dog size class: ${model.animalSizeClass}`)
+            : `Dog size class: ${animalSizeClassLabel(model.animalSizeClass, locale)}`)
         : (isSr
             ? `Kapacitet: do ${model.capacity.max} mačaka`
             : `Capacity: up to ${model.capacity.max} cats`),
@@ -100,16 +167,38 @@ export function Finder({
         </label>
 
         {animal === "cat" ? (
-          <label>
-            <span>{isSr ? "Broj mačaka" : "Number of cats"}</span>
-            <input
-              type="number"
-              min={1}
-              max={12}
-              value={count}
-              onChange={(event) => updateCriteria("count", Math.min(12, Math.max(1, Math.round(Number(event.target.value) || 1))))}
-            />
-          </label>
+          <div className="finder-field">
+            <label htmlFor="finder-cat-count">{isSr ? "Broj mačaka" : "Number of cats"}</label>
+            <div className="stepper">
+              <button
+                type="button"
+                onClick={() => setCount(count - 1)}
+                disabled={count <= finderCatCountLimits.min}
+                aria-label={isSr ? "Jedna mačka manje" : "One cat fewer"}
+              >
+                −
+              </button>
+              <input
+                id="finder-cat-count"
+                type="number"
+                inputMode="numeric"
+                min={finderCatCountLimits.min}
+                max={finderCatCountLimits.max}
+                value={count}
+                onChange={(event) => {
+                  if (event.target.value !== "") setCount(Number(event.target.value));
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setCount(count + 1)}
+                disabled={count >= finderCatCountLimits.max}
+                aria-label={isSr ? "Jedna mačka više" : "One cat more"}
+              >
+                +
+              </button>
+            </div>
+          </div>
         ) : (
           <label>
             <span>{isSr ? "Veličina psa" : "Dog size"}</span>
@@ -148,9 +237,9 @@ export function Finder({
           <span>{isSr ? "Maksimalna širina" : "Maximum width"}: {maxWidth} mm</span>
           <input
             type="range"
-            min={600}
-            max={2400}
-            step={50}
+            min={finderSpaceLimits.width.min}
+            max={finderSpaceLimits.width.max}
+            step={finderSpaceLimits.width.step}
             value={maxWidth}
             onChange={(event) => updateCriteria("maxWidthMm", Number(event.target.value))}
           />
@@ -160,13 +249,22 @@ export function Finder({
           <span>{isSr ? "Maksimalna dubina" : "Maximum depth"}: {maxDepth} mm</span>
           <input
             type="range"
-            min={500}
-            max={1800}
-            step={50}
+            min={finderSpaceLimits.depth.min}
+            max={finderSpaceLimits.depth.max}
+            step={finderSpaceLimits.depth.step}
             value={maxDepth}
             onChange={(event) => updateCriteria("maxDepthMm", Number(event.target.value))}
           />
         </label>
+
+        <button
+          type="button"
+          className="finder-reset"
+          onClick={() => setCriteria(defaultFinderUrlState)}
+          disabled={isDefault}
+        >
+          {isSr ? "Vrati podrazumevane uslove" : "Reset to defaults"}
+        </button>
 
         <div className="finder-note">
           {isSr
@@ -177,12 +275,12 @@ export function Finder({
 
       <section>
         <div className="finder-results-head">
-          <p className="result-summary">
+          <p className="result-summary" role="status" aria-live="polite">
             <strong>{matches.length}</strong> {isSr ? "kompatibilnih modela" : "compatible models"}
           </p>
           <small>
             {isSr
-              ? "Najpre se prikazuje najmanji dovoljan kapacitet, zatim kompaktniji footprint."
+              ? "Najpre se prikazuje najmanji dovoljan kapacitet, zatim manja zauzeta površina."
               : "Results prioritize the smallest sufficient capacity, then the more compact footprint."}
           </small>
         </div>
@@ -207,9 +305,31 @@ export function Finder({
             <h2>{isSr ? "Trenutno nema modela koji prolazi sve uslove." : "No current model passes every constraint."}</h2>
             <p>
               {isSr
-                ? "Promenite prostor, zimski profil ili zahtev za grejanjem. Finder neće predložiti model koji ne ispunjava tvrda ograničenja."
-                : "Adjust available space, winter profile or heating requirement. The finder will not suggest a model that fails hard constraints."}
+                ? "Finder neće predložiti model koji ne ispunjava tvrda ograničenja. Svaki predlog ispod menja tačno jedan uslov — vi odlučujete da li je ta promena prihvatljiva."
+                : "The finder will not suggest a model that fails a hard constraint. Each option below changes exactly one condition — you decide whether that change is acceptable."}
             </p>
+            {relaxations.length > 0 ? (
+              <ul className="relaxation-list">
+                {relaxations.map((relaxation) => {
+                  const copy = relaxationCopy(relaxation);
+                  return (
+                    <li key={relaxation.kind}>
+                      <button type="button" onClick={() => setCriteria(relaxation.criteria)}>
+                        <span>
+                          <strong>{copy.title}</strong>
+                          <small>{copy.detail}</small>
+                        </span>
+                        <em>{modelCountLabel(relaxation.matchCount)} <span aria-hidden="true">→</span></em>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <button type="button" className="button secondary" onClick={() => setCriteria(defaultFinderUrlState)}>
+                {isSr ? "Vrati podrazumevane uslove" : "Reset to defaults"}
+              </button>
+            )}
           </div>
         )}
       </section>

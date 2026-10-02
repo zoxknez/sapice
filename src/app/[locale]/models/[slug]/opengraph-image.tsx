@@ -2,6 +2,7 @@ import {ImageResponse} from "next/og";
 import type {AppLocale} from "@/i18n/routing";
 import {getShelterModel} from "@/data/models";
 import {compileShelterModel} from "@/lib/compiler";
+import {modelDescription} from "@/lib/model-presentation";
 
 export const size = {
   width: 1200,
@@ -55,7 +56,7 @@ export default async function ModelOpenGraphImage({
             {copy.name}
           </div>
           <div style={{fontSize: "22px", lineHeight: 1.4, color: "#665f58"}}>
-            {copy.description}
+            {modelDescription(model, locale)}
           </div>
 
           <div style={{display: "flex", gap: "10px", marginTop: "auto", flexWrap: "wrap"}}>

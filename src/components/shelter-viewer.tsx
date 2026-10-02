@@ -844,7 +844,7 @@ export function ShelterViewer({
         <span>{locale === "sr" ? "Interaktivni 3D model" : "Interactive 3D model"}</span>
         <strong>{model.dimensions.widthMm} × {model.dimensions.depthMm} × {model.dimensions.frontHeightMm} mm</strong>
         {mode === "frame" && <small>
-          {locale === "sr" ? "Zeleno: okvir · oker: PROVISIONAL raspored" : "Green: frame · ochre: PROVISIONAL layout"}
+          {locale === "sr" ? "Zeleno: okvir · oker: privremeni raspored" : "Green: frame · ochre: PROVISIONAL layout"}
         </small>}
         {model.heated && mode === "roof-off" && <small>
           {locale === "sr" ? "Crveno: rezervisana zona, bez grejnog uređaja" : "Red: reserved zone, no heating device shown"}

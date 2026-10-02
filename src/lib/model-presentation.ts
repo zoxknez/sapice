@@ -17,7 +17,7 @@ const buildStepCopySr: Record<string, {title: string; detail: string}> = {
   },
   "ventilation-provision": {
     title: "Ostavite gornje zone zadnjeg zida za ventilacione umetke",
-    detail: "Prenesite zone statusa PROVISIONAL u gornji deo zadnjeg zida i ostavite ih van položaja stubova. Ne secite konačan otvor dok ne izaberete konkretan podesivi ventilacioni umetak. Proizvođač umetka određuje otvor i slobodnu površinu za protok vazduha."
+    detail: "Prenesite privremeno rezervisane zone u gornji deo zadnjeg zida i ostavite ih van položaja stubova. Ne secite konačan otvor dok ne izaberete konkretan podesivi ventilacioni umetak. Proizvođač umetka određuje otvor i slobodnu površinu za protok vazduha."
   },
   roof: {
     title: "Montirajte krov i hidroizolaciju",
@@ -34,7 +34,7 @@ const hardwareItemCopySr: Record<string, {name?: string; note?: string}> = {
     note: "Procena V1 koristi približno 150 mm razmaka uz ivice i 300 mm u polju kao početni referentni obrazac. Konačni prečnik, dužina i raspored treba da prođu stručnu tehničku proveru."
   },
   "roof-hinges": {
-    note: "Broj se izvodi iz širine krova. Osa šarke prati liniju prednjeg zida i uvučena je od spoljne prednje ivice za dužinu prepusta. Pre dostizanja statusa ENGINEERING_REVIEWED proverite konačan tip šarke i nosivost."
+    note: "Broj se izvodi iz širine krova. Osa šarke prati liniju prednjeg zida i uvučena je od spoljne prednje ivice za dužinu prepusta. Pre statusa „Stručna tehnička provera” proverite konačan tip šarke i nosivost."
   },
   "roof-latches": {
     note: "Zatvarači služe da servisni krov ostane bezbedno zatvoren na vetru. Postavljaju se uz liniju zadnjeg zida, uvučeno od zadnje ivice za dužinu prepusta, tako da putanja oticanja vode ostane slobodna."
@@ -62,7 +62,7 @@ const costLineCopySr: Record<string, {label?: string; note?: string}> = {
     note: "Po jedan konkretan umetak za svaku rezervisanu zonu ventilacije. Konačan otvor i slobodna površina za protok vazduha moraju odgovarati tehničkom listu izabranog proizvoda."
   },
   "timber-frame": {
-    note: "Ukupna dužina elemenata rama + 10% rezerve. Profili ostaju označeni kao PROVISIONAL dok ne prođu stručnu tehničku proveru."
+    note: "Ukupna dužina elemenata rama + 10% rezerve. Profili ostaju označeni kao privremeni dok ne prođu stručnu tehničku proveru."
   },
   "heating-product": {
     label: "Namenski proizvod za grejanje životinja",
@@ -139,4 +139,50 @@ export function costLineCopy(line: CostLine, locale: AppLocale) {
     label: hardwareCopy?.name ?? lineCopy?.label ?? line.labelSr,
     note: hardwareCopy?.note ?? lineCopy?.note ?? line.noteSr
   };
+}
+
+// Serbian display copy for model descriptions. Canonical translations stay untouched in
+// src/data/models.ts because they are part of the plan fingerprint input.
+const modelDescriptionSr: Record<string, string> = {
+  "cat-six-winter-01":
+    "Trokomorno sklonište za do šest slobodnoživećih mačaka. Više komora smanjuje zavisnost cele grupe od jednog ulaza.",
+  "rescue-cat-eight-01":
+    "Četvorokomorni referentni model za udruženja i kolonije slobodnoživećih mačaka, projektovan kao ponovljiv modularni deo.",
+  "cat-duo-heated-01":
+    "Grejana jednokomorna varijanta za dve odrasle mačke, sa rezervisanom zonom za namenski grejni proizvod i preostalom negrejanom površinom poda.",
+  "cat-six-heated-01":
+    "Grejana trokomorna varijanta za do šest slobodnoživećih mačaka, sa po jednom odvojenom zonom za namenski grejni proizvod u svakoj komori.",
+  "rescue-cat-eight-heated-01":
+    "Grejana četvorokomorna varijanta za udruženja i kolonije do osam mačaka, sa posebnom zonom za izabrani grejni proizvod u svakoj komori.",
+  "dog-medium-heated-01":
+    "Grejana pomoćna zimska kućica za jednog srednjeg psa, sa rezervisanom zonom za namenski grejni proizvod i zaštićenim prolazom za kabl."
+};
+
+export function modelDescription(
+  model: {id: string; translations: Record<AppLocale, {description: string}>},
+  locale: AppLocale
+) {
+  if (locale === "sr") return modelDescriptionSr[model.id] ?? model.translations.sr.description;
+  return model.translations.en.description;
+}
+
+const planStatusSr: Record<string, string> = {
+  PROVISIONAL: "PRIVREMENO",
+  PRODUCT_SPECIFIC: "ZAVISI OD PROIZVODA",
+  NOT_APPLICABLE: "NIJE PRIMENLJIVO"
+};
+
+export function planStatusLabel(status: string, locale: AppLocale) {
+  return locale === "sr" ? planStatusSr[status] ?? status : status;
+}
+
+const materialNoteSr: Record<string, string> = {
+  xps:
+    "Za V1 sklopove od 50 i 60 mm koristi se λD 0,033 W/mK iz tehničkog lista FIBRANxps 300. Drugi proizvod mora da zameni ovu vrednost podatkom iz sopstvene izjave o svojstvima (DoP) ili tehničkog lista.",
+  plywood:
+    "V1 termički proračun koristi 0,17 W/mK kao konzervativnu referencu za brezovu i vodootpornu (brodsku) šperploču. Stvarna vrednost zavisi od vrste drveta, gustine i vlage; finalni projekat treba da koristi tehnički list izabrane ploče."
+};
+
+export function materialNote(materialId: string, locale: AppLocale) {
+  return locale === "sr" ? materialNoteSr[materialId] : undefined;
 }

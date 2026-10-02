@@ -9,6 +9,7 @@ import {
   hardwareItemName,
   hardwareItemNote,
   linearPartNote,
+  planStatusLabel,
   provenanceLabel
 } from "@/lib/model-presentation";
 
@@ -110,12 +111,12 @@ export function ModelBuildBook({
         <div className="shell">
           <div className="section-heading">
             <div>
-              <span className="kicker">{locale === "sr" ? "Ram" : "Framing"} · {compiled.framing.status}</span>
+              <span className="kicker">{locale === "sr" ? "Ram" : "Framing"} · {planStatusLabel(compiled.framing.status, locale)}</span>
               <h2>{locale === "sr" ? "Raspored letvi i nosača" : "Framing and support schedule"}</h2>
             </div>
             <p>
               {locale === "sr"
-                ? "Dužine su izvedene iz geometrije modela. Profili rama i baze su projektantska pretpostavka V1 i ostaju označeni kao PROVISIONAL dok ih ne pregleda stručnjak i dok ne prođu fizičku proveru."
+                ? "Dužine su izvedene iz geometrije modela. Profili rama i baze su projektantska pretpostavka V1 i ostaju označeni kao privremeni dok ih ne pregleda stručnjak i dok ne prođu fizičku proveru."
                 : "Lengths are derived from model geometry. Frame and base profiles are a V1 design assumption and remain explicitly PROVISIONAL until engineering review and physical validation."}
             </p>
           </div>
@@ -206,7 +207,7 @@ export function ModelBuildBook({
         <div className="shell">
           <div className="section-heading">
             <div>
-              <span className="kicker">{locale === "sr" ? "Okov" : "Hardware"} · {compiled.hardware.status}</span>
+              <span className="kicker">{locale === "sr" ? "Okov" : "Hardware"} · {planStatusLabel(compiled.hardware.status, locale)}</span>
               <h2>{locale === "sr" ? "Pričvršćivači, servisni krov i voda" : "Fasteners, service roof and water"}</h2>
             </div>
             <p>

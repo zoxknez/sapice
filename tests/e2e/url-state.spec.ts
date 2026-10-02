@@ -47,7 +47,7 @@ test("catalog restores shareable filters and comparison selection after reload",
 
   await expect(page.getByLabel("Pretražite modele")).toHaveValue("Nordic");
   await expect(page.getByRole("button", {name: "Mačke"})).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByRole("button", {name: "Bez grejanja"})).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", {name: "Pasivni"})).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByRole("button", {name: "U poređenju"})).toHaveCount(2);
   await expect(page.getByRole("heading", {name: "Poređenje modela"})).toBeVisible();
 

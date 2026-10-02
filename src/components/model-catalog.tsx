@@ -3,10 +3,12 @@
 import {useEffect, useMemo, useState} from "react";
 import type {ShelterModel} from "@/lib/domain";
 import type {AppLocale} from "@/i18n/routing";
+import {Link} from "@/i18n/navigation";
 import {ModelCard} from "./model-card";
 import type {ModelComparisonSummary} from "@/lib/catalog-summary";
 import {validationStageLabel} from "@/lib/validation-labels";
 import {animalSizeClassLabel} from "@/lib/model-labels";
+import {modelDescription} from "@/lib/model-presentation";
 import {
   defaultCatalogUrlState,
   parseCatalogUrlState,
@@ -50,7 +52,7 @@ export function ModelCatalog({
       const animalOk = animal === "all" || model.animal === animal;
       const heatOk = heating === "all" || (heating === "heated" ? model.heated : !model.heated);
       const search = query.trim().toLocaleLowerCase();
-      const searchOk = !search || `${model.translations[locale].name} ${model.translations[locale].description} ${model.slug}`.toLocaleLowerCase().includes(search);
+      const searchOk = !search || `${model.translations[locale].name} ${modelDescription(model, locale)} ${model.slug}`.toLocaleLowerCase().includes(search);
       return animalOk && heatOk && searchOk;
     }),
     [models, animal, heating, query, locale]
@@ -108,7 +110,7 @@ export function ModelCatalog({
       </div>
 
       {selected.length >= 2 && (
-        <section className="compare-panel" aria-labelledby="compare-title">
+        <section className="compare-panel" id="compare" aria-labelledby="compare-title" tabIndex={-1}>
           <header>
             <div>
               <span className="kicker">{isSr ? "Uporedni prikaz" : "Side by side"}</span>
@@ -124,7 +126,13 @@ export function ModelCatalog({
               <thead>
                 <tr>
                   <th>{isSr ? "Osobina" : "Property"}</th>
-                  {selected.map((model) => <th key={model.id}>{model.translations[locale].name}</th>)}
+                  {selected.map((model) => (
+                    <th key={model.id} scope="col">
+                      <Link href={{pathname: "/models/[slug]", params: {slug: model.slug}}}>
+                        {model.translations[locale].name}
+                      </Link>
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
@@ -231,9 +239,39 @@ export function ModelCatalog({
         </div>
       )}
 
-      {selected.length === 1 && (
-        <div className="compare-hint">
-          {isSr ? "Izaberite još jedan model za poređenje." : "Select one more model to compare."}
+      {selected.length > 0 && (
+        <div className="compare-tray" role="region" aria-label={isSr ? "Izbor za poređenje" : "Comparison selection"}>
+          <ul>
+            {selected.map((model) => (
+              <li key={model.id}>
+                <span>{model.translations[locale].name}</span>
+                <button
+                  type="button"
+                  onClick={() => toggleCompare(model.slug)}
+                  aria-label={isSr
+                    ? `Ukloni ${model.translations[locale].name} iz izbora`
+                    : `Remove ${model.translations[locale].name} from selection`}
+                >
+                  ×
+                </button>
+              </li>
+            ))}
+          </ul>
+          {selected.length >= 2 ? (
+            <button
+              type="button"
+              className="compare-tray-go"
+              onClick={() => {
+                const panel = document.getElementById("compare");
+                panel?.scrollIntoView({block: "start"});
+                panel?.focus({preventScroll: true});
+              }}
+            >
+              {isSr ? "Prikaži tabelu" : "View table"} <span aria-hidden="true">↑</span>
+            </button>
+          ) : (
+            <small>{isSr ? "Izaberite još jedan model (do 3)." : "Select one more model (up to 3)."}</small>
+          )}
         </div>
       )}
     </>

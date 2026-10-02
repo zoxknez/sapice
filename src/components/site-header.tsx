@@ -2,16 +2,17 @@ import {getTranslations} from "next-intl/server";
 import type {AppLocale} from "@/i18n/routing";
 import {Link} from "@/i18n/navigation";
 import {LocaleSwitcher} from "./locale-switcher";
+import {MainNav, MobileNav, type HeaderNavLink} from "./header-nav";
 
 export async function SiteHeader({locale}: {locale: AppLocale}) {
   const t = await getTranslations({locale, namespace: "Nav"});
-  const links = [
+  const links: HeaderNavLink[] = [
     ["/models", t("models")],
     ["/finder", t("finder")],
     ["/materials", t("materials")],
     ["/guides", t("guides")],
     ["/methodology", t("methodology")]
-  ] as const;
+  ];
 
   return (
     <header className="site-header">
@@ -24,20 +25,13 @@ export async function SiteHeader({locale}: {locale: AppLocale}) {
           </span>
         </Link>
 
-        <nav className="main-nav" aria-label={locale === "sr" ? "Glavna navigacija" : "Main navigation"}>
-          {links.map(([href, label]) => <Link key={href} href={href} locale={locale}>{label}</Link>)}
-        </nav>
+        <MainNav links={links} label={locale === "sr" ? "Glavna navigacija" : "Main navigation"} />
 
-        <details className="mobile-nav">
-          <summary aria-label={locale === "sr" ? "Otvori meni" : "Open menu"}>
-            <span />
-            <span />
-            <span />
-          </summary>
-          <nav aria-label={locale === "sr" ? "Mobilna navigacija" : "Mobile navigation"}>
-            {links.map(([href, label]) => <Link key={href} href={href} locale={locale}>{label}</Link>)}
-          </nav>
-        </details>
+        <MobileNav
+          links={links}
+          label={locale === "sr" ? "Mobilna navigacija" : "Mobile navigation"}
+          openLabel={locale === "sr" ? "Otvori meni" : "Open menu"}
+        />
 
         <LocaleSwitcher />
       </div>

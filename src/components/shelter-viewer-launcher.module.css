@@ -21,6 +21,11 @@
   display: grid;
   place-items: center;
   height: auto !important;
+  cursor: pointer;
+}
+
+:global(.viewer.viewer-launcher).launcher > .preview:hover :global(.model-thumbnail) {
+  transform: translateY(-4px) scale(1.01);
 }
 
 :global(.viewer.viewer-launcher).launcher .preview :global(.model-thumbnail) {
@@ -28,6 +33,7 @@
   height: auto;
   max-height: 100%;
   filter: drop-shadow(0 24px 24px #263c2a1c);
+  transition: transform .25s ease;
 }
 
 :global(.viewer.viewer-launcher).launcher .copy {

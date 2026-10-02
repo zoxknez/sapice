@@ -43,7 +43,7 @@ const guides: Guide[] = [
       "Podignite sklonište od hladnog i mokrog tla.",
       "Okrenite ulaz ka zaštićenoj strani kada je to moguće.",
       "Obezbedite stabilnost da vetar ne može da pomeri konstrukciju.",
-      "Kod community mačaka procenite predator risk pre odluke o jednom ili dva ulaza.",
+      "Kod slobodnoživećih mačaka procenite rizik od predatora pre odluke o jednom ili dva ulaza.",
       "Redovno čistite sneg i led oko ulaza."
     ],
     pointsEn: [
@@ -62,11 +62,11 @@ const guides: Guide[] = [
     introSr: "Zimsko sklonište mora da ostane suvo. Mokra posteljina i prodor vode mogu poništiti korist izolacije.",
     introEn: "A winter shelter has to remain dry. Wet bedding and water ingress can erase much of the benefit of insulation.",
     pointsSr: [
-      "Za community mačke koristite slamu; peškiri i ćebad mogu zadržavati vlagu.",
+      "Za slobodnoživeće mačke koristite slamu; peškiri i ćebad mogu zadržavati vlagu.",
       "Obezbedite odvod vode sa krova dalje od ulaza.",
       "Kontrolišite spojeve i ivice posle jakog vetra, snega ili kiše.",
       "Zamenite mokru ili zaprljanu posteljinu.",
-      "Ventilaciju ne svodite na nasumično bušenje rupa: trenutni modeli koriste ulaz kao dominantan put razmene vazduha dok vent sizing ne bude posebno validiran."
+      "Ventilaciju ne svodite na nasumično bušenje rupa: trenutni modeli koriste ulaz kao dominantan put razmene vazduha dok dimenzionisanje ventilacije ne bude posebno validirano."
     ],
     pointsEn: [
       "For community cats, use straw; towels and blankets can retain moisture.",
@@ -81,7 +81,7 @@ const guides: Guide[] = [
     id: "heating",
     titleSr: "Grejanje bez improvizacije",
     titleEn: "Heating without improvisation",
-    introSr: "Grejana varijanta nije dozvola za DIY mrežni grejač. Šapice modelira prostor i ograničenja, ne električni uređaj.",
+    introSr: "Grejana varijanta nije dozvola za samostalno pravljen grejač na mrežni napon. Šapice modelira prostor i ograničenja, ne električni uređaj.",
     introEn: "A heated variant is not permission to build a DIY mains heater. Šapice models space and constraints, not the electrical appliance.",
     pointsSr: [
       "Koristite samo namenski proizvod predviđen za životinje i odgovarajuće okruženje.",

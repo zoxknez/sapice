@@ -21,13 +21,18 @@ import {ModelValidationPanel, validationStageLabel} from "@/components/model-val
 import {VentilationProvision} from "@/components/ventilation-provision";
 import {PrototypeEvidenceWorksheet} from "@/components/prototype-evidence-worksheet";
 import {HeatingProvision} from "@/components/heating-provision";
+import {ModelSubnav} from "@/components/model-subnav";
+import {ModelCard} from "@/components/model-card";
+import {Link} from "@/i18n/navigation";
+import {heatingCounterpart, neighbouringModels} from "@/lib/related-models";
 import {compileShelterModel} from "@/lib/compiler";
 import {thermalMethod} from "@/lib/engineering";
 import {compiledSourceIds} from "@/lib/provenance";
 import {costLinesForCompiled} from "@/lib/costing";
-import {modelComparisonSummaryFromCompiled} from "@/lib/catalog-summary";
+import {modelComparisonSummaryFromCompiled, modelComparisonSummaryMap} from "@/lib/catalog-summary";
 import {animalSizeClassLabel, climateProfileLabel} from "@/lib/model-labels";
 import {openGraphLocale, siteUrl} from "@/lib/seo";
+import {modelDescription} from "@/lib/model-presentation";
 
 const thermalLimitationCopy = {
   "No validated entrance infiltration model": {
@@ -78,7 +83,7 @@ export async function generateMetadata({
 
   return {
     title: copy.name,
-    description: copy.description,
+    description: modelDescription(model, locale),
     alternates: {
       canonical: locale === "sr" ? srPath : enPath,
       languages: {
@@ -90,14 +95,14 @@ export async function generateMetadata({
     twitter: {
       card: "summary_large_image",
       title: `${copy.name} · Šapice`,
-      description: copy.description
+      description: modelDescription(model, locale)
     },
     openGraph: {
       type: "article",
       siteName: "Šapice",
       url: locale === "sr" ? srPath : enPath,
       title: `${copy.name} · Šapice`,
-      description: copy.description,
+      description: modelDescription(model, locale),
       ...openGraphLocale(locale)
     }
   };
@@ -119,12 +124,36 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
   const construction = compiled.construction;
   const assemblies = compiled.assemblies;
   const costLines = costLinesForCompiled(compiled);
+  const counterpart = heatingCounterpart(model, shelterModels);
+  const neighbours = neighbouringModels(model, shelterModels);
+  const relatedModels = counterpart ? [counterpart, ...neighbours.slice(0, 2)] : neighbours;
+  const relatedSummaries = modelComparisonSummaryMap(relatedModels);
+  const isSr = locale === "sr";
+  const subnavItems = [
+    {id: "geometry", label: isSr ? "Mere" : "Dimensions"},
+    {id: "validation", label: isSr ? "Validacija" : "Validation"},
+    {id: "thermal", label: isSr ? "Termika" : "Thermal"},
+    {id: "ventilation", label: isSr ? "Ventilacija" : "Ventilation"},
+    ...(model.heated ? [{id: "heating", label: isSr ? "Grejanje" : "Heating"}] : []),
+    {id: "materials", label: isSr ? "Materijali" : "Materials"},
+    {id: "nesting", label: isSr ? "Raspored tabla" : "Sheets"},
+    {id: "cost", label: isSr ? "Trošak" : "Cost"},
+    {id: "operation", label: isSr ? "Korišćenje" : "Use"},
+    {id: "inside", label: isSr ? "Unutrašnjost" : "Interior"},
+    {id: "cut-list", label: isSr ? "Krojna lista" : "Cut list"},
+    {id: "framing", label: isSr ? "Ram" : "Framing"},
+    {id: "hardware", label: isSr ? "Okov" : "Hardware"},
+    {id: "build-guide", label: isSr ? "Izrada" : "Build"},
+    {id: "sources", label: isSr ? "Izvori" : "Sources"},
+    {id: "prototype", label: isSr ? "Prototip" : "Prototype"},
+    ...(relatedModels.length > 0 ? [{id: "related", label: isSr ? "Slični modeli" : "Related"}] : [])
+  ];
   const modelUrl = `${siteUrl}/${locale}/${locale === "sr" ? "modeli" : "models"}/${model.slug}`;
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "HowTo",
     name: copy.name,
-    description: copy.description,
+    description: modelDescription(model, locale),
     url: modelUrl,
     inLanguage: locale === "sr" ? "sr-Latn" : "en",
     identifier: `sapice:${model.id}:v${model.version}:${compiled.planFingerprint}`,
@@ -152,7 +181,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
           <div className="detail-summary">
             <span className="kicker">{validationStageLabel(model.validationState, locale)}</span>
             <h1>{copy.name}</h1>
-            <p>{copy.description}</p>
+            <p>{modelDescription(model, locale)}</p>
             <div className="notice model-hero-notice" role="note">
               <p>
                 {model.animal === "dog"
@@ -166,7 +195,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
               {model.heated && (
                 <p>
                   {locale === "sr"
-                    ? "Grejanje nije DIY električna specifikacija. Model zahteva kompatibilan namenski proizvod i poštovanje njegovog uputstva."
+                    ? "Grejanje nije uputstvo za samostalnu električnu izradu. Model zahteva kompatibilan namenski proizvod i poštovanje njegovog uputstva."
                     : "Heating is not a DIY electrical specification. The model requires a compatible purpose-built product installed to its instructions."}
                 </p>
               )}
@@ -206,6 +235,26 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
               <SharePlanButton locale={locale} title={copy.name} />
               <PlanExportButtons compiled={compiled} locale={locale} />
             </div>
+            {counterpart && (
+              <Link
+                href={{pathname: "/models/[slug]", params: {slug: counterpart.slug}}}
+                locale={locale}
+                className="variant-callout"
+              >
+                <span className="variant-callout-badge" aria-hidden="true">
+                  {counterpart.heated ? (isSr ? "Grejana" : "Heated") : (isSr ? "Pasivna" : "Passive")}
+                </span>
+                <span>
+                  <small>
+                    {counterpart.heated
+                      ? (isSr ? "Isto kućište, predviđeno za namensko grejanje" : "Same envelope, designed for purpose-built heating")
+                      : (isSr ? "Isto kućište, bez aktivnog grejanja" : "Same envelope, without active heating")}
+                  </small>
+                  <strong>{counterpart.translations[locale].name}</strong>
+                </span>
+                <span aria-hidden="true">→</span>
+              </Link>
+            )}
           </div>
           <ShelterViewerLauncher compiled={compiled} locale={locale}>
             <ModelThumbnail model={model} locale={locale} summary={thumbnailSummary} />
@@ -213,26 +262,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
         </div>
       </section>
 
-      <nav className="model-subnav" aria-label={locale === "sr" ? "Sekcije modela" : "Model sections"}>
-        <div className="shell">
-          <a href="#geometry">{locale === "sr" ? "Mere" : "Dimensions"}</a>
-          <a href="#validation">{locale === "sr" ? "Validacija" : "Validation"}</a>
-          <a href="#thermal">{locale === "sr" ? "Termika" : "Thermal"}</a>
-          <a href="#ventilation">{locale === "sr" ? "Ventilacija" : "Ventilation"}</a>
-          {model.heated && <a href="#heating">{locale === "sr" ? "Grejanje" : "Heating"}</a>}
-          <a href="#materials">{locale === "sr" ? "Materijali" : "Materials"}</a>
-          <a href="#nesting">{locale === "sr" ? "Raspored tabla" : "Sheets"}</a>
-          <a href="#cost">{locale === "sr" ? "Trošak" : "Cost"}</a>
-          <a href="#operation">{locale === "sr" ? "Korišćenje" : "Use"}</a>
-          <a href="#inside">{locale === "sr" ? "Unutrašnjost" : "Interior"}</a>
-          <a href="#cut-list">{locale === "sr" ? "Krojna lista" : "Cut list"}</a>
-          <a href="#framing">{locale === "sr" ? "Ram" : "Framing"}</a>
-          <a href="#hardware">{locale === "sr" ? "Okov" : "Hardware"}</a>
-          <a href="#build-guide">{locale === "sr" ? "Izrada" : "Build"}</a>
-          <a href="#prototype">{locale === "sr" ? "Prototip" : "Prototype"}</a>
-          <a href="#sources">{locale === "sr" ? "Izvori" : "Sources"}</a>
-        </div>
-      </nav>
+      <ModelSubnav items={subnavItems} locale={locale} />
 
       <section className="section" id="geometry">
         <div className="shell detail-content">
@@ -387,6 +417,34 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
         planFingerprint={compiled.planFingerprint}
         heated={model.heated}
       />
+
+      {relatedModels.length > 0 && (
+        <section className="section related-section" id="related" aria-labelledby="related-title">
+          <div className="shell">
+            <div className="section-heading">
+              <div>
+                <span className="kicker">{isSr ? "Iz iste biblioteke" : "From the same library"}</span>
+                <h2 id="related-title">{isSr ? "Slični modeli" : "Related models"}</h2>
+              </div>
+              <p>
+                {isSr
+                  ? "Isti sistem konstrukcije, druga veličina ili strategija grejanja. Redosled je deterministički: najpre ista kućišta, zatim najbliži kapacitet ili veličina."
+                  : "The same construction system in another size or heating strategy. The order is deterministic: same envelope first, then the closest capacity or size."}
+              </p>
+            </div>
+            <div className="model-grid">
+              {relatedModels.map((related) => (
+                <ModelCard
+                  key={related.id}
+                  model={related}
+                  locale={locale}
+                  summary={relatedSummaries[related.id]}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </>
   );
 }

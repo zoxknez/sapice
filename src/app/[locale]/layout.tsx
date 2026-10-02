@@ -5,6 +5,7 @@ import {notFound} from "next/navigation";
 import {routing, type AppLocale} from "@/i18n/routing";
 import {SiteHeader} from "@/components/site-header";
 import {PwaRegistration} from "@/components/pwa-registration";
+import {Link} from "@/i18n/navigation";
 import {openGraphLocale, siteUrl, socialImage} from "@/lib/seo";
 import "../globals.css";
 
@@ -92,20 +93,33 @@ export default async function LocaleLayout({
         <NextIntlClientProvider>
           <PwaRegistration locale={locale as AppLocale} />
           <SiteHeader locale={locale as AppLocale} />
-          <main id="main-content">{children}</main>
+          <main id="main-content" tabIndex={-1}>{children}</main>
           <footer className="site-footer">
             <div className="shell footer-grid">
-              <div>
+              <div className="footer-brand">
                 <strong>Šapice</strong>
                 <p>{locale === "sr" ? "Otvoreno inženjersko projektovanje kućica za ljubimce." : "Open pet shelter engineering."}</p>
+                <p className="footer-note">
+                  {locale === "sr"
+                    ? "Bez AI generisanja planova. Svaki plan je vezan za verziju modela, verziju kompajlera i ID plana."
+                    : "No AI plan generation. Every plan is tied to a model version, compiler version and plan ID."}
+                </p>
               </div>
               <nav className="footer-nav" aria-label={locale === "sr" ? "Navigacija u podnožju" : "Footer navigation"}>
-                <a href={`/${locale}/${locale === "sr" ? "metodologija" : "methodology"}`}>
-                  {locale === "sr" ? "Metodologija" : "Methodology"}
-                </a>
-                <a href="https://github.com/zoxknez/sapice" target="_blank" rel="noreferrer">GitHub</a>
+                <div>
+                  <span>{locale === "sr" ? "Planovi" : "Plans"}</span>
+                  <Link href="/models" locale={locale as AppLocale}>{locale === "sr" ? "Modeli" : "Models"}</Link>
+                  <Link href="/finder" locale={locale as AppLocale}>{locale === "sr" ? "Pronađi model" : "Find a model"}</Link>
+                  <Link href="/materials" locale={locale as AppLocale}>{locale === "sr" ? "Materijali" : "Materials"}</Link>
+                </div>
+                <div>
+                  <span>{locale === "sr" ? "Znanje" : "Knowledge"}</span>
+                  <Link href="/guides" locale={locale as AppLocale}>{locale === "sr" ? "Vodiči" : "Guides"}</Link>
+                  <Link href="/methodology" locale={locale as AppLocale}>{locale === "sr" ? "Metodologija" : "Methodology"}</Link>
+                  <a href="https://github.com/zoxknez/sapice" target="_blank" rel="noreferrer">GitHub</a>
+                </div>
               </nav>
-              <p>© 2026 · SR / EN · {locale === "sr" ? "Modeli sa verzijama, transparentni proračuni." : "Versioned models, transparent calculations."}</p>
+              <p className="footer-legal">© 2026 · SR / EN · {locale === "sr" ? "Modeli sa verzijama, transparentni proračuni." : "Versioned models, transparent calculations."}</p>
             </div>
           </footer>
         </NextIntlClientProvider>

@@ -7,9 +7,9 @@ test("SR homepage exposes the real engineering workflow", async ({page}) => {
     page.getByRole("heading", {level: 1, name: /Toplije i bezbednije kućice/i})
   ).toBeVisible();
 
-  await expect(page.getByText("Krojna lista + nesting")).toBeVisible();
+  await expect(page.getByText("Krojna lista i raspored delova")).toBeVisible();
   await expect(page.getByText("Troškovnik bez izmišljenih cena")).toBeVisible();
-  await expect(page.getByText("Build mode u radionici")).toBeVisible();
+  await expect(page.getByText("Režim izrade za radionicu")).toBeVisible();
 });
 
 test("model page exposes compiled workshop sections", async ({page}) => {

@@ -4,6 +4,7 @@ import type {AppLocale} from "@/i18n/routing";
 import {materials} from "@/data/materials";
 import {sources} from "@/data/sources";
 import {localizedMetadata} from "@/lib/seo";
+import {materialNote} from "@/lib/model-presentation";
 
 
 export async function generateMetadata({
@@ -40,7 +41,7 @@ export default async function MaterialsPage({params}: {params: Promise<{locale: 
         <div className="material-cards">
           {Object.values(materials).map((material) => (
             <article key={material.id}>
-              <span className="kicker">{material.id.toUpperCase()}</span>
+              <span className="kicker">{locale === "sr" ? (material.id === "plywood" ? "Šperploča" : "XPS") : material.id.toUpperCase()}</span>
               <h2>{locale === "sr" ? material.nameSr : material.nameEn}</h2>
               <div className="material-thermal">
                 <strong>λ ≈ {material.lambdaTypicalWmK} W/mK</strong>
@@ -53,7 +54,7 @@ export default async function MaterialsPage({params}: {params: Promise<{locale: 
                   ))}
                 </div>
               )}
-              <p>{locale === "sr" ? material.notesSr : material.notesEn}</p>
+              <p>{materialNote(material.id, locale) ?? (locale === "sr" ? material.notesSr : material.notesEn)}</p>
               <div className="material-source-links">
                 {material.sourceIds.map((sourceId) => {
                   const source = sources[sourceId];

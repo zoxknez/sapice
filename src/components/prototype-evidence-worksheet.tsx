@@ -328,7 +328,7 @@ export function PrototypeEvidenceWorksheet({
 
         <p className="prototype-disclaimer">
           {isSr
-            ? "Ovaj radni list nije sertifikat, veterinarska procena niti automatski FIELD_TESTED status. Objavljeni status validacije menja se tek nakon odvojene revizije stvarnih dokaza."
+            ? "Ovaj radni list nije sertifikat, veterinarska procena niti automatski status „Terenska validacija”. Objavljeni status validacije menja se tek nakon odvojene revizije stvarnih dokaza."
             : "This worksheet is not a certificate, veterinary assessment or automatic FIELD_TESTED state. The published validation state changes only after separate review of real evidence."}
         </p>
       </div>

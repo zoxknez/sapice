@@ -11,7 +11,9 @@ The repository currently includes:
 - SR / EN routing with localized URLs
 - 16 reference shelter models with passive/heated coverage across all published cat capacity tiers and dog size classes
 - deterministic rule-based finder
+- finder empty-state guidance with single-constraint relaxations (space, capacity, heating, winter profile)
 - side-by-side model comparison
+- persistent comparison tray, heating-counterpart links and deterministic related models
 - parametric WebGL 3D viewer
 - assembled / roof-off / exploded / framing 3D views
 - compiler-driven workshop drawing sheet with front / side / plan / roof views

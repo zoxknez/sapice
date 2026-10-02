@@ -1,5 +1,6 @@
 import type {AppLocale} from "@/i18n/routing";
 import type {CompiledShelterModel} from "@/lib/compiler";
+import {planStatusLabel, provenanceLabel} from "@/lib/model-presentation";
 
 export function VentilationProvision({
   compiled,
@@ -15,7 +16,7 @@ export function VentilationProvision({
       <div className="shell">
         <div className="section-heading">
           <div>
-            <span className="kicker">{isSr ? "Ventilacija" : "Ventilation"} · {compiled.ventilation.status}</span>
+            <span className="kicker">{isSr ? "Ventilacija" : "Ventilation"} · {planStatusLabel(compiled.ventilation.status, locale)}</span>
             <h2>{isSr ? "Rezervisane visoke zone zadnjeg zida" : "Reserved high-rear zones"}</h2>
           </div>
           <p>
@@ -62,7 +63,7 @@ export function VentilationProvision({
                 </div>
                 <div>
                   <dt>{isSr ? "Status" : "Status"}</dt>
-                  <dd>{zone.provenance}</dd>
+                  <dd>{provenanceLabel(zone.provenance, locale)}</dd>
                 </div>
               </dl>
             </article>

@@ -105,7 +105,7 @@ export function ModelValidationPanel({
                 <span className="validation-index">{String(index + 1).padStart(2, "0")}</span>
                 <div>
                   <strong>{validationStageLabel(stage.state, locale)}</strong>
-                  <code>{stage.state}</code>
+                  {locale === "en" && <code>{stage.state}</code>}
                   <p>{isSr ? stage.detailSr : stage.detailEn}</p>
                 </div>
                 <span className="validation-state">

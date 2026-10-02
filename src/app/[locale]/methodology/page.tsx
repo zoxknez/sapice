@@ -4,6 +4,8 @@ import type {AppLocale} from "@/i18n/routing";
 import {sources} from "@/data/sources";
 import {thermalMethod} from "@/lib/engineering";
 import {localizedMetadata} from "@/lib/seo";
+import {validationStateSchema} from "@/lib/domain";
+import {validationStageLabel} from "@/lib/validation-labels";
 
 export async function generateMetadata({
   params
@@ -29,10 +31,10 @@ export default async function MethodologyPage({params}: {params: Promise<{locale
 
   const cards = isSr
     ? [
-      ["SOURCE", "Vrednost ili pravilo potiče iz spoljnog izvora koji je evidentiran u bazi izvora."],
-      ["GEOMETRY", "Vrednost se izvodi direktno iz kanonske geometrije modela, bez ručnog dupliranja."],
-      ["CALCULATION", "Vrednost je rezultat determinističkog proračuna nad poznatim ulazima."],
-      ["ASSUMPTION", "Projektantska pretpostavka je eksplicitno označena i ne predstavlja potvrđenu činjenicu."]
+      ["IZVOR", "Vrednost ili pravilo potiče iz spoljnog izvora koji je evidentiran u bazi izvora."],
+      ["GEOMETRIJA", "Vrednost se izvodi direktno iz kanonske geometrije modela, bez ručnog dupliranja."],
+      ["PRORAČUN", "Vrednost je rezultat determinističkog proračuna nad poznatim ulazima."],
+      ["PRETPOSTAVKA", "Projektantska pretpostavka je eksplicitno označena i ne predstavlja potvrđenu činjenicu."]
     ]
     : [
       ["SOURCE", "A value or rule comes from an external source recorded in the provenance library."],
@@ -72,7 +74,7 @@ export default async function MethodologyPage({params}: {params: Promise<{locale
           <h2>{isSr ? "Ventilacija" : "Ventilation"}</h2>
           <p>
             {isSr
-              ? "Verzija 1 ne propisuje univerzalnu potrebnu površinu ventilacionog otvora. Kompajler predviđa rezervne zone PROVISION pri vrhu zadnjeg zida, koje se ne preklapaju sa preliminarno predviđenim elementima rama. Stvarni otvor i slobodna površina za protok vazduha zavise od izabranog podesivog ventilacionog umetka. Terenska provera mora da obuhvati kondenzaciju, vlagu i lokalnu promaju. Termički proračun ne računa protok vazduha kroz te buduće otvore."
+              ? "Verzija 1 ne propisuje univerzalnu potrebnu površinu ventilacionog otvora. Kompajler predviđa rezervisane zone pri vrhu zadnjeg zida, koje se ne preklapaju sa preliminarno predviđenim elementima rama. Stvarni otvor i slobodna površina za protok vazduha zavise od izabranog podesivog ventilacionog umetka. Terenska provera mora da obuhvati kondenzaciju, vlagu i lokalnu promaju. Termički proračun ne računa protok vazduha kroz te buduće otvore."
               : "V1 does not claim a universal required ventilation-opening area. The compiler reserves high-rear PROVISION zones that avoid provisional framing, while the actual cutout and net free area depend on the selected adjustable vent insert. Field validation must include condensation, moisture and localized drafts. The thermal engine does not calculate airflow through those future openings."}
           </p>
 
@@ -85,11 +87,9 @@ export default async function MethodologyPage({params}: {params: Promise<{locale
 
           <h2>{isSr ? "Status validacije" : "Validation status"}</h2>
           <ol>
-            <li>DATA_VALIDATED</li>
-            <li>GEOMETRY_VALIDATED</li>
-            <li>ENGINEERING_REVIEWED</li>
-            <li>PROTOTYPE_BUILT</li>
-            <li>FIELD_TESTED</li>
+            {validationStateSchema.options.map((state) => (
+              <li key={state}>{isSr ? validationStageLabel(state, locale) : state}</li>
+            ))}
           </ol>
           <p>
             {isSr

@@ -7,6 +7,8 @@ import {ModelThumbnail} from "@/components/model-thumbnail";
 import {StructuredData} from "@/components/structured-data";
 import {modelComparisonSummaryMap} from "@/lib/catalog-summary";
 import {siteUrl} from "@/lib/seo";
+import {validationStateSchema} from "@/lib/domain";
+import {validationStageLabel} from "@/lib/validation-labels";
 
 export default async function HomePage({params}: {params: Promise<{locale: AppLocale}>}) {
   const {locale: routeLocale} = await params;
@@ -161,7 +163,7 @@ export default async function HomePage({params}: {params: Promise<{locale: AppLo
           <div className="validation-banner">
             <div>
               <span className="kicker">{locale === "sr" ? "Nivoi validacije" : "Validation ladder"}</span>
-              <strong>DATA_VALIDATED → GEOMETRY_VALIDATED → ENGINEERING_REVIEWED → PROTOTYPE_BUILT → FIELD_TESTED</strong>
+              <strong>{validationStateSchema.options.map((state) => validationStageLabel(state, locale)).join(" → ")}</strong>
             </div>
             <Link href="/methodology" locale={locale} className="button secondary">
               {locale === "sr" ? "Kako radi validacija" : "How validation works"}
