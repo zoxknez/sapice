@@ -7,6 +7,7 @@ import {SiteHeader} from "@/components/site-header";
 import {PwaRegistration} from "@/components/pwa-registration";
 import {Link} from "@/i18n/navigation";
 import {openGraphLocale, siteUrl, socialImage} from "@/lib/seo";
+import {Analytics} from "@vercel/analytics/next";
 import "../globals.css";
 
 export const viewport: Viewport = {
@@ -123,6 +124,7 @@ export default async function LocaleLayout({
             </div>
           </footer>
         </NextIntlClientProvider>
+        <Analytics />
       </body>
     </html>
   );
