@@ -248,6 +248,41 @@ Cost quantities are compiler-driven for:
 
 The application does not invent current market prices. Users enter local unit prices.
 
+## Practical models (compiler P1.0.0)
+
+Practical models cover emergency, reuse, budget and standard DIY constructions. They use simpler geometry than the engineered models and are labelled by design class, never by a higher validation state.
+
+Thermal method for practical models:
+
+- the same orientation-specific surface resistances as thermal method v1.2 (wall Rsi 0.13, roof Rsi 0.10, floor Rsi 0.17, Rse 0.04 m²K/W)
+- R_layer = d / λ for every layer with a sourced λ
+- `COMPLETE` only when every layer has a sourced λ; only then is U = 1 / ΣR shown
+- `INCOMPLETE` when some layers are unknown: the known resistance is shown as a partial value and no U-value is given
+- `UNAVAILABLE` when there is no controlled insulation layer (emergency wraps, gapped pallets)
+- `NOT_APPLICABLE` for open structures (shade, windbreak, platform, feeding station)
+
+Generic λ values from R-value per inch tables use λ = 0.0254 / (R_IP × 0.17611). A product datasheet takes precedence over a generic value.
+
+Material substitution keeps the layer resistance: d_new = R × λ_new. The conservative thickness uses the worst end of the λ range. A substitute is `NOT_ALLOWED` when the material may not face the animal in that role, or when a fibrous insulation would not be fully enclosed. It is `REDESIGN_REQUIRED` when either material has no sourced λ or when the role is structural or weathering.
+
+Insulation parts larger than the stock board are split into segments with butt joints. A structural sheet part larger than stock is an invariant violation, not a silent split.
+
+Practical BOM lines carry a basis: `NESTED` (sheet count from nesting), `GEOMETRY` (derived length or area) or `ASSUMPTION` (for example straw quantity or tape).
+
+## Field rules
+
+These rule engines produce checklists and explanations, not certificates:
+
+- reuse checklist: any reject criterion gives `REJECTED`; all accept criteria give `CHECKLIST_PASSED`; anything else stays `INCOMPLETE`
+- placement checklist: wet ground, direct wind, midday sun, runoff toward the entrance, flooding, predator access, snow, unstable base, maintenance access and noise
+- retrofit advisor: an ordered list of improvements by severity (rotten structure stops the plan; then water, roof fall, raising and floor; then entrance, insulation and its protection; then service access and ventilation; metal walls and summer rules depend on season) without a thermal calculation
+- bedding verdicts: straw is preferred for outdoor winter cat shelters; hay, blankets and towels are not recommended there (see `docs/SOURCE_CLAIM_MATRIX.md`)
+- emergency chooser: picks the most durable emergency model that the items at hand allow
+
+## Budget
+
+Budget fit uses only prices the user entered. Material the user already owns is shown with its value but is not added to the purchase cost. If any required price is missing, the purchase cost is a lower bound (`≥`) and budget fit is `UNKNOWN`.
+
 ## Validation states
 
 The public validation ladder is:

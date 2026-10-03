@@ -37,6 +37,43 @@ ShelterModel
 
 The compiler is the authoritative derivation layer. UI components should consume compiled output instead of reproducing engineering formulas.
 
+## Practical domain (platform 2.0)
+
+The engineered compiler is unchanged by platform 2.0, so the 16 engineered plan fingerprints are unchanged. Practical models are a parallel domain:
+
+```text
+PracticalModel (src/data/practical-models.ts, zod schema in src/lib/practical/domain.ts)
+  -> practical compiler P1.0.0 (src/lib/practical/compiler.ts)
+     -> family dispatch: PANEL_BOX, TOTE_IN_TOTE, FOAM_CONTAINER, CRATE, EMERGENCY_WRAP,
+        PALLET_FRAME, SHADE_STRUCTURE, RAISED_PLATFORM, RETROFIT
+     -> envelope, cut parts, linear parts
+     -> insulation segmented onto stock boards; structural parts that exceed stock are invariant violations
+     -> stock nesting (src/lib/nesting.ts)
+     -> BOM with basis NESTED / GEOMETRY / ASSUMPTION
+     -> thermal report: COMPLETE / INCOMPLETE / UNAVAILABLE / NOT_APPLICABLE
+     -> build steps, inspection schedule, moisture profile
+     -> derived calculation coverage
+     -> deterministic plan fingerprint
+```
+
+Both domains feed one compact catalog layer:
+
+```text
+engineeredEntry(model) + practicalEntry(model) -> CatalogEntry[] (src/lib/catalog/entries.ts)
+  -> Finder 2.0 matcher (src/lib/catalog/matcher.ts)
+  -> catalog, topic pages, workshop inventory, budget, rescue batch planner
+```
+
+Supporting modules:
+
+- `src/lib/catalog/taxonomy-core.ts`: zod-free taxonomy values and labels for client components; `taxonomy.ts` adds the zod schemas for server use
+- `src/data/material-library.ts`: material library v2 with a thermal union `KNOWN` / `UNKNOWN` / `NOT_MODELLED`
+- `src/lib/catalog/substitutes.ts`: substitute evaluation (`THERMAL_EQUIVALENT`, `REDESIGN_REQUIRED`, `NOT_ALLOWED`)
+- `src/lib/catalog/inventory.ts` and `budget.ts`: local workshop inventory and price profile logic
+- `src/data/upgrades.ts`: upgrade graph with `NEW_MODEL` and `IN_PLACE` edges
+- `src/lib/field-checks.ts`, `src/lib/retrofit.ts`, `src/lib/emergency.ts`, `src/data/bedding.ts`: deterministic rule engines for field use
+- `src/data/landing-topics.ts` and `landing-slugs.ts`: topic pages and their localized slugs
+
 ## Server / client boundary
 
 Engineering compilation should happen on the server wherever practical.
@@ -46,6 +83,7 @@ Examples:
 - model detail page compiles once and shares the resulting plan with 3D, costing and export tools
 - model catalog comparison receives compact server-derived summaries instead of shipping the full compiler into the browser
 - client components are responsible for interaction, local persistence and visualization rather than engineering derivation
+- platform pages pass `CatalogEntry` summaries, sheet parts and material options from server components; client components import only `taxonomy-core.ts`, never the zod schemas or the compilers
 
 ## Plan identity
 

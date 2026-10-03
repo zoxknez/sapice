@@ -12,4 +12,12 @@ describe("sitemap metadata", () => {
       expect(page).not.toHaveProperty("priority");
     }
   });
+
+  it("lists every model and topic page in both locales with hreflang alternates", () => {
+    const urls = sitemap().map((page) => page.url);
+    expect(urls.some((url) => url.endsWith("/sr/hitno"))).toBe(true);
+    expect(urls.some((url) => url.endsWith("/en/models/tote-in-tote-straw"))).toBe(true);
+    expect(urls.some((url) => url.endsWith("/sr/planovi/jeftina-kucica-za-macke"))).toBe(true);
+    expect(sitemap().every((page) => page.alternates?.languages)).toBe(true);
+  });
 });

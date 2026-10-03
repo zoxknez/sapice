@@ -1,4 +1,4 @@
-const CACHE_VERSION = "sapice-v3";
+const CACHE_VERSION = "sapice-v4";
 const STATIC_CACHE = `${CACHE_VERSION}:static`;
 const PAGE_CACHE = `${CACHE_VERSION}:pages`;
 const STATIC_SEED = [
@@ -6,6 +6,8 @@ const STATIC_SEED = [
   "/en",
   "/sr/offline",
   "/en/offline",
+  "/sr/hitno",
+  "/en/emergency",
   "/manifest-sr.webmanifest",
   "/manifest-en.webmanifest",
   "/icon.svg",

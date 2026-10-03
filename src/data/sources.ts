@@ -164,5 +164,115 @@ export const sources: Record<string, SourceRecord> = {
     topics: ["heating", "electrical-safety", "animals"],
     notes: "Safety reference for electrical animal-heating appliances. The app only accommodates purpose-built products and does not claim product certification.",
     notesSr: "Bezbednosna referenca za električne uređaje za grejanje životinja. Aplikacija predviđa samo namenski izrađene proizvode i ne tvrdi da je proizvod sertifikovan."
+  },
+  "alleycat-providing-shelter": {
+    id: "alleycat-providing-shelter",
+    publisher: "Alley Cat Allies",
+    title: "Providing Shelter",
+    url: "https://www.alleycat.org/community-cat-care/providing-shelter/",
+    accessedAt: "2026-10-03",
+    tier: 1,
+    topics: ["community-cats", "shelter-size", "entrances", "bedding", "elevation", "placement", "materials-sourcing"],
+    notes: "Describes a community-cat shelter of about 2 ft × 3 ft and at least 18 in high for three to five cats, a doorway about 6-8 in wide, an entrance away from prevailing wind or a flap/L-shaped entry, straw rather than hay or blankets, pallets for elevation and scrap lumber from building supply stores or contractors.",
+    notesSr: "Opisuje sklonište za slobodnoživeće mačke od oko 2 × 3 stope i najmanje 18 inča visine za tri do pet mačaka, ulaz širine oko 6-8 inča, ulaz okrenut od dominantnog vetra ili sa zaklopcem i L-ulazom, slamu umesto sena i ćebadi, palete za podizanje i otpadnu građu od prodavnica građevinskog materijala ili izvođača."
+  },
+  "alleycat-build-outdoor-shelter": {
+    id: "alleycat-build-outdoor-shelter",
+    publisher: "Alley Cat Allies",
+    title: "How to Build an Outdoor Shelter",
+    url: "https://www.alleycat.org/resources/how-to-build-an-outdoor-shelter/",
+    accessedAt: "2026-10-03",
+    tier: 1,
+    topics: ["community-cats", "tote-shelter", "insulation", "bedding", "entrances"],
+    notes: "Step-by-step tote-in-tote shelter: an approximately 30 gallon outer tub, an approximately 20 gallon inner tub, a thin foam slab under the inner tub, straw (not hay) and one tube entrance through both tubs. No elevation height is specified.",
+    notesSr: "Uputstvo za kutiju u kutiji: spoljašnja kutija od oko 30 galona, unutrašnja od oko 20 galona, tanka ploča stiropora ispod unutrašnje kutije, slama (ne seno) i jedan ulaz kroz obe kutije. Visina podizanja nije navedena."
+  },
+  "alleycat-straw-not-hay": {
+    id: "alleycat-straw-not-hay",
+    publisher: "Alley Cat Allies",
+    title: "Straw, not Hay, for Outdoor Cat Shelters",
+    url: "https://www.alleycat.org/community-cat-care/straw-not-hay-for-outdoor-cat-shelters",
+    accessedAt: "2026-10-03",
+    tier: 1,
+    topics: ["bedding", "straw", "hay", "community-cats", "moisture"],
+    notes: "Straw repels moisture while hay soaks it up and can mold. Loosely pack straw to the quarter or halfway point; store spare straw dry and off the ground.",
+    notesSr: "Slama odbija vlagu, a seno je upija i može da se ubuđa. Slamu rastresito napuniti do četvrtine ili polovine visine; rezervu čuvati suvu i odignutu od tla."
+  },
+  "alleycat-cold-weather": {
+    id: "alleycat-cold-weather",
+    publisher: "Alley Cat Allies",
+    title: "Outdoor Cat Cold Weather Tips",
+    url: "https://www.alleycat.org/outdoor-cat-cold-weather-tips/",
+    accessedAt: "2026-10-03",
+    tier: 1,
+    topics: ["community-cats", "winter", "snow", "bedding", "antifreeze"],
+    notes: "Recommends straw instead of blankets or hay, elevation, clearing snow from entrances and exits, and keeping antifreeze and de-icers away from cats.",
+    notesSr: "Preporučuje slamu umesto ćebadi i sena, podizanje skloništa, čišćenje snega sa ulaza i izlaza i držanje antifriza i sredstava za otapanje leda dalje od mačaka."
+  },
+  "alleycat-summer-weather": {
+    id: "alleycat-summer-weather",
+    publisher: "Alley Cat Allies",
+    title: "Summer Weather Tips",
+    url: "https://www.alleycat.org/community-cat-care/summer-weather-tips/",
+    accessedAt: "2026-10-03",
+    tier: 1,
+    topics: ["community-cats", "summer", "shade", "water", "ventilation"],
+    notes: "Shelters in summer should be shaded, placed on grass or dirt rather than concrete and have two openings so hot air can cycle through; water belongs in shade and should be refreshed often.",
+    notesSr: "Leti skloništa treba da budu u senci, na travi ili zemlji umesto na betonu, sa dva otvora kroz koje topao vazduh može da struji; vodu držati u senci i često je menjati."
+  },
+  "humane-world-heatwave": {
+    id: "humane-world-heatwave",
+    publisher: "Humane World for Animals",
+    title: "Heatwave alert: protect pets amid soaring temperatures",
+    url: "https://www.humaneworld.org/en/news/heatwave-pet-safety-tips-extreme-heat",
+    accessedAt: "2026-10-03",
+    tier: 1,
+    topics: ["summer", "heat", "shade", "doghouse", "at-risk-animals"],
+    notes: "States that doghouses do not provide relief from heat and can make it worse; trees and tarps are ideal shade because they do not obstruct airflow; old, young, overweight and short-muzzled animals are at higher risk.",
+    notesSr: "Navodi da kućice za pse ne pružaju olakšanje od vrućine i mogu je pogoršati; drveće i cerade su najbolja senka jer ne zaustavljaju strujanje vazduha; stare, mlade, gojazne i kratkonose životinje su ugroženije."
+  },
+  "usda-aphis-dog-temperature": {
+    id: "usda-aphis-dog-temperature",
+    publisher: "USDA APHIS Animal Care",
+    title: "Temperature Requirements for Dogs (Animal Care Tech Note, APHIS-22-031)",
+    url: "https://www.aphis.usda.gov/sites/default/files/ac-tech-note-temp-req-dogs.pdf",
+    accessedAt: "2026-10-03",
+    tier: 1,
+    topics: ["dogs", "regulatory", "outdoor-housing", "bedding", "shade", "wind-break"],
+    notes: "Regulatory guidance for US Animal Welfare Act licensees and registrants, not for private companion dogs. Requires shelter with a wind break and rain break at the entrance, dry bedding in cold, shade outside the shelter because shelters may become too warm, continuous water access, and excludes unacclimated, elderly, sick or very young dogs from outdoor housing. Šapice does not transfer its temperature thresholds into universal safe temperatures.",
+    notesSr: "Regulatorni vodič za licencirane subjekte po američkom Zakonu o dobrobiti životinja, ne za kućne pse. Zahteva sklonište sa zaštitom od vetra i kiše na ulazu, suvu posteljinu po hladnom vremenu, senku van skloništa jer sklonište može postati pretoplo, stalan pristup vodi i isključuje neaklimatizovane, stare, bolesne i vrlo mlade pse iz smeštaja napolju. Šapice njegove temperaturne pragove ne prenosi kao univerzalne bezbedne temperature."
+  },
+  "doe-basc-insulation-r-values": {
+    id: "doe-basc-insulation-r-values",
+    publisher: "U.S. DOE Building America Solution Center (PNNL)",
+    title: "Typical R-Values and Vapor Retarder Classifications of Common Insulation Materials",
+    url: "https://basc.pnnl.gov/information/typical-r-values-and-vapor-retarder-classifications-common-insulation-materials",
+    accessedAt: "2026-10-03",
+    tier: 1,
+    topics: ["insulation", "r-value", "eps", "xps", "polyiso", "mineral-wool", "fiberglass"],
+    notes: "Typical R-value per inch: EPS 3.8-4.4, XPS 5, polyiso approx. 6, fiberglass batt or board 2.5-4, mineral wool board 3-4. Šapice converts these to planning λ ranges (λ = 0.0254 m / (R_IP × 0.1761)); a product datasheet always takes precedence.",
+    notesSr: "Tipične R-vrednosti po inču: EPS 3,8-4,4, XPS 5, PIR oko 6, staklena vuna 2,5-4, ploče kamene vune 3-4. Šapice ih preračunava u planske raspone λ (λ = 0,0254 m / (R_IP × 0,1761)); tehnički list konkretnog proizvoda uvek ima prednost."
+  },
+  "ippc-ispm-15": {
+    id: "ippc-ispm-15",
+    publisher: "International Plant Protection Convention (IPPC)",
+    title: "ISPM 15: Regulation of wood packaging material in international trade",
+    url: "https://www.ippc.int/en/publications/640/",
+    accessedAt: "2026-10-03",
+    tier: 1,
+    topics: ["pallets", "wood-packaging", "treatment-marks", "reuse"],
+    notes: "Phytosanitary standard for wood packaging in international trade, including treatment codes such as HT (heat treatment) and MB (methyl bromide). The mark confirms a phytosanitary treatment only; it says nothing about the later history, contamination or condition of a used pallet.",
+    notesSr: "Fitosanitarni standard za drvenu ambalažu u međunarodnom prometu, sa oznakama tretmana kao što su HT (termička obrada) i MB (metil-bromid). Oznaka potvrđuje samo fitosanitarni tretman i ne govori ništa o kasnijoj istoriji, zagađenju ni stanju korišćene palete."
+  },
+  "epa-cca-treated-wood": {
+    id: "epa-cca-treated-wood",
+    publisher: "U.S. Environmental Protection Agency",
+    title: "Chromated Arsenicals (CCA)",
+    url: "https://www.epa.gov/ingredients-used-pesticide-products/chromated-arsenicals-cca",
+    accessedAt: "2026-10-03",
+    tier: 1,
+    topics: ["treated-wood", "cca", "reuse", "safety"],
+    notes: "CCA-treated wood was withdrawn from US homeowner uses at the end of 2003, but older structures may still contain it. Do not burn it; use dust protection when sawing and wash hands after handling. Šapice therefore rejects unknown old treated timber wherever an animal could chew or lick it.",
+    notesSr: "Drvo tretirano CCA sredstvom povučeno je iz kućne upotrebe u SAD krajem 2003. godine, ali starije konstrukcije ga i dalje mogu sadržati. Ne sme se paliti; pri sečenju koristiti zaštitu od prašine i oprati ruke posle rada. Zato Šapice odbija nepoznatu staru impregniranu građu svuda gde bi je životinja mogla gristi ili lizati."
   }
 };

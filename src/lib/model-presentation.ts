@@ -186,3 +186,32 @@ const materialNoteSr: Record<string, string> = {
 export function materialNote(materialId: string, locale: AppLocale) {
   return locale === "sr" ? materialNoteSr[materialId] : undefined;
 }
+
+// Serbian display names. Canonical names in src/data/models.ts are fingerprint input and
+// remain the cross-locale identity (they also stay searchable in the catalog).
+const modelNameSr: Record<string, string> = {
+  "cat-solo-winter-01": "Nordijska Solo zimska",
+  "cat-duo-winter-01": "Nordijska Duo zimska",
+  "cat-quad-winter-01": "Nordijska Četvorka zimska",
+  "cat-quad-heated-01": "Nordijska Četvorka grejana",
+  "cat-six-winter-01": "Alpska Kolonija Šest",
+  "dog-small-winter-01": "Alpska mala zimska",
+  "dog-medium-winter-01": "Alpska srednja zimska",
+  "dog-large-winter-01": "Alpska velika zimska",
+  "dog-large-heated-01": "Alpska velika grejana",
+  "rescue-cat-eight-01": "Modularna Osmica za udruženja",
+  "cat-solo-heated-01": "Nordijska Solo grejana",
+  "cat-duo-heated-01": "Nordijska Duo grejana",
+  "cat-six-heated-01": "Alpska Kolonija Šest grejana",
+  "rescue-cat-eight-heated-01": "Modularna Osmica za udruženja, grejana",
+  "dog-small-heated-01": "Alpska mala grejana",
+  "dog-medium-heated-01": "Alpska srednja grejana"
+};
+
+export function modelName(
+  model: {id: string; translations: Record<AppLocale, {name: string}>},
+  locale: AppLocale
+) {
+  if (locale === "sr") return modelNameSr[model.id] ?? model.translations.sr.name;
+  return model.translations.en.name;
+}

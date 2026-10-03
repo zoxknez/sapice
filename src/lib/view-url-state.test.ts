@@ -11,23 +11,27 @@ import {
 describe("Finder URL state", () => {
   it("restores criteria from a shared link and clamps numeric values to control limits", () => {
     const state = parseFinderUrlState(new URLSearchParams(
-      "animal=dog&count=18&dogSize=large&heating=heated&climate=severe&width=1599&depth=9999"
+      "animal=dog&count=18&dogSize=large&heating=heated&climate=severe&width=1599&depth=9999&season=SUMMER&tools=DRILL,FAKE&have=plastic-tote,straw&reuse=0"
     ));
 
-    expect(state).toEqual({
+    expect(state).toMatchObject({
       animal: "dog",
       count: 12,
       dogSize: "large",
       heating: "heated",
       climate: "severe",
       maxWidthMm: 1600,
-      maxDepthMm: 1800
+      maxDepthMm: 1800,
+      season: "SUMMER",
+      tools: ["DRILL"],
+      ownedMaterials: ["plastic-tote", "straw"],
+      reuseAllowed: false
     });
   });
 
   it("ignores invalid values and omits default criteria when serializing", () => {
     const invalid = parseFinderUrlState(new URLSearchParams(
-      "animal=fox&count=0&dogSize=giant&heating=plug-in&climate=freezing&width=abc&depth=499"
+      "animal=fox&count=0&dogSize=giant&heating=plug-in&climate=freezing&width=abc&depth=499&season=MONSOON&budget=CHEAP"
     ));
     expect(invalid).toEqual(defaultFinderUrlState);
 
@@ -44,7 +48,9 @@ describe("Finder URL state", () => {
         dogSize: "large",
         heating: "heated",
         climate: "severe",
-        maxDepthMm: 1000
+        maxDepthMm: 1000,
+        designClasses: ["REUSE", "EMERGENCY"],
+        maxTimeMinutes: 60
       }
     );
 
@@ -54,6 +60,8 @@ describe("Finder URL state", () => {
     expect(params.get("heating")).toBe("heated");
     expect(params.get("climate")).toBe("severe");
     expect(params.get("depth")).toBe("1000");
+    expect(params.get("class")).toBe("EMERGENCY,REUSE");
+    expect(params.get("time")).toBe("60");
     expect(params.has("count")).toBe(false);
     expect(params.has("width")).toBe(false);
   });
@@ -77,7 +85,9 @@ describe("model catalog URL state", () => {
       animal: "cat",
       heating: "heated",
       query: "quad",
-      compareSlugs: ["nordic-duo-winter", "nordic-quad-winter", "alpine-colony-six"]
+      compareSlugs: ["nordic-duo-winter", "nordic-quad-winter", "alpine-colony-six"],
+      designClasses: [],
+      season: "all"
     });
   });
 
@@ -103,7 +113,9 @@ describe("model catalog URL state", () => {
         animal: "cat",
         heating: "heated",
         query: "Nordic",
-        compareSlugs: ["nordic-quad-winter", "nordic-duo-winter"]
+        compareSlugs: ["nordic-quad-winter", "nordic-duo-winter"],
+        designClasses: ["BUDGET", "REUSE"],
+        season: "WINTER"
       },
       validSlugs
     );
@@ -113,5 +125,7 @@ describe("model catalog URL state", () => {
     expect(params.get("heating")).toBe("heated");
     expect(params.get("q")).toBe("Nordic");
     expect(params.get("compare")).toBe("nordic-quad-winter,nordic-duo-winter");
+    expect(params.get("class")).toBe("REUSE,BUDGET");
+    expect(params.get("season")).toBe("WINTER");
   });
 });

@@ -1,6 +1,7 @@
 import type {AppLocale} from "@/i18n/routing";
 import type {CompiledShelterModel} from "@/lib/compiler";
 import {validationStageLabel} from "@/lib/validation-labels";
+import {modelName} from "@/lib/model-presentation";
 
 function HDimension({
   x1,
@@ -176,7 +177,7 @@ export function TechnicalSketch({
       <div className="technical-sheet-head">
         <div>
           <span className="kicker">{isSr ? "Kompajlirani tehnički crtež" : "Compiled drawing sheet"}</span>
-          <strong>{model.translations[locale].name}</strong>
+          <strong>{modelName(model, locale)}</strong>
         </div>
         <div>
           <span>MODEL</span>

@@ -1,5 +1,7 @@
-import type {CutPart} from "@/lib/compiler";
-import {cutGeometryAreaMm2} from "@/lib/cut-geometry";
+import {cutGeometryAreaMm2, type CutGeometryLike} from "@/lib/cut-geometry";
+
+/** Anything with an id, a quantity and true cut geometry can be nested. */
+export type NestablePart = CutGeometryLike & {id: string; quantity: number};
 
 export type PackedPart = {
   partId: string;
@@ -10,9 +12,9 @@ export type PackedPart = {
   sourceWidthMm: number;
   sourceHeightMm: number;
   rotated: boolean;
-  shape: CutPart["shape"];
+  shape: NestablePart["shape"];
   trapezoidRearHeightMm?: number;
-  cutouts?: CutPart["cutouts"];
+  cutouts?: NestablePart["cutouts"];
   partAreaMm2: number;
 };
 
@@ -72,15 +74,12 @@ function splitFreeRect(free: FreeRect, usedWidth: number, usedHeight: number) {
   return [right, bottom].filter((rect) => rect.width > 0 && rect.height > 0);
 }
 
-export function cutPartAreaMm2(part: Pick<
-  CutPart,
-  "widthMm" | "heightMm" | "shape" | "trapezoidRearHeightMm" | "cutouts"
->) {
+export function cutPartAreaMm2(part: CutGeometryLike) {
   return cutGeometryAreaMm2(part);
 }
 
 function packPayload(
-  item: CutPart & {instanceId: string},
+  item: NestablePart & {instanceId: string},
   x: number,
   y: number,
   rotated: boolean
@@ -102,7 +101,7 @@ function packPayload(
 }
 
 export function packCutParts(
-  cutParts: CutPart[],
+  cutParts: NestablePart[],
   options: {
     sheetWidthMm?: number;
     sheetHeightMm?: number;
@@ -208,4 +207,80 @@ export function packCutParts(
       packingEnvelopeUtilization: envelopeAreaMm2 / stockAreaMm2
     };
   });
+}
+
+export type StockPiece = {id: string; widthMm: number; heightMm: number};
+
+export type OffcutPlacement = {
+  stockId: string;
+  part: PackedPart;
+};
+
+export type OffcutFitResult = {
+  placements: OffcutPlacement[];
+  unplacedPartIds: string[];
+  /** True only when every requested part instance found a place. */
+  allPlaced: boolean;
+};
+
+/**
+ * Deterministic first-fit-decreasing placement of rectangular packing envelopes onto a user's
+ * offcuts (each offcut is its own small stock piece). Same placement rules as sheet nesting:
+ * kerf is added to every part, rotation is allowed. Trapezoids and cutouts use their bounding
+ * rectangle, so the result is conservative: it can say "does not fit" for a piece that a skilled
+ * maker could still cut, but it never claims a fit that the envelope does not allow.
+ */
+export function fitPartsOnOffcuts(
+  parts: NestablePart[],
+  stock: StockPiece[],
+  options: {kerfMm?: number} = {}
+): OffcutFitResult {
+  const kerfMm = options.kerfMm ?? 3;
+  const items = parts
+    .flatMap((part) =>
+      Array.from({length: part.quantity}, (_, copyIndex) => ({
+        ...part,
+        instanceId: `${part.id}-${copyIndex + 1}`
+      }))
+    )
+    .sort((a, b) => b.widthMm * b.heightMm - a.widthMm * a.heightMm || a.instanceId.localeCompare(b.instanceId));
+
+  const pieces = [...stock]
+    .sort((a, b) => a.widthMm * a.heightMm - b.widthMm * b.heightMm || a.id.localeCompare(b.id))
+    .map((piece) => ({piece, free: [{x: 0, y: 0, width: piece.widthMm, height: piece.heightMm}] as FreeRect[]}));
+
+  const placements: OffcutPlacement[] = [];
+  const unplacedPartIds: string[] = [];
+
+  for (const item of items) {
+    let placed = false;
+    // Smallest offcut first keeps large offcuts available for large parts.
+    for (const entry of pieces) {
+      const placement = choosePlacement(entry.free, item.widthMm + kerfMm, item.heightMm + kerfMm, true);
+      if (!placement) continue;
+      const free = entry.free.splice(placement.freeIndex, 1)[0];
+      placements.push({stockId: entry.piece.id, part: packPayload(item, free.x, free.y, placement.rotated)});
+      entry.free.push(...splitFreeRect(free, placement.width, placement.height));
+      placed = true;
+      break;
+    }
+    if (!placed) unplacedPartIds.push(item.instanceId);
+  }
+
+  return {placements, unplacedPartIds, allPlaced: unplacedPartIds.length === 0};
+}
+
+/**
+ * Batch nesting: N identical units share one stock plan instead of N separate plans.
+ * Part ids are prefixed with the unit number so the cutting schedule stays traceable.
+ */
+export function packBatch(
+  parts: NestablePart[],
+  units: number,
+  options: Parameters<typeof packCutParts>[1] = {}
+) {
+  const batched = Array.from({length: units}, (_, unit) =>
+    parts.map((part) => ({...part, id: `u${unit + 1}-${part.id}`}))
+  ).flat();
+  return packCutParts(batched, options);
 }

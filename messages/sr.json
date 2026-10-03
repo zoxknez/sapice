@@ -5,20 +5,26 @@
     "finder": "Pronađi model",
     "materials": "Materijali",
     "guides": "Vodiči",
-    "methodology": "Metodologija"
+    "methodology": "Metodologija",
+    "haveMaterials": "Imam materijal",
+    "budget": "Budžet",
+    "emergency": "Hitno",
+    "retrofit": "Unapredi kućicu",
+    "rescue": "Za udruženja",
+    "reuse": "Ponovna upotreba"
   },
   "Home": {
     "eyebrow": "Otvoreni tehnički planovi za zimu",
     "title": "Toplije i bezbednije kućice za pse i mačke.",
-    "lead": "Odaberite unapred projektovan model i dobijte 3D prikaz, stvarne mere, slojeve konstrukcije, materijale i transparentne proračune.",
-    "primary": "Pronađite model",
+    "lead": "Od hitnog rešenja od kartonske kutije do preciznog inženjerskog modela: izaberite sklonište prema onome što imate, koliko imate i šta vam treba, uz jasno označeno šta je izvor, šta proračun, a šta pretpostavka.",
+    "primary": "Pronađi sklonište",
     "secondary": "Pregledajte modele",
     "catalogTitle": "Referentni modeli",
-    "catalogLead": "Referentni modeli za mačke i pse, od kompaktnih do višekomornih i grejanih varijanti, svi na istom proverljivom inženjerskom sistemu."
+    "catalogLead": "Primeri iz različitih klasa: budžetska kutija u kutiji, OSB kućica za psa i inženjerski model za četiri mačke."
   },
   "Models": {
     "title": "Modeli kućica",
-    "lead": "Filtrirajte gotove konstrukcije po životinji, kapacitetu i načinu grejanja."
+    "lead": "Od hitnih i besplatnih rešenja do inženjerskih modela. Filtrirajte po životinji, sezoni, grejanju i klasi konstrukcije."
   },
   "Finder": {
     "title": "Pronađite odgovarajuću kućicu",

@@ -5,20 +5,26 @@
     "finder": "Find a model",
     "materials": "Materials",
     "guides": "Guides",
-    "methodology": "Methodology"
+    "methodology": "Methodology",
+    "haveMaterials": "Build with what you have",
+    "budget": "Budget builds",
+    "emergency": "Emergency",
+    "retrofit": "Improve a house",
+    "rescue": "Rescue & batches",
+    "reuse": "Reuse & pallets"
   },
   "Home": {
     "eyebrow": "Open winter shelter engineering plans",
     "title": "Warmer, safer shelters for cats and dogs.",
-    "lead": "Choose a pre-designed model and get a 3D view, real dimensions, construction layers, materials and transparent calculations.",
-    "primary": "Find a model",
+    "lead": "From an emergency cardboard box to a precise engineered model: choose a shelter by what you have, what you can spend and what you need, with sources, calculations and assumptions clearly labelled.",
+    "primary": "Find a shelter",
     "secondary": "Browse models",
     "catalogTitle": "Reference models",
-    "catalogLead": "Reference cat and dog models, from compact shelters to multi-chamber and heated variants, all built on the same verifiable engineering system."
+    "catalogLead": "Examples from different classes: a budget tote-in-tote, an OSB dog house and an engineered four-cat model."
   },
   "Models": {
     "title": "Shelter models",
-    "lead": "Filter ready-made constructions by animal, capacity and heating strategy."
+    "lead": "From emergency and free solutions to engineered models. Filter by animal, season, heating and design class."
   },
   "Finder": {
     "title": "Find a suitable shelter",

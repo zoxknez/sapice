@@ -9,8 +9,17 @@ export async function SiteHeader({locale}: {locale: AppLocale}) {
   const links: HeaderNavLink[] = [
     ["/models", t("models")],
     ["/finder", t("finder")],
-    ["/materials", t("materials")],
+    ["/build-with-what-you-have", t("haveMaterials")],
+    ["/budget", t("budget")],
     ["/guides", t("guides")],
+    ["/emergency", t("emergency")]
+  ];
+  const mobileLinks: HeaderNavLink[] = [
+    ...links,
+    ["/retrofit", t("retrofit")],
+    ["/rescue", t("rescue")],
+    ["/reuse", t("reuse")],
+    ["/materials", t("materials")],
     ["/methodology", t("methodology")]
   ];
 
@@ -28,7 +37,7 @@ export async function SiteHeader({locale}: {locale: AppLocale}) {
         <MainNav links={links} label={locale === "sr" ? "Glavna navigacija" : "Main navigation"} />
 
         <MobileNav
-          links={links}
+          links={mobileLinks}
           label={locale === "sr" ? "Mobilna navigacija" : "Mobile navigation"}
           openLabel={locale === "sr" ? "Otvori meni" : "Open menu"}
         />

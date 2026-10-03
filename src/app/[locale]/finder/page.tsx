@@ -5,6 +5,7 @@ import {shelterModels} from "@/data/models";
 import {Finder} from "@/components/finder";
 import {localizedMetadata} from "@/lib/seo";
 import {modelComparisonSummaryMap} from "@/lib/catalog-summary";
+import {catalogEntries} from "@/lib/catalog/entries";
 import {
   defaultFinderUrlState,
   parseFinderUrlState,
@@ -23,8 +24,8 @@ export async function generateMetadata({
     locale,
     titleSr: "Pronađite model",
     titleEn: "Find a model",
-    descriptionSr: "Deterministički izbor modela po životinji, kapacitetu, prostoru, zimskoj klasi i zahtevu za grejanjem.",
-    descriptionEn: "Deterministic model matching by animal, capacity, available space, winter profile and heating requirement.",
+    descriptionSr: "Deterministički izbor skloništa po životinji, kapacitetu, sezoni, lokaciji, alatu, vremenu, budžetu i materijalu koji već imate.",
+    descriptionEn: "Deterministic shelter matching by animal, capacity, season, location, tools, time, budget and the materials you already have.",
     srPath: "/sr/pronadji-model",
     enPath: "/en/find-model"
   });
@@ -43,6 +44,7 @@ export default async function FinderPage({
   setRequestLocale(locale);
   const t = await getTranslations({locale, namespace: "Finder"});
   const comparisonSummaries = modelComparisonSummaryMap(shelterModels);
+  const engineeredThumbnails = Object.fromEntries(shelterModels.map((model) => [model.slug, {model, summary: comparisonSummaries[model.id]}]));
   const initialState = query
     ? parseFinderUrlState(searchParamsRecordToURLSearchParams(query))
     : defaultFinderUrlState;
@@ -54,8 +56,8 @@ export default async function FinderPage({
         <h1>{t("title")}</h1>
         <p className="page-lead">{t("lead")}</p>
         <Finder
-          models={shelterModels}
-          comparisonSummaries={comparisonSummaries}
+          entries={catalogEntries()}
+          engineeredThumbnails={engineeredThumbnails}
           locale={locale}
           initialState={initialState}
         />

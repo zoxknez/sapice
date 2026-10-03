@@ -25,6 +25,9 @@ import {ModelSubnav} from "@/components/model-subnav";
 import {ModelCard} from "@/components/model-card";
 import {Link} from "@/i18n/navigation";
 import {heatingCounterpart, neighbouringModels} from "@/lib/related-models";
+import {getPracticalModel, practicalModels} from "@/data/practical-models";
+import {PracticalModelPage} from "@/components/practical/practical-model-page";
+import {compilePracticalModel} from "@/lib/practical/compiler";
 import {compileShelterModel} from "@/lib/compiler";
 import {thermalMethod} from "@/lib/engineering";
 import {compiledSourceIds} from "@/lib/provenance";
@@ -32,7 +35,7 @@ import {costLinesForCompiled} from "@/lib/costing";
 import {modelComparisonSummaryFromCompiled, modelComparisonSummaryMap} from "@/lib/catalog-summary";
 import {animalSizeClassLabel, climateProfileLabel} from "@/lib/model-labels";
 import {openGraphLocale, siteUrl} from "@/lib/seo";
-import {modelDescription} from "@/lib/model-presentation";
+import {modelDescription, modelName} from "@/lib/model-presentation";
 
 const thermalLimitationCopy = {
   "No validated entrance infiltration model": {
@@ -66,7 +69,7 @@ const thermalLimitationCopy = {
 } satisfies Record<(typeof thermalMethod.limitations)[number], Record<AppLocale, string>>;
 
 export function generateStaticParams() {
-  return shelterModels.map((model) => ({slug: model.slug}));
+  return [...shelterModels, ...practicalModels].map((model) => ({slug: model.slug}));
 }
 
 export async function generateMetadata({
@@ -76,13 +79,25 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const {locale, slug} = await params;
   const model = getShelterModel(slug);
-  if (!model) return {};
-  const copy = model.translations[locale];
+  if (!model) {
+    const practical = getPracticalModel(slug);
+    if (!practical) return {};
+    const copy = practical.translations[locale];
+    const srPracticalPath = `/sr/modeli/${practical.slug}`;
+    const enPracticalPath = `/en/models/${practical.slug}`;
+    return {
+      title: copy.name,
+      description: copy.description,
+      alternates: {canonical: locale === "sr" ? srPracticalPath : enPracticalPath, languages: {"sr-Latn": srPracticalPath, en: enPracticalPath, "x-default": srPracticalPath}},
+      twitter: {card: "summary_large_image", title: `${copy.name} · Šapice`, description: copy.description},
+      openGraph: {type: "article", siteName: "Šapice", url: locale === "sr" ? srPracticalPath : enPracticalPath, title: `${copy.name} · Šapice`, description: copy.description, ...openGraphLocale(locale)}
+    };
+  }
   const srPath = `/sr/modeli/${model.slug}`;
   const enPath = `/en/models/${model.slug}`;
 
   return {
-    title: copy.name,
+    title: modelName(model, locale),
     description: modelDescription(model, locale),
     alternates: {
       canonical: locale === "sr" ? srPath : enPath,
@@ -94,14 +109,14 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: `${copy.name} · Šapice`,
+      title: `${modelName(model, locale)} · Šapice`,
       description: modelDescription(model, locale)
     },
     openGraph: {
       type: "article",
       siteName: "Šapice",
       url: locale === "sr" ? srPath : enPath,
-      title: `${copy.name} · Šapice`,
+      title: `${modelName(model, locale)} · Šapice`,
       description: modelDescription(model, locale),
       ...openGraphLocale(locale)
     }
@@ -113,9 +128,28 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
   const locale: AppLocale = routeLocale === "en" ? "en" : "sr";
   setRequestLocale(locale);
   const model = getShelterModel(slug);
-  if (!model) notFound();
+  if (!model) {
+    const practical = getPracticalModel(slug);
+    if (!practical) notFound();
+    const practicalCompiled = compilePracticalModel(practical);
+    const practicalCopy = practical.translations[locale];
+    return (
+      <>
+        <StructuredData data={{
+          "@context": "https://schema.org",
+          "@type": "HowTo",
+          name: practicalCopy.name,
+          description: practicalCopy.description,
+          url: `${siteUrl}/${locale}/${locale === "sr" ? "modeli" : "models"}/${practical.slug}`,
+          inLanguage: locale === "sr" ? "sr-Latn" : "en",
+          identifier: `sapice:${practical.id}:v${practical.version}:${practicalCompiled.planFingerprint}`,
+          step: practicalCompiled.steps.map((step, index) => ({"@type": "HowToStep", position: index + 1, name: locale === "sr" ? step.titleSr : step.titleEn, text: locale === "sr" ? step.detailSr : step.detailEn}))
+        }} />
+        <PracticalModelPage model={practical} locale={locale} />
+      </>
+    );
+  }
 
-  const copy = model.translations[locale];
   const compiled = compileShelterModel(model);
   const thumbnailSummary = modelComparisonSummaryFromCompiled(compiled);
   const thermal = compiled.thermal;
@@ -152,7 +186,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "HowTo",
-    name: copy.name,
+    name: modelName(model, locale),
     description: modelDescription(model, locale),
     url: modelUrl,
     inLanguage: locale === "sr" ? "sr-Latn" : "en",
@@ -180,7 +214,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
         <div className="shell detail-grid">
           <div className="detail-summary">
             <span className="kicker">{validationStageLabel(model.validationState, locale)}</span>
-            <h1>{copy.name}</h1>
+            <h1>{modelName(model, locale)}</h1>
             <p>{modelDescription(model, locale)}</p>
             <div className="notice model-hero-notice" role="note">
               <p>
@@ -232,7 +266,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
             </div>
             <div className="detail-actions">
               <PrintPlanButton locale={locale} />
-              <SharePlanButton locale={locale} title={copy.name} />
+              <SharePlanButton locale={locale} title={modelName(model, locale)} />
               <PlanExportButtons compiled={compiled} locale={locale} />
             </div>
             {counterpart && (
@@ -250,7 +284,7 @@ export default async function ModelPage({params}: {params: Promise<{locale: AppL
                       ? (isSr ? "Isto kućište, predviđeno za namensko grejanje" : "Same envelope, designed for purpose-built heating")
                       : (isSr ? "Isto kućište, bez aktivnog grejanja" : "Same envelope, without active heating")}
                   </small>
-                  <strong>{counterpart.translations[locale].name}</strong>
+                  <strong>{modelName(counterpart, locale)}</strong>
                 </span>
                 <span aria-hidden="true">→</span>
               </Link>

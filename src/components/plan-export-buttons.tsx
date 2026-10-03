@@ -8,8 +8,7 @@ import {
   hardwareItemName,
   hardwareItemNote,
   linearPartNote,
-  provenanceLabel
-} from "@/lib/model-presentation";
+  provenanceLabel, modelName} from "@/lib/model-presentation";
 
 function csvCell(value: string | number) {
   const text = String(value);
@@ -51,7 +50,7 @@ export function PlanExportButtons({
       divider: "pregrada"
     };
     const rows: Array<Array<string | number>> = [
-      ["Šapice", model.translations[locale].name, `v${model.version}`],
+      ["Šapice", modelName(model, locale), `v${model.version}`],
       [label("ID modela", "Model ID"), model.id],
       [label("Verzija modela", "Model version"), model.version],
       [label("Verzija kompajlera", "Compiler version"), compiled.compilerVersion],

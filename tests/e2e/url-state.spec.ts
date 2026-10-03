@@ -15,7 +15,7 @@ test("Finder restores shared criteria in Serbian and English", async ({page}) =>
       .toHaveValue("heated");
     await expect(finder.getByLabel(route.startsWith("/sr") ? "Zimski profil" : "Winter profile"))
       .toHaveValue("severe");
-    await expect(page.getByText("Alpine Large Heated", {exact: true}))
+    await expect(page.getByText(route.startsWith("/sr") ? "Alpska velika grejana" : "Alpine Large Heated", {exact: true}))
       .toBeVisible();
 
     await page.reload();

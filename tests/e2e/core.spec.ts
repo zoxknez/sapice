@@ -15,7 +15,7 @@ test("SR homepage exposes the real engineering workflow", async ({page}) => {
 test("model page exposes compiled workshop sections", async ({page}) => {
   await page.goto("/sr/modeli/nordic-quad-winter");
 
-  await expect(page.getByRole("heading", {level: 1, name: "Nordic Quad Winter"})).toBeVisible();
+  await expect(page.getByRole("heading", {level: 1, name: "Nordijska Četvorka zimska"})).toBeVisible();
   await expect(page.getByRole("heading", {name: "Transparentna termička procena"})).toBeVisible();
   await expect(page.getByRole("heading", {name: "Raspored na tablama"})).toBeVisible();
   await expect(page.getByRole("heading", {name: "Troškovnik"})).toBeVisible();
@@ -38,9 +38,9 @@ test("large dog request never surfaces small or medium dog models", async ({page
   await page.getByLabel("Životinja").selectOption("dog");
   await page.getByLabel("Veličina psa").selectOption("large");
 
-  await expect(page.getByText("Alpine Large Winter", {exact: true})).toBeVisible();
-  await expect(page.getByText("Alpine Small Winter", {exact: true})).toHaveCount(0);
-  await expect(page.getByText("Alpine Medium Winter", {exact: true})).toHaveCount(0);
+  await expect(page.getByText("Alpska velika zimska", {exact: true})).toBeVisible();
+  await expect(page.getByText("Alpska mala zimska", {exact: true})).toHaveCount(0);
+  await expect(page.getByText("Alpska srednja zimska", {exact: true})).toHaveCount(0);
 });
 
 test("English model route is directly addressable", async ({page}) => {
@@ -85,9 +85,9 @@ test("heated finder coverage exists for every dog size", async ({page}) => {
   await page.getByLabel("Zimski profil").selectOption("severe");
 
   for (const [size, modelName] of [
-    ["small", "Alpine Small Heated"],
-    ["medium", "Alpine Medium Heated"],
-    ["large", "Alpine Large Heated"]
+    ["small", "Alpska mala grejana"],
+    ["medium", "Alpska srednja grejana"],
+    ["large", "Alpska velika grejana"]
   ] as const) {
     await page.getByLabel("Veličina psa").selectOption(size);
     await expect(page.getByText(modelName, {exact: true})).toBeVisible();

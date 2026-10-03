@@ -1,6 +1,6 @@
 # Šapice · Pet Shelter Engineering
 
-Open, bilingual engineering plans for practical winter shelters for cats and dogs.
+Open, bilingual plans for practical shelters for cats and dogs, from free emergency solutions to engineered models.
 
 Šapice is **not** an AI design generator. Public models are versioned, deterministic definitions that compile into dimensions, 3D geometry, technical drawings, material quantities, cut parts, sheet layouts, thermal estimates, framing schedules, cost inputs and build steps.
 
@@ -9,9 +9,10 @@ Open, bilingual engineering plans for practical winter shelters for cats and dog
 The repository currently includes:
 
 - SR / EN routing with localized URLs
-- 16 reference shelter models with passive/heated coverage across all published cat capacity tiers and dog size classes
-- deterministic rule-based finder
-- finder empty-state guidance with single-constraint relaxations (space, capacity, heating, winter profile)
+- 64 canonical models: 16 engineered reference models (compiler v1.8) and 48 practical models (practical compiler P1.0.0)
+- design classes `EMERGENCY` (3), `REUSE` (9), `BUDGET` (29), `STANDARD_DIY` (7), `ENGINEERED` (16), kept separate from the validation ladder
+- per-model calculation coverage (geometry, BOM, cut list, nesting, thermal transmission, cost, drawing, build guide), derived by the compiler and checked against the declared value
+- deterministic Finder 2.0: hard constraints, lexicographic ranking, "why it matches" and compromises per result, single-constraint relaxations including the smallest sufficient footprint
 - side-by-side model comparison
 - persistent comparison tray, heating-counterpart links and deterministic related models
 - parametric WebGL 3D viewer
@@ -37,6 +38,34 @@ The repository currently includes:
 - localized 404 / error states and accessibility baseline
 - Playwright desktop + mobile smoke suite
 - Neon runtime schema for mutable data
+
+## Platform routes
+
+| Route (EN) | Route (SR) | Purpose |
+| :- | :- | :- |
+| `/emergency` | `/hitno` | choose an emergency solution from what is at hand; printable instruction cards; pre-cached offline |
+| `/build-with-what-you-have` | `/napravi-od-onoga-sto-imas` | "My workshop": local inventory, offcut fitting, owned vs to obtain |
+| `/budget` | `/budzet` | budget fit from the user's own prices; missing prices give `UNKNOWN` |
+| `/retrofit` | `/unapredi-kucicu` | ordered improvements for an existing house, no thermal claim |
+| `/rescue` | `/za-udruzenja` | batch planning for rescues: shared sheet nesting, capacity, work days |
+| `/reuse` | `/ponovna-upotreba` | ISPM 15 marks, treated wood, reuse checklist |
+| `/materials` | `/materijali` | material library v2 and substitute calculator (R = d / λ with caveats) |
+| `/plans/[topic]` | `/planovi/[topic]` | 11 topic pages with localized slugs |
+
+Local browser storage keys: `sapice:workshop:v1` (inventory and tools) and `sapice:prices:v1` (price profile). Nothing is sent to a server.
+
+## Practical models
+
+Practical models (`src/data/practical-models.ts`) compile through construction families: `PANEL_BOX`, `TOTE_IN_TOTE`, `FOAM_CONTAINER`, `CRATE`, `EMERGENCY_WRAP`, `PALLET_FRAME`, `SHADE_STRUCTURE`, `RAISED_PLATFORM`, `RETROFIT`. Each compiled plan has an envelope, cut parts, linear parts, nesting, a BOM with a basis per line (`NESTED`, `GEOMETRY`, `ASSUMPTION`), build steps, an inspection schedule and a deterministic fingerprint.
+
+Thermal status per practical model:
+
+- `COMPLETE` (18): every layer has a sourced λ, so a U-value is shown
+- `INCOMPLETE` (14): some layers are unknown; only the resistance of known layers is shown, no U-value
+- `UNAVAILABLE` (6): no controlled insulation layer, for example emergency wraps
+- `NOT_APPLICABLE` (10): open structures without an enclosed space
+
+The material library (`src/data/material-library.ts`) has 40 materials: 11 with a sourced λ, 9 with an unknown λ and 20 where thermal behaviour is not modelled. Sources and their limits are listed in [docs/SOURCE_CLAIM_MATRIX.md](docs/SOURCE_CLAIM_MATRIX.md).
 
 ## Validation language
 

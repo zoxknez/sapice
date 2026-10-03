@@ -18,7 +18,7 @@ test("mobile model detail leads with identity, validation and safety context", a
   expect(summary!.y).toBeLessThan(viewer!.y);
   expect(notice!.y).toBeLessThan(metrics!.y);
   expect(notice!.y).toBeLessThan(actions!.y);
-  await expect(page.getByRole("heading", {level: 1, name: "Nordic Quad Winter"})).toBeVisible();
+  await expect(page.getByRole("heading", {level: 1, name: "Nordijska Četvorka zimska"})).toBeVisible();
 });
 
 test("3D viewer loads only after the user requests it", async ({page}) => {

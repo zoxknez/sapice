@@ -2,7 +2,7 @@
 
 ## Project mission
 
-Šapice is a deterministic SR/EN web application for predefined winter shelter plans for cats and dogs.
+Šapice is a deterministic SR/EN platform for predefined shelter plans for cats and dogs, from free emergency solutions to engineered models.
 
 It is **not** an AI design generator. Do not add runtime LLM/AI generation, free-form shelter generation or opaque recommendation logic.
 
@@ -21,6 +21,14 @@ It is **not** an AI design generator. Do not add runtime LLM/AI generation, free
 11. Do not invent current material prices. User prices or sourced dated market prices only.
 12. SR and EN routes/content must remain functionally equivalent.
 13. Accessibility, offline behavior and print/PDF output are part of the product, not optional polish.
+14. Design class (`EMERGENCY`, `REUSE`, `BUDGET`, `STANDARD_DIY`, `ENGINEERED`) describes what kind of construction a model is. It is never a validation state and never implies one.
+15. Practical models live in `src/data/practical-models.ts` and compile through `src/lib/practical/compiler.ts` (P1.x). Declared `coverage` must equal the compiler's `derivedCoverage`; a unit test enforces it.
+16. A material with an unknown λ makes the thermal result `INCOMPLETE` or `UNAVAILABLE`. Never fill an unknown λ with a guess, and never show a U-value unless every layer has a sourced λ.
+17. `UNKNOWN` is a valid result for prices, thermal values and budget fit. Missing data must stay visible as missing.
+18. Emergency models are temporary. They must say so, they are excluded from long-term finder results unless the user asks for emergency options, and they never get a thermal calculation.
+19. Material substitution uses R = d / λ only between materials with sourced λ, always with caveats; animal-facing and fibrous-material rules can forbid a substitute regardless of R.
+20. Every external claim must be listed in `docs/SOURCE_CLAIM_MATRIX.md` with its source ID, scope and limitations.
+21. Reused material is accepted only through the reuse checklist; the checklist is user guidance, not a certificate.
 
 ## Validation ladder
 
@@ -47,6 +55,14 @@ When editing a model:
 7. validate roof runoff, ventilation provision and heating provision invariants
 8. run typecheck, lint, unit tests, production build and E2E smoke tests
 9. only then consider validation-state changes
+
+When editing a practical model:
+
+1. update `src/data/practical-models.ts` (and `src/data/material-library.ts` for new materials, with source IDs)
+2. run the practical compiler tests: coverage equality, zero invariant violations, deterministic fingerprints, stock fit
+3. check the catalog, finder, workshop, budget and rescue pages that consume `catalogEntries()`
+4. update `docs/SOURCE_CLAIM_MATRIX.md` if a new claim or source is introduced
+5. run the full release gate
 
 ## Current release blockers
 

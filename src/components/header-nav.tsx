@@ -3,7 +3,18 @@
 import {useEffect, useRef} from "react";
 import {Link, usePathname} from "@/i18n/navigation";
 
-export type HeaderNavHref = "/models" | "/finder" | "/materials" | "/guides" | "/methodology";
+export type HeaderNavHref =
+  | "/models"
+  | "/finder"
+  | "/build-with-what-you-have"
+  | "/budget"
+  | "/emergency"
+  | "/guides"
+  | "/materials"
+  | "/retrofit"
+  | "/rescue"
+  | "/reuse"
+  | "/methodology";
 export type HeaderNavLink = readonly [HeaderNavHref, string];
 
 function isActive(pathname: string, href: HeaderNavHref) {
@@ -15,7 +26,12 @@ function NavLinks({links}: {links: readonly HeaderNavLink[]}) {
   return links.map(([href, label]) => {
     const active = isActive(pathname, href);
     return (
-      <Link key={href} href={href} aria-current={active ? "page" : undefined} className={active ? "active" : undefined}>
+      <Link
+        key={href}
+        href={href}
+        aria-current={active ? "page" : undefined}
+        className={[active ? "active" : "", href === "/emergency" ? "nav-emergency" : ""].filter(Boolean).join(" ") || undefined}
+      >
         {label}
       </Link>
     );

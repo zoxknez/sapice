@@ -1,6 +1,7 @@
 import type {ShelterModel} from "@/lib/domain";
 import type {AppLocale} from "@/i18n/routing";
 import type {ModelComparisonSummary} from "@/lib/catalog-summary";
+import {modelName} from "@/lib/model-presentation";
 
 type Point = [number, number];
 
@@ -61,8 +62,8 @@ export function ModelThumbnail({model, locale, summary}: {
   return (
     <svg className="model-thumbnail" viewBox="0 0 320 210" role="img"
       aria-label={locale === "sr"
-        ? `${model.translations.sr.name}: ${width} × ${depth} mm, ${entranceCount} ${entranceCount === 1 ? "ulaz" : "ulaza"}${model.heated ? ", predviđeno grejanje" : ""}`
-        : `${model.translations.en.name}: ${width} × ${depth} mm, ${entranceCount} ${entranceCount === 1 ? "entrance" : "entrances"}${model.heated ? ", heating provision" : ""}`}
+        ? `${modelName(model, "sr")}: ${width} × ${depth} mm, ${entranceCount} ${entranceCount === 1 ? "ulaz" : "ulaza"}${model.heated ? ", predviđeno grejanje" : ""}`
+        : `${modelName(model, "en")}: ${width} × ${depth} mm, ${entranceCount} ${entranceCount === 1 ? "entrance" : "entrances"}${model.heated ? ", heating provision" : ""}`}
     >
       <defs>
         <linearGradient id={`front-${id}`} x1="0" y1="0" x2="1" y2="1">

@@ -19,4 +19,15 @@ describe("locale route switching", () => {
     expect(switchLocalePath("/en/models/alpine-large-heated", "en", "sr"))
       .toBe("/sr/modeli/alpine-large-heated");
   });
+
+  it("switches the new platform routes", () => {
+    expect(switchLocalePath("/sr/hitno", "sr", "en")).toBe("/en/emergency");
+    expect(switchLocalePath("/en/build-with-what-you-have", "en", "sr")).toBe("/sr/napravi-od-onoga-sto-imas");
+    expect(switchLocalePath("/sr/za-udruzenja", "sr", "en")).toBe("/en/rescue");
+  });
+
+  it("translates localized topic slugs", () => {
+    expect(switchLocalePath("/sr/planovi/jeftina-kucica-za-macke", "sr", "en")).toBe("/en/plans/cheap-cat-shelter");
+    expect(switchLocalePath("/en/plans/pallet-dog-house", "en", "sr")).toBe("/sr/planovi/kucica-za-psa-od-paleta");
+  });
 });

@@ -4,9 +4,9 @@ test("finder explains an empty result with one-step relaxations", async ({page})
   await page.goto("/sr/pronadji-model?heating=passive&climate=severe");
 
   await expect(page.getByRole("heading", {name: "Trenutno nema modela koji prolazi sve uslove."})).toBeVisible();
-  await page.getByRole("button", {name: /Uključi i modele predviđene za grejanje/}).click();
+  await page.getByRole("button", {name: /Dozvoli i grejane i pasivne modele/}).click();
 
-  await expect(page.getByText("Nordic Solo Heated", {exact: true})).toBeVisible();
+  await expect(page.getByText("Nordijska Solo grejana", {exact: true})).toBeVisible();
   await expect.poll(() => new URL(page.url()).searchParams.has("heating")).toBe(false);
 });
 
@@ -15,7 +15,8 @@ test("finder suggests the smallest sufficient footprint in English", async ({pag
 
   await page.getByRole("button", {name: /Allow 1150 × 1350 mm of space/}).click();
   await expect(page.getByText("Alpine Large Winter", {exact: true})).toBeVisible();
-  await expect(page.getByText("Dog size class: large").first()).toBeVisible();
+  await expect.poll(() => new URL(page.url()).searchParams.get("width")).toBe("1150");
+  await expect.poll(() => new URL(page.url()).searchParams.get("depth")).toBe("1350");
 });
 
 test("catalog comparison tray tracks the selection", async ({page}) => {
@@ -29,7 +30,7 @@ test("catalog comparison tray tracks the selection", async ({page}) => {
   await page.getByRole("button", {name: "Uporedi"}).nth(0).click();
   await expect(tray.getByRole("button", {name: "Prikaži tabelu"})).toBeVisible();
 
-  await tray.getByRole("button", {name: "Ukloni Nordic Solo Winter iz izbora"}).click();
+  await tray.getByRole("button", {name: "Ukloni Nordijska Solo zimska iz izbora"}).click();
   await expect.poll(() => new URL(page.url()).searchParams.get("compare")).toBe("nordic-duo-winter");
 });
 
@@ -39,7 +40,7 @@ test("model page links the heating counterpart and related models", async ({page
   await expect(page.getByRole("heading", {name: "Slični modeli"})).toBeAttached();
   await page.locator(".variant-callout").click();
   await expect(page).toHaveURL(/\/sr\/modeli\/nordic-quad-heated$/);
-  await expect(page.getByRole("heading", {level: 1, name: "Nordic Quad Heated"})).toBeVisible();
+  await expect(page.getByRole("heading", {level: 1, name: "Nordijska Četvorka grejana"})).toBeVisible();
 });
 
 test("header marks the current section", async ({page}) => {

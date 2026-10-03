@@ -7,6 +7,7 @@ import {ContactShadows, OrbitControls} from "@react-three/drei";
 import type {ShelterModel} from "@/lib/domain";
 import type {AppLocale} from "@/i18n/routing";
 import type {CompiledShelterModel} from "@/lib/compiler";
+import {modelName} from "@/lib/model-presentation";
 
 type ViewMode = "assembled" | "roof-off" | "exploded" | "frame";
 type CameraPreset = "isometric" | "front" | "rear" | "left" | "right" | "top" | "custom";
@@ -743,7 +744,7 @@ export function ShelterViewer({
   };
 
   return (
-    <div className="viewer" role="group" aria-label={`${locale === "sr" ? "3D prikaz" : "3D preview"}: ${model.translations[locale].name}`}>
+    <div className="viewer" role="group" aria-label={`${locale === "sr" ? "3D prikaz" : "3D preview"}: ${modelName(model, locale)}`}>
       <Canvas camera={{position: cameraPosition, fov: 35}} dpr={[1, 1.75]} shadows aria-hidden="true">
         <color attach="background" args={["#e9e4d9"]} />
         <hemisphereLight args={["#fff8eb", "#a49b8e", 2]} />

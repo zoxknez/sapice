@@ -9,6 +9,8 @@ import {Link} from "@/i18n/navigation";
 import {openGraphLocale, siteUrl, socialImage} from "@/lib/seo";
 import {Analytics} from "@vercel/analytics/next";
 import "../globals.css";
+import "../platform.css";
+import "../platform-pages.css";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -111,11 +113,20 @@ export default async function LocaleLayout({
                   <span>{locale === "sr" ? "Planovi" : "Plans"}</span>
                   <Link href="/models" locale={locale as AppLocale}>{locale === "sr" ? "Modeli" : "Models"}</Link>
                   <Link href="/finder" locale={locale as AppLocale}>{locale === "sr" ? "Pronađi model" : "Find a model"}</Link>
-                  <Link href="/materials" locale={locale as AppLocale}>{locale === "sr" ? "Materijali" : "Materials"}</Link>
+                  <Link href="/emergency" locale={locale as AppLocale}>{locale === "sr" ? "Hitno sklonište" : "Emergency shelter"}</Link>
+                  <Link href="/build-with-what-you-have" locale={locale as AppLocale}>{locale === "sr" ? "Imam materijal" : "Build with what you have"}</Link>
+                  <Link href="/budget" locale={locale as AppLocale}>{locale === "sr" ? "Budžet" : "Budget builds"}</Link>
+                </div>
+                <div>
+                  <span>{locale === "sr" ? "Alati" : "Tools"}</span>
+                  <Link href="/retrofit" locale={locale as AppLocale}>{locale === "sr" ? "Unapredi kućicu" : "Improve a house"}</Link>
+                  <Link href="/rescue" locale={locale as AppLocale}>{locale === "sr" ? "Za udruženja" : "Rescue & batches"}</Link>
+                  <Link href="/reuse" locale={locale as AppLocale}>{locale === "sr" ? "Ponovna upotreba" : "Reuse & pallets"}</Link>
                 </div>
                 <div>
                   <span>{locale === "sr" ? "Znanje" : "Knowledge"}</span>
                   <Link href="/guides" locale={locale as AppLocale}>{locale === "sr" ? "Vodiči" : "Guides"}</Link>
+                  <Link href="/materials" locale={locale as AppLocale}>{locale === "sr" ? "Materijali" : "Materials"}</Link>
                   <Link href="/methodology" locale={locale as AppLocale}>{locale === "sr" ? "Metodologija" : "Methodology"}</Link>
                   <a href="https://github.com/zoxknez/sapice" target="_blank" rel="noreferrer">GitHub</a>
                 </div>

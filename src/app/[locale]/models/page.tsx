@@ -5,6 +5,7 @@ import {shelterModels} from "@/data/models";
 import {ModelCatalog} from "@/components/model-catalog";
 import {localizedMetadata} from "@/lib/seo";
 import {modelComparisonSummaryMap} from "@/lib/catalog-summary";
+import {catalogEntries} from "@/lib/catalog/entries";
 import {
   defaultCatalogUrlState,
   parseCatalogUrlState,
@@ -23,8 +24,8 @@ export async function generateMetadata({
     locale,
     titleSr: "Modeli kućica",
     titleEn: "Shelter models",
-    descriptionSr: "Pregled unapred definisanih modela zimskih kućica za mačke i pse sa merama, materijalima i validacionim statusom.",
-    descriptionEn: "Browse predefined winter shelter models for cats and dogs with dimensions, materials and validation status.",
+    descriptionSr: "Hitna, budžetska, ponovno iskorišćena, standardna i inženjerska skloništa za mačke i pse, sa merama, materijalima, klasom konstrukcije i statusom provere.",
+    descriptionEn: "Emergency, budget, reuse, DIY and engineered shelters for cats and dogs, with dimensions, materials, design class and validation status.",
     srPath: "/sr/modeli",
     enPath: "/en/models"
   });
@@ -43,10 +44,14 @@ export default async function ModelsPage({
   setRequestLocale(locale);
   const t = await getTranslations({locale, namespace: "Models"});
   const comparisonSummaries = modelComparisonSummaryMap(shelterModels);
+  const entries = catalogEntries();
+  const engineeredThumbnails = Object.fromEntries(
+    shelterModels.map((model) => [model.slug, {model, summary: comparisonSummaries[model.id]}])
+  );
   const initialState = query
     ? parseCatalogUrlState(
         searchParamsRecordToURLSearchParams(query),
-        shelterModels.map((model) => model.slug)
+        entries.map((entry) => entry.slug)
       )
     : defaultCatalogUrlState;
 
@@ -57,8 +62,8 @@ export default async function ModelsPage({
         <h1>{t("title")}</h1>
         <p className="page-lead">{t("lead")}</p>
         <ModelCatalog
-          models={shelterModels}
-          comparisonSummaries={comparisonSummaries}
+          entries={entries}
+          engineeredThumbnails={engineeredThumbnails}
           locale={locale}
           initialState={initialState}
         />

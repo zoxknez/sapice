@@ -17,11 +17,23 @@ const pages = [
   ["large multichamber model", "/sr/modeli/rescue-modular-eight"],
   ["methodology", "/sr/metodologija"],
   ["model sources", "/sr/modeli/nordic-quad-winter#sources"],
-  ["offline page", "/sr/offline"]
+  ["offline page", "/sr/offline"],
+  ["emergency", "/sr/hitno"],
+  ["build with what you have", "/sr/napravi-od-onoga-sto-imas"],
+  ["budget", "/sr/budzet"],
+  ["retrofit", "/sr/unapredi-kucicu"],
+  ["rescue batch", "/sr/za-udruzenja"],
+  ["reuse", "/sr/ponovna-upotreba"],
+  ["materials", "/sr/materijali"],
+  ["guides", "/sr/vodici"],
+  ["topic page", "/sr/planovi/jeftina-kucica-za-macke"],
+  ["practical model", "/sr/modeli/tote-eps-lined"],
+  ["English emergency", "/en/emergency"]
 ] as const;
 const notFoundPath = "/sr/modeli/nonexistent-model";
 
 test("core routes fit the requested responsive widths", async ({page}, testInfo) => {
+  test.setTimeout(300_000);
   test.skip(testInfo.project.name !== "chromium", "Uses exact CSS viewport sizes.");
   const runtimeErrors: string[] = [];
   let currentPage = "initial";
