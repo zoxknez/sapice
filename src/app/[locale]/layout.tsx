@@ -135,7 +135,8 @@ export default async function LocaleLayout({
             </div>
           </footer>
         </NextIntlClientProvider>
-        <Analytics />
+        {/* The insights script is served only on Vercel; elsewhere it would 404 and log console errors. */}
+        {process.env.VERCEL === "1" && <Analytics />}
       </body>
     </html>
   );
